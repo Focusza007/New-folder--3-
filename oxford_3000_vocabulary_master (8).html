@@ -1,0 +1,2663 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Oxford 3000 Vocabulary Master</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Prompt for Thai typography -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <!-- FontAwesome for Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      body {
+        font-family: "Prompt", sans-serif;
+        background-color: #f8fafc;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      /* 3D Flip Card CSS */
+      .flip-card {
+        background-color: transparent;
+        width: 100%;
+        min-height: 420px;
+        perspective: 1000px;
+        cursor: pointer;
+      }
+
+      .flip-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        min-height: 420px;
+        text-align: center;
+        transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+        transform-style: preserve-3d;
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      }
+
+      .flip-card.flipped .flip-card-inner {
+        transform: rotateY(180deg);
+      }
+
+      .flip-card-front,
+      .flip-card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        border-radius: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        padding: 2rem;
+        overflow: hidden;
+      }
+
+      .flip-card-front {
+        background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+        color: white;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .flip-card-back {
+        background-color: white;
+        color: #1e293b;
+        transform: rotateY(180deg);
+        border: 2px solid #e2e8f0;
+        text-align: left;
+        justify-content: space-between;
+      }
+
+      /* Keyframe Animations */
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        20%,
+        60% {
+          transform: translateX(-6px);
+        }
+        40%,
+        80% {
+          transform: translateX(6px);
+        }
+      }
+      .shake-animation {
+        animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+      }
+
+      @keyframes pop {
+        0% {
+          transform: scale(0.95);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      .pop-in {
+        animation: pop 0.3s ease-out forwards;
+      }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+  <body class="antialiased min-h-screen flex flex-col text-slate-800">
+    <!-- Custom Notification Modal -->
+    <div
+      id="custom-modal"
+      class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4 transition-opacity"
+    >
+      <div
+        class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl transform transition-transform"
+        id="modal-content"
+      >
+        <div
+          class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4 mx-auto"
+          id="modal-icon-container"
+        >
+          <i
+            class="fa-solid fa-lightbulb text-2xl text-blue-600"
+            id="modal-icon"
+          ></i>
+        </div>
+        <h3
+          class="text-xl font-extrabold text-slate-800 mb-2 text-center"
+          id="modal-title"
+        >
+          แจ้งเตือน
+        </h3>
+        <p
+          class="text-slate-600 text-sm mb-6 text-center leading-relaxed"
+          id="modal-message"
+        >
+          ข้อความแจ้งเตือน
+        </p>
+        <button
+          id="modal-btn"
+          class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 active:scale-95 transition-all shadow-md"
+        >
+          ตกลง
+        </button>
+      </div>
+    </div>
+
+    <!-- Chapter Selection Modal -->
+    <div
+      id="chapter-modal"
+      class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 transition-opacity"
+    >
+      <div
+        class="bg-white rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl max-h-[85vh] flex flex-col"
+      >
+        <div
+          class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100"
+        >
+          <div>
+            <h3 class="text-xl font-extrabold text-slate-800">
+              <i class="fa-solid fa-book-bookmark text-blue-600 mr-2"></i
+              >เลือกบทเรียน (Chapters)
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">
+              แบ่งเป็นโซนตามระดับ CEFR เรียงจากง่ายไปยาก บทละไม่เกิน 20 คำ
+              สามารถเลือกสลับบทเรียนได้ตามต้องการ • คำจากไฟล์ JSON
+              จะกระจายเข้าโซนตามระดับ CEFR ของแต่ละคำ
+              <a
+                href="#"
+                onclick="
+                  downloadSampleJSON();
+                  return false;
+                "
+                class="text-blue-600 underline"
+                >ดาวน์โหลดตัวอย่าง</a
+              >
+            </p>
+          </div>
+          <button
+            onclick="document.getElementById('json-import-input').click()"
+            class="mr-2 px-3 h-9 rounded-full bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 flex items-center gap-1.5 whitespace-nowrap"
+          >
+            <i class="fa-solid fa-file-import"></i> นำเข้า JSON
+          </button>
+          <button
+            onclick="closeChapterModal()"
+            class="w-9 h-9 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition-colors"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div
+          class="overflow-y-auto flex-grow pr-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 py-2"
+          id="chapter-grid-container"
+        >
+          <!-- Dynamically generated chapter buttons -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Header & Navigation -->
+    <header
+      class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-slate-200"
+    >
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+          class="flex flex-col sm:flex-row justify-between items-center py-3 gap-3"
+        >
+          <!-- Logo Area -->
+          <div
+            class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-start"
+          >
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-md flex items-center justify-center text-white font-extrabold text-xl"
+              >
+                O3k
+              </div>
+              <div>
+                <h1
+                  class="text-lg font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 leading-tight"
+                >
+                  Oxford 3000
+                </h1>
+                <p
+                  class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider"
+                >
+                  Vocabulary Master & Quiz
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Nav Tabs -->
+          <nav
+            class="flex space-x-1 bg-slate-100 p-1.5 rounded-2xl w-full sm:w-auto overflow-x-auto justify-center"
+          >
+            <button
+              onclick="switchMode('dashboard')"
+              id="tab-dashboard"
+              class="tab-btn flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap bg-white text-blue-600 shadow-sm"
+            >
+              <i class="fa-solid fa-house mr-1.5"></i>หน้าแรก
+            </button>
+            <button
+              onclick="switchMode('flashcards')"
+              id="tab-flashcards"
+              class="tab-btn flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-500 hover:text-blue-600 transition-all whitespace-nowrap"
+            >
+              <i class="fa-solid fa-layer-group mr-1.5"></i>เรียนรู้ (Cards)
+            </button>
+            <button
+              onclick="switchMode('quiz')"
+              id="tab-quiz"
+              class="tab-btn flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-500 hover:text-blue-600 transition-all whitespace-nowrap"
+            >
+              <i class="fa-solid fa-gamepad mr-1.5"></i>ทำควิซ (Quiz)
+            </button>
+            <button
+              onclick="switchMode('list')"
+              id="tab-list"
+              class="tab-btn flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-500 hover:text-blue-600 transition-all whitespace-nowrap"
+            >
+              <i class="fa-solid fa-book mr-1.5"></i>คลังศัพท์
+            </button>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main
+      class="flex-grow w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20"
+    >
+      <!-- ==================== DASHBOARD MODE ==================== -->
+      <section
+        id="mode-dashboard"
+        class="mode-section flex flex-col items-center max-w-2xl mx-auto w-full pop-in"
+      >
+        <!-- Chapter Banner -->
+        <div
+          class="w-full bg-white rounded-3xl p-6 border border-slate-200 shadow-sm mb-6"
+        >
+          <div
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4"
+          >
+            <div>
+              <div class="flex items-center space-x-2 mb-1">
+                <span
+                  class="text-[10px] font-extrabold uppercase tracking-wider bg-blue-100 text-blue-700 px-3 py-1 rounded-full"
+                  >ความคืบหน้าบทเรียนปัจจุบัน</span
+                >
+                <span
+                  class="text-[10px] text-slate-500 font-bold bg-slate-100 px-2.5 py-0.5 rounded-full"
+                  id="total-chapters-badge"
+                  >สำเร็จแล้ว 0 / 10 บท</span
+                >
+              </div>
+              <h3
+                class="text-xl font-extrabold text-slate-800"
+                id="current-chapter-title"
+              >
+                บทที่ 1 (คำที่ 1 - 20)
+              </h3>
+              <p class="text-xs text-slate-500 mt-1" id="current-chapter-desc">
+                กำลังเรียนรู้คำศัพท์ในบทนี้
+              </p>
+            </div>
+            <div class="flex gap-2 w-full sm:w-auto">
+              <button
+                onclick="startChapterSession(userProgress.currentChapter)"
+                class="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-2xl text-xs transition-all shadow-md active:scale-95 flex items-center justify-center"
+              >
+                <i class="fa-solid fa-play mr-2"></i> ท่องศัพท์บทนี้
+              </button>
+              <button
+                onclick="startChapterQuiz(userProgress.currentChapter)"
+                class="flex-1 sm:flex-none bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-5 rounded-2xl text-xs transition-all shadow-md active:scale-95 flex items-center justify-center"
+              >
+                <i class="fa-solid fa-gamepad mr-2"></i> ควิซบทนี้
+              </button>
+              <input
+                type="file"
+                id="json-import-input"
+                accept=".json,application/json"
+                class="hidden"
+                onchange="handleJSONImport(event)"
+              />
+              <button
+                onclick="openChapterModal()"
+                class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-4 rounded-2xl text-xs transition-all active:scale-95 flex items-center justify-center"
+              >
+                <i class="fa-solid fa-list-ul mr-1.5"></i> เปลี่ยนบท
+              </button>
+            </div>
+          </div>
+          <!-- Progress Bar -->
+          <div
+            class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden flex"
+          >
+            <div
+              id="current-chapter-progress-bar"
+              class="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full w-0 transition-all duration-500"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Daily SRS Target Banner -->
+        <div
+          class="w-full bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-blue-200 mb-6 relative overflow-hidden"
+        >
+          <div
+            class="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"
+          ></div>
+          <div
+            class="absolute -bottom-10 -left-10 w-40 h-40 bg-black/10 rounded-full blur-2xl"
+          ></div>
+
+          <div class="relative z-10">
+            <div class="flex justify-between items-start mb-2">
+              <h2 class="text-2xl sm:text-3xl font-bold">
+                เป้าหมายทบทวนประจำวัน 🚀
+              </h2>
+            </div>
+            <p class="text-blue-100 text-sm mb-6 leading-relaxed">
+              ระบบผสมคำศัพท์ใหม่และคำศัพท์เก่าที่ถึงเวลาต้องทวนตามหลัก Spaced
+              Repetition (SRS) เพื่อย้ายความจำเข้าสู่ Long-term Memory
+            </p>
+
+            <div class="grid grid-cols-2 gap-4 mb-6">
+              <div
+                class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20"
+              >
+                <p
+                  class="text-[11px] uppercase tracking-wider text-blue-100 font-bold mb-1 flex items-center"
+                >
+                  <i class="fa-solid fa-sparkles mr-1.5 text-yellow-300"></i
+                  >คำศัพท์ใหม่วันนี้
+                </p>
+                <p class="text-3xl font-extrabold" id="dash-new-count">0</p>
+              </div>
+              <div
+                class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20"
+              >
+                <p
+                  class="text-[11px] uppercase tracking-wider text-blue-100 font-bold mb-1 flex items-center"
+                >
+                  <i class="fa-solid fa-rotate-left mr-1.5 text-red-300"></i
+                  >คำที่ต้องทบทวน
+                </p>
+                <p
+                  class="text-3xl font-extrabold text-amber-300"
+                  id="dash-review-count"
+                >
+                  0
+                </p>
+              </div>
+            </div>
+
+            <button
+              onclick="startDailySession()"
+              class="w-full bg-white text-blue-700 hover:bg-blue-50 font-extrabold py-4 px-6 rounded-2xl transition-all active:scale-95 shadow-lg text-base flex justify-center items-center"
+            >
+              <i class="fa-solid fa-play mr-2"></i> เริ่มฝึกคำศัพท์วันนี้
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="w-full mb-4">
+          <h3
+            class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 px-1"
+          >
+            ภาพรวมความก้าวหน้าทั้งหมด (คลิกเพื่อดูรายการ)
+          </h3>
+          <div class="grid grid-cols-3 gap-3">
+            <div
+              onclick="goToFilteredList('mastered')"
+              class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm text-center cursor-pointer hover:bg-green-50 hover:border-green-300 transition-all active:scale-95"
+            >
+              <div
+                class="w-10 h-10 mx-auto bg-green-100 rounded-full flex items-center justify-center text-green-600 mb-2"
+              >
+                <i class="fa-solid fa-check-double"></i>
+              </div>
+              <p
+                class="text-xl sm:text-2xl font-bold text-slate-800"
+                id="stat-mastered"
+              >
+                0
+              </p>
+              <p
+                class="text-[10px] sm:text-xs text-slate-500 font-bold uppercase mt-1"
+              >
+                จำได้แม่นยำ
+              </p>
+            </div>
+            <div
+              onclick="goToFilteredList('learning')"
+              class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm text-center cursor-pointer hover:bg-yellow-50 hover:border-yellow-300 transition-all active:scale-95"
+            >
+              <div
+                class="w-10 h-10 mx-auto bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 mb-2"
+              >
+                <i class="fa-solid fa-brain"></i>
+              </div>
+              <p
+                class="text-xl sm:text-2xl font-bold text-slate-800"
+                id="stat-learning"
+              >
+                0
+              </p>
+              <p
+                class="text-[10px] sm:text-xs text-slate-500 font-bold uppercase mt-1"
+              >
+                กำลังเรียนรู้
+              </p>
+            </div>
+            <div
+              onclick="goToFilteredList('new')"
+              class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm text-center cursor-pointer hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95"
+            >
+              <div
+                class="w-10 h-10 mx-auto bg-slate-100 rounded-full flex items-center justify-center text-slate-500 mb-2"
+              >
+                <i class="fa-solid fa-box-open"></i>
+              </div>
+              <p
+                class="text-xl sm:text-2xl font-bold text-slate-800"
+                id="stat-remaining"
+              >
+                0
+              </p>
+              <p
+                class="text-[10px] sm:text-xs text-slate-500 font-bold uppercase mt-1"
+              >
+                ยังไม่ได้เริ่ม
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== FLASHCARDS MODE ==================== -->
+      <section
+        id="mode-flashcards"
+        class="mode-section hidden flex flex-col items-center max-w-md mx-auto w-full"
+      >
+        <!-- Empty State when session finishes -->
+        <div
+          id="fc-empty-state"
+          class="hidden w-full text-center py-16 bg-white rounded-3xl border border-slate-200 shadow-sm p-6"
+        >
+          <div
+            class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <i class="fa-solid fa-trophy text-4xl text-amber-500"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-800 mb-2">
+            ยอดเยี่ยมมาก! คุณเรียนจบเซ็ตนี้แล้ว
+          </h3>
+          <p class="text-sm text-slate-500 mb-6">
+            กลับไปหน้าแรกเพื่อดูพัฒนาการ หรือเริ่มบททดสอบประเมินผล
+          </p>
+          <button
+            onclick="switchMode('dashboard')"
+            class="bg-blue-600 text-white px-6 py-3.5 rounded-2xl font-bold hover:bg-blue-700 active:scale-95 transition-all shadow-md"
+          >
+            กลับหน้าหลัก
+          </button>
+        </div>
+
+        <!-- Active Flashcard Area -->
+        <div id="fc-active-area" class="w-full">
+          <!-- Session Progress Bar -->
+          <div class="flex justify-between items-center mb-2 px-1">
+            <span
+              class="text-xs font-bold text-slate-500"
+              id="session-progress-text"
+              >คำที่ 1 / 20</span
+            >
+            <span
+              class="text-[10px] px-2 py-1 rounded-md font-bold transition-colors"
+              id="fc-status-badge"
+              >สถานะ</span
+            >
+          </div>
+          <div
+            class="w-full bg-slate-200 h-2 rounded-full overflow-hidden mb-5"
+          >
+            <div
+              id="session-progress-bar"
+              class="h-full bg-blue-600 w-0 transition-all duration-300"
+            ></div>
+          </div>
+
+          <!-- 3D Card Container -->
+          <div
+            class="flip-card w-full mb-6"
+            id="fc-container"
+            onclick="toggleFlip()"
+          >
+            <div class="flip-card-inner">
+              <!-- Front of Card -->
+              <div class="flip-card-front shadow-lg">
+                <span
+                  class="absolute top-4 right-4 text-[10px] uppercase font-bold tracking-wider bg-white/20 px-3 py-1 rounded-full text-white/90 backdrop-blur-sm"
+                >
+                  <i class="fa-solid fa-hand-pointer mr-1"></i>แตะเพื่อเปิดคำแปล
+                </span>
+
+                <div class="flex items-center justify-center gap-2 mb-2">
+                  <h3
+                    class="text-4xl sm:text-5xl font-extrabold tracking-tight text-center break-words"
+                    id="fc-word"
+                  >
+                    word
+                  </h3>
+                  <button
+                    onclick="speakWord(event)"
+                    class="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white transition-all ml-1"
+                  >
+                    <i class="fa-solid fa-volume-high text-lg"></i>
+                  </button>
+                </div>
+
+                <p
+                  class="text-blue-100 text-lg font-medium tracking-wide"
+                  id="fc-pronunciation-front"
+                ></p>
+                <span
+                  class="mt-4 text-xs font-bold bg-white/20 px-3 py-1 rounded-full"
+                  id="fc-cefr-front"
+                  >CEFR B1</span
+                >
+              </div>
+
+              <!-- Back of Card -->
+              <div class="flip-card-back shadow-lg">
+                <div class="flex-grow flex flex-col h-full">
+                  <!-- Top: Meaning & Pronunciation -->
+                  <div class="mb-3 flex justify-between items-start">
+                    <div>
+                      <h3
+                        class="text-2xl font-bold text-blue-700 mb-1"
+                        id="fc-meaning"
+                      >
+                        ความหมาย
+                      </h3>
+                      <span
+                        class="text-sm text-slate-500 font-semibold"
+                        id="fc-pronunciation-back"
+                      ></span>
+                    </div>
+                    <button
+                      onclick="speakWord(event)"
+                      class="w-9 h-9 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-100 transition-all"
+                    >
+                      <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                  </div>
+
+                  <!-- Middle: Mnemonic Box -->
+                  <div
+                    class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 p-3 rounded-xl mb-3 shadow-sm"
+                    id="fc-mnemonic-box"
+                  >
+                    <p class="text-xs font-bold text-amber-800 mb-1">
+                      <i class="fa-solid fa-lightbulb mr-1.5 text-amber-500"></i
+                      >เทคนิคช่วยจำ (Mnemonic)
+                    </p>
+                    <p
+                      class="text-xs sm:text-sm text-amber-900 font-medium"
+                      id="fc-mnemonic"
+                    >
+                      เทคนิคการจำ...
+                    </p>
+                  </div>
+
+                  <!-- Bottom: Example Sentence -->
+                  <div
+                    class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 mt-auto"
+                  >
+                    <p
+                      class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1"
+                    >
+                      <i class="fa-solid fa-quote-left mr-1.5 text-blue-400"></i
+                      >ตัวอย่างการใช้งาน
+                    </p>
+                    <p
+                      class="text-slate-800 font-semibold text-xs sm:text-sm italic mb-1 leading-relaxed"
+                      id="fc-example-en"
+                    >
+                      "English example sentence."
+                    </p>
+                    <p class="text-slate-500 text-xs" id="fc-example-th">
+                      "แปลไทย"
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SRS Rating Buttons -->
+          <div
+            id="fc-rating-buttons"
+            class="grid grid-cols-3 gap-2 sm:gap-3 w-full opacity-0 pointer-events-none transition-all duration-300 transform translate-y-4"
+          >
+            <button
+              onclick="rateWord(1)"
+              class="bg-white hover:bg-red-50 border-2 border-red-100 hover:border-red-300 text-red-600 font-bold py-3 px-2 rounded-2xl text-xs sm:text-sm transition-all active:scale-95 flex flex-col items-center shadow-sm"
+            >
+              <i class="fa-solid fa-face-frown text-xl sm:text-2xl mb-1"></i>
+              <span>จำไม่ได้ (ลืม)</span>
+              <span class="text-[9px] font-normal text-red-400 mt-0.5"
+                >ทวนซ้ำวันนี้</span
+              >
+            </button>
+            <button
+              onclick="rateWord(2)"
+              class="bg-white hover:bg-yellow-50 border-2 border-yellow-100 hover:border-yellow-300 text-yellow-600 font-bold py-3 px-2 rounded-2xl text-xs sm:text-sm transition-all active:scale-95 flex flex-col items-center shadow-sm"
+            >
+              <i class="fa-solid fa-face-meh text-xl sm:text-2xl mb-1"></i>
+              <span>คุ้นๆ (นึกนาน)</span>
+              <span
+                class="text-[9px] font-normal text-yellow-500 mt-0.5"
+                id="lbl-rate-2"
+                >ทวนอีกทีเร็วๆนี้</span
+              >
+            </button>
+            <button
+              onclick="rateWord(3)"
+              class="bg-white hover:bg-green-50 border-2 border-green-100 hover:border-green-300 text-green-600 font-bold py-3 px-2 rounded-2xl text-xs sm:text-sm transition-all active:scale-95 flex flex-col items-center shadow-sm"
+            >
+              <i
+                class="fa-solid fa-face-smile-beam text-xl sm:text-2xl mb-1"
+              ></i>
+              <span>จำได้แม่น</span>
+              <span
+                class="text-[9px] font-normal text-green-500 mt-0.5"
+                id="lbl-rate-3"
+                >ยืดเวลาทวน</span
+              >
+            </button>
+          </div>
+          <p
+            id="fc-instruction"
+            class="text-center text-xs text-slate-400 mt-4 font-medium animate-pulse"
+          >
+            แตะที่การ์ดเพื่อดูคำแปลและเฉลย
+          </p>
+        </div>
+      </section>
+
+      <!-- ==================== QUIZ / ACTIVE RECALL MODE ==================== -->
+      <section
+        id="mode-quiz"
+        class="mode-section hidden flex flex-col items-center max-w-md mx-auto w-full pop-in"
+      >
+        <!-- HUD -->
+        <div id="quiz-hud" class="w-full mb-4">
+          <div class="flex justify-between items-center mb-2 px-1">
+            <span
+              class="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-md"
+              id="quiz-scope-badge"
+              >โหมด: ควิซรวมศัพท์</span
+            >
+          </div>
+          <div
+            class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-3"
+          >
+            <div
+              class="flex items-center space-x-1 text-red-500 text-lg"
+              id="quiz-lives"
+            >
+              <!-- Hearts injected dynamically -->
+            </div>
+            <div class="flex items-center space-x-4">
+              <div class="flex flex-col items-center">
+                <span class="text-[9px] uppercase font-bold text-slate-400"
+                  >Streak</span
+                >
+                <span class="text-orange-500 font-bold text-base"
+                  ><i class="fa-solid fa-fire mr-1"></i
+                  ><span id="quiz-streak">0</span></span
+                >
+              </div>
+              <div class="h-6 w-px bg-slate-200"></div>
+              <div class="flex flex-col items-center">
+                <span class="text-[9px] uppercase font-bold text-slate-400"
+                  >Score</span
+                >
+                <span class="text-blue-600 font-bold text-base" id="quiz-score"
+                  >0</span
+                >
+              </div>
+            </div>
+          </div>
+          <!-- Countdown Bar -->
+          <div
+            class="w-full bg-slate-100 h-2 rounded-full overflow-hidden shadow-inner"
+          >
+            <div
+              id="quiz-timer-bar"
+              class="h-full bg-blue-500 w-full transition-all ease-linear"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Quiz Play Area -->
+        <div id="quiz-play-area" class="w-full">
+          <!-- Question Card -->
+          <div
+            id="quiz-card"
+            class="bg-white w-full rounded-3xl shadow-sm border border-slate-200 p-6 text-center mb-4 transition-transform"
+          >
+            <p
+              class="text-slate-400 text-xs font-bold mb-2 uppercase tracking-wider"
+              id="quiz-question-type"
+            >
+              คำถามทดสอบความหมาย
+            </p>
+            <h3
+              class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight mb-2 break-words"
+              id="quiz-word"
+            >
+              word
+            </h3>
+            <p class="text-slate-500 text-xs font-medium" id="quiz-subtext"></p>
+          </div>
+
+          <!-- Choice Options -->
+          <div
+            class="grid grid-cols-1 gap-3 w-full"
+            id="quiz-options-container"
+          >
+            <!-- Dynamic Buttons -->
+          </div>
+        </div>
+
+        <!-- Game Over Area -->
+        <div
+          id="quiz-game-over"
+          class="w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-8 text-center hidden mt-2"
+        >
+          <div
+            class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <i class="fa-solid fa-heart-crack text-4xl text-red-500"></i>
+          </div>
+          <h2 class="text-2xl font-extrabold text-slate-800 mb-1">
+            จบการทดสอบ!
+          </h2>
+          <p class="text-slate-500 text-sm mb-6">
+            ฝึกฝนอย่างต่อเนื่องจะช่วยให้สถิติคะแนนและคอมโบสูงขึ้น
+          </p>
+
+          <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+              <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">
+                คะแนนรวม
+              </p>
+              <p class="text-2xl font-bold text-blue-600" id="go-score">0</p>
+            </div>
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+              <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">
+                คอมโบสูงสุด
+              </p>
+              <p class="text-2xl font-bold text-orange-500" id="go-streak">0</p>
+            </div>
+          </div>
+
+          <button
+            onclick="startNewQuiz()"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-8 rounded-2xl shadow-lg shadow-blue-200 transition-all active:scale-95 text-base"
+          >
+            <i class="fa-solid fa-rotate-right mr-2"></i> เล่นอีกครั้ง
+          </button>
+        </div>
+      </section>
+
+      <!-- ==================== DICTIONARY / LIST MODE ==================== -->
+      <section id="mode-list" class="mode-section hidden w-full pop-in">
+        <!-- Search & Filter Bar -->
+        <div
+          class="mb-5 sticky top-16 z-40 bg-white/90 backdrop-blur-md p-4 rounded-3xl shadow-sm border border-slate-200 flex flex-col sm:flex-row gap-3"
+        >
+          <div class="relative flex-grow">
+            <div
+              class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+            >
+              <i class="fa-solid fa-search text-slate-400"></i>
+            </div>
+            <input
+              type="text"
+              id="search-input"
+              onkeyup="filterList()"
+              placeholder="ค้นหาคำศัพท์, คำแปล, ประโยคตัวอย่าง..."
+              class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-sm text-slate-700 font-medium transition-all"
+            />
+          </div>
+          <div class="flex flex-col sm:flex-row gap-2 min-w-[300px]">
+            <select
+              id="filter-cefr"
+              onchange="filterList()"
+              class="w-full sm:w-1/2 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            >
+              <option value="all">ทุกระดับ (CEFR)</option>
+              <option value="A1">ระดับ A1</option>
+              <option value="A2">ระดับ A2</option>
+              <option value="B1">ระดับ B1</option>
+              <option value="B2">ระดับ B2</option>
+            </select>
+            <select
+              id="filter-status"
+              onchange="filterList()"
+              class="w-full sm:w-1/2 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            >
+              <option value="all">ทุกสถานะความจำ</option>
+              <option value="new">⚪️ คำศัพท์ใหม่</option>
+              <option value="review">🔴 ต้องทวนซ้ำ</option>
+              <option value="learning">🟡 กำลังจำ</option>
+              <option value="mastered">🟢 จำได้แม่น</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Grid Container -->
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+          id="list-grid-container"
+        >
+          <!-- Dynamically rendered cards -->
+        </div>
+
+        <!-- Empty State -->
+        <div
+          id="list-empty-state"
+          class="hidden text-center py-16 bg-white rounded-3xl border border-slate-200"
+        >
+          <div
+            class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3"
+          >
+            <i class="fa-solid fa-magnifying-glass text-2xl text-slate-400"></i>
+          </div>
+          <h3 class="text-lg font-bold text-slate-700">ไม่พบคำศัพท์ที่ค้นหา</h3>
+          <p class="text-slate-500 text-sm">
+            ลองค้นหาด้วยคำอื่น หรือเปลี่ยนตัวกรองระดับภาษา
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script>
+      // Raw dataset containing Oxford 3000 vocabulary words with CEFR, meanings, mnemonics, and example sentences
+      const RAW_VOCAB = `
+abandon|อะ-แบน-เดิน|ละทิ้ง, ปล่อยทิ้ง|They had to abandon the old house.|พวกเขาต้องละทิ้งบ้านหลังเก่า|a + bandon = ละทิ้งไป|B2
+ability|อะ-บิล-ลิ-ที|ความสามารถ|Reading is an important ability.|การอ่านเป็นความสามารถที่สำคัญ|ability นึกถึง able (สามารถ)|A2
+able|เอ-เบิล|สามารถ|She is able to swim.|เธอสามารถว่ายน้ำได้|able = สามารถทำได้|A2
+about|อะ-เบาทฺ|เกี่ยวกับ, ประมาณ|This book is about space.|หนังสือเล่มนี้เกี่ยวกับอวกาศ|about (เกี่ยวกับ)|A1
+above|อะ-บัฟว|เหนือ, ด้านบน|The clock hangs above the door.|นาฬิกาแขวนอยู่เหนือประตู|above (เหนือ)|A1
+abroad|อะ-บรอด|ต่างประเทศ|He went abroad for studying.|เขาไปเรียนต่างประเทศ|a + broad (กว้าง) = ออกไปสู่โลกกว้าง|B2
+absence|แอบ-เซนซฺ|การขาด, การไม่อยู่|His absence was noticed.|การไม่อยู่ของเขาถูกสังเกตเห็น|absent (ขาด) -> absence|B2
+absolute|แอบ-โซ-ลูท|สมบูรณ์, เด็ดขาด|I have absolute trust in you.|ฉันเชื่อใจคุณอย่างสมบูรณ์|absolute = เด็ดขาด|B2
+absolutely|แอบ-โซ-ลูท-ลี|อย่างแน่นอน|You are absolutely right.|คุณถูกอย่างแน่นอน|absolute + ly|B1
+absorb|แอบ-ซอร์บ|ดูดซับ, รับรู้|Sponges absorb water well.|ฟองน้ำดูดซับน้ำได้ดี|ซอร์บ = ซับ|B2
+abuse|อะ-บิวซฺ|การข่มเหง, การใช้ในทางที่ผิด|Child abuse is a serious crime.|การทารุณกรรมเด็กเป็นอาชญากรรมร้ายแรง|ab (ผิด) + use (ใช้) = ใช้ผิด|B2
+academic|แอค-คะ-เดม-มิค|เชิงวิชาการ|She is focused on her academic career.|เธอมุ่งเน้นไปที่อาชีพนักวิชาการ|academy (สถาบัน)|B1
+accept|แอค-เซปทฺ|ยอมรับ|Please accept this gift.|โปรดยอมรับของขวัญชิ้นนี้|ac + cept (รับ)|A2
+acceptable|แอค-เซป-เทอะ-เบิล|ซึ่งยอมรับได้|This solution is acceptable.|วิธีแก้ปัญหานี้ยอมรับได้|accept + able|B2
+access|แอค-เซส|การเข้าถึง|We have internet access here.|เรามีการเข้าถึงอินเทอร์เน็ตที่นี่|เข้าถึง (access)|B1
+accident|แอค-ซิ-เดินทฺ|อุบัติเหตุ|He had a car accident.|เขาประสบอุบัติเหตุทางรถยนต์|accident (เหตุบังเอิญ)|A2
+accommodation|อะ-คอม-โม-เด-เชิน|ที่พัก|The hotel offers good accommodation.|โรงแรมมีที่พักที่ดี|accommodate (จัดหาที่ให้)|B2
+accompany|อะ-คัม-พะ-นี|ไปเป็นเพื่อน, ติดตาม|I will accompany you to the station.|ฉันจะไปเป็นเพื่อนคุณที่สถานี|company (เพื่อน)|B2
+according to|อะ-คอร์ด-ดิง ทู|ตามที่|According to the report, sales are up.|ตามรายงาน ยอดขายเพิ่มขึ้น|accord (สอดคล้อง)|A2
+account|อะ-เคานทฺ|บัญชี, รายงาน|I opened a new bank account.|ฉันเปิดบัญชีธนาคารใหม่|count (นับ)|B1
+accurate|แอค-คิว-เรท|ถูกต้องแม่นยำ|The weather forecast was accurate.|พยากรณ์อากาศถูกต้องแม่นยำ|cure (ดูแล) = ดูแลให้ตรง|B2
+accuse|อะ-คิวซฺ|กล่าวหา|He was accused of stealing.|เขาถูกกล่าวหาว่าขโมย|cause (สาเหตุ) = โยนสาเหตุให้|B2
+achieve|อะ-ชีฟว|บรรลุผล, สำเร็จ|She achieved her goals.|เธอบรรลุเป้าหมายของเธอ|chief (หัวหน้า) = ขึ้นเป็นใหญ่|A2
+achievement|อะ-ชีฟว-เมินทฺ|ความสำเร็จ|Winning the award is a great achievement.|การชนะรางวัลเป็นความสำเร็จที่ยิ่งใหญ่|achieve + ment|B1
+acknowledge|แอค-นอล-ลิจ|ยอมรับ(ว่าจริง), รับทราบ|He acknowledged his mistake.|เขายอมรับความผิดพลาดของเขา|knowledge (ความรู้)|B2
+acquire|อะ-ไคว-เออะ|ได้รับ, ได้มา|They acquired a new company.|พวกเขาได้มาซึ่งบริษัทใหม่|acquire (ได้มา)|B2
+across|อะ-ครอส|ข้าม, ฝั่งตรงข้าม|She walked across the street.|เธอเดินข้ามถนน|cross (ข้าม)|A1
+act|แอคทฺ|กระทำ, แสดง|He acts like a child.|เขาทำตัวเหมือนเด็ก|act = กระทำ|A2
+action|แอค-เชิน|การกระทำ|Actions speak louder than words.|การกระทำสำคัญกว่าคำพูด|act + ion|A1
+active|แอค-ทิฟว|ตื่นตัว, คล่องแคล่ว|He is very active in sports.|เขาคล่องแคล่วมากในเรื่องกีฬา|act + ive|A2
+activity|แอค-ทิฟ-วิ-ที|กิจกรรม|Swimming is a fun activity.|การว่ายน้ำเป็นกิจกรรมที่สนุก|active + ity|A1
+actor|แอค-เทอะ|นักแสดงชาย|He is a famous actor.|เขาเป็นนักแสดงชายที่มีชื่อเสียง|act + or (ผู้ทำ)|A1
+actress|แอค-เทรส|นักแสดงหญิง|She won best actress.|เธอชนะรางวัลนักแสดงหญิงยอดเยี่ยม|act + ress (หญิง)|A1
+actual|แอค-ชวล|ตามความเป็นจริง|The actual cost was much higher.|ค่าใช้จ่ายจริงสูงกว่ามาก|act = ความจริง|B2
+actually|แอค-ชวล-ลี|จริงๆ แล้ว|Actually, I don't like coffee.|จริงๆ แล้วฉันไม่ชอบกาแฟ|actual + ly|A2
+adapt|อะ-แดพทฺ|ปรับตัว|We must adapt to change.|เราต้องปรับตัวเข้ากับการเปลี่ยนแปลง|apt (เหมาะสม) = ปรับให้เหมาะ|B2
+add|แอด|เพิ่ม, บวก|Please add some sugar.|โปรดเติมน้ำตาล|add (เพิ่ม)|A1
+addition|อะ-ดิช-เชิน|การเพิ่ม|The new team member is a great addition.|สมาชิกใหม่คือส่วนที่เพิ่มเข้ามาอย่างดี|add + ition|B1
+additional|อะ-ดิช-เชิน-เนิล|เพิ่มเติม|We need additional information.|เราต้องการข้อมูลเพิ่มเติม|addition + al|B2
+address|อะ-เดรส|ที่อยู่, จัดการ(ปัญหา)|What is your home address?|ที่อยู่บ้านคุณคืออะไร?|address (จ่าหน้า)|A1
+adequate|แอค-ดิ-คเวท|เพียงพอ|Make sure you get adequate sleep.|ตรวจสอบให้แน่ใจว่าคุณนอนหลับเพียงพอ|equ (เท่ากัน) = พอดี|B2
+adjust|อะ-จัสทฺ|ปรับ, จัด|You can adjust the seat height.|คุณสามารถปรับความสูงของเบาะได้|just (พอดี) = ปรับให้ตรง|B2
+administration|แอด-มิน-นิส-เทร-เชิน|การบริหาร, การจัดการ|She works in administration.|เธอทำงานในฝ่ายบริหาร|admin (ผู้ดูแล)|B1
+admire|แอด-ไม-เออะ|ชื่นชม|I admire your courage.|ฉันชื่นชมความกล้าหาญของคุณ|mire (มอง) = มองด้วยความทึ่ง|B1
+admit|แอด-มิท|ยอมรับ(ความจริง)|He admitted that he was wrong.|เขายอมรับว่าเขาผิด|ad + mit (ส่ง) = ส่งความจริงออกมา|B1
+adopt|อะ-ดอพทฺ|รับเลี้ยง, นำมาใช้|They adopted a baby boy.|พวกเขารับเด็กชายมาเลี้ยง|opt (เลือก) = เลือกเข้ามา|B2
+adult|อะ-ดัลทฺ|ผู้ใหญ่|Adults must pay full price.|ผู้ใหญ่ต้องจ่ายราคาเต็ม|adult (ผู้ใหญ่)|A1
+advance|แอด-วานซฺ|ความก้าวหน้า, ล่วงหน้า|Thank you in advance.|ขอบคุณล่วงหน้า|advance (ก้าวหน้า)|B2
+advanced|แอด-วานซดฺ|ระดับสูง, ก้าวหน้า|He is taking an advanced math class.|เขาเรียนชั้นคณิตศาสตร์ระดับสูง|advance + d|B1
+advantage|แอด-วาน-ทิจ|ข้อได้เปรียบ, ประโยชน์|Tall players have an advantage in basketball.|ผู้เล่นตัวสูงมีข้อได้เปรียบในบาสเกตบอล|vantage (จุดที่ดี)|A2
+adventure|แอด-เวน-เชอะ|การผจญภัย|They went on a jungle adventure.|พวกเขาไปผจญภัยในป่า|adventure (ผจญภัย)|A2
+advertise|แอด-เวอะ-ไทซ|โฆษณา|They advertise their products online.|พวกเขาโฆษณาสินค้าทางออนไลน์|advert (ดึงดูดใจ)|A2
+advertisement|แอด-เวอะ-ไทซ-เมินทฺ|โฆษณา|I saw an advertisement for a new car.|ฉันเห็นโฆษณารถยนต์ใหม่|advertise + ment|A2
+advertising|แอด-เวอะ-ไท-ซิง|การโฆษณา|He works in advertising.|เขาทำงานในวงการโฆษณา|advertise + ing|A2
+advice|แอด-ไวซ|คำแนะนำ|Let me give you some advice.|ให้ฉันให้คำแนะนำคุณบ้าง|advise (v.) -> advice (n.)|A1
+advise|แอด-ไวซ|แนะนำ|I advise you to stay home.|ฉันแนะนำให้คุณอยู่บ้าน|advise = ให้คำปรึกษา|B1
+affair|อะ-แฟร์|เรื่องราว, ธุระ|The meeting is a formal affair.|การประชุมเป็นเรื่องที่เป็นทางการ|affair (กิจธุระ)|B2
+affect|อะ-เฟคทฺ|ส่งผลกระทบ|The weather affects my mood.|สภาพอากาศส่งผลต่ออารมณ์ของฉัน|af + fect (ทำ) = ทำต่อ|A2
+affection|อะ-เฟค-เชิน|ความรักใคร่, ความผูกพัน|She looked at him with affection.|เธอมองเขาด้วยความรักใคร่|affect (กระทบใจ)|B2
+afford|อะ-ฟอร์ด|สามารถจ่ายได้|I can't afford a new car.|ฉันไม่สามารถจ่ายค่ารถใหม่ได้|afford (มีเงินพอ)|B1
+afraid|อะ-เฟรด|กลัว|Don't be afraid of the dark.|อย่ากลัวความมืด|afraid (หวาดกลัว)|A1
+after|อาฟ-เทอะ|หลังจาก|Call me after dinner.|โทรหาฉันหลังอาหารเย็น|after (หลัง)|A1
+afternoon|อาฟ-เทอะ-นูน|ตอนบ่าย|Let's meet this afternoon.|เจอกันบ่ายนี้นะ|after (หลัง) + noon (เที่ยง)|A1
+afterward|อาฟ-เทอะ-เวิร์ด|หลังจากนั้น|We can go for a walk afterward.|เราสามารถไปเดินเล่นหลังจากนั้นได้|after + ward|B2
+again|อะ-เกน|อีกครั้ง|Please say that again.|โปรดพูดอีกครั้ง|again (ซ้ำ)|A1
+against|อะ-เกนสทฺ|ต่อต้าน, แข่งกับ|He leaned against the wall.|เขาพิงกำแพง|against (ตรงข้าม)|A2
+age|เอจ|อายุ, ยุค|What is your age?|คุณอายุเท่าไหร่?|age (อายุ)|A1
+agency|เอ-เจน-ซี|หน่วยงาน, ตัวแทน|I booked through a travel agency.|ฉันจองผ่านตัวแทนการท่องเที่ยว|agent (ตัวแทน)|B2
+agenda|อะ-เจน-ดา|วาระการประชุม|What is on the agenda today?|วันนี้มีวาระอะไรบ้าง?|agenda = สิ่งที่ต้องทำ|B2
+agent|เอ-เจินทฺ|ตัวแทน, เอเย่นต์|He is a real estate agent.|เขาเป็นตัวแทนอสังหาริมทรัพย์|agent (ผู้กระทำแทน)|B1
+aggressive|อะ-เกรส-ซิฟว|ก้าวร้าว, ดุดัน|The dog was very aggressive.|สุนัขตัวนั้นก้าวร้าวมาก|ag (เข้าหา) + gress (ก้าว) = ก้าวร้าว|B2
+ago|อะ-โก|ที่ผ่านมาแล้ว|I saw him a few minutes ago.|ฉันเห็นเขาเมื่อไม่กี่นาทีที่ผ่านมา|ago = ผ่านไป|A1
+agree|อะ-กรี|เห็นด้วย|I agree with your idea.|ฉันเห็นด้วยกับความคิดของคุณ|agree (ยินยอม)|A1
+agreement|อะ-กรี-เมินทฺ|ข้อตกลง|We finally reached an agreement.|ในที่สุดเราก็บรรลุข้อตกลง|agree + ment|B1
+ahead|อะ-เฮด|ข้างหน้า|Go straight ahead.|เดินตรงไปข้างหน้า|a + head (หัว) = มุ่งหน้า|B1
+aid|เอด|ความช่วยเหลือ, ปฐมพยาบาล|He gave first aid to the victim.|เขาให้การปฐมพยาบาลแก่ผู้เคราะห์ร้าย|aid = ช่วย|B2
+aim|เอม|เป้าหมาย, เล็ง|My aim is to pass the exam.|เป้าหมายของฉันคือการสอบผ่าน|aim = เล็งเป้า|B1
+air|แอร์|อากาศ|The air is fresh here.|อากาศที่นี่สดชื่น|air (ลม)|A1
+aircraft|แอร์-คราฟทฺ|เครื่องบิน|The aircraft is ready for takeoff.|เครื่องบินพร้อมบินขึ้น|air + craft (ยานพาหนะ)|B2
+airline|แอร์-ไลน์|สายการบิน|Which airline are you flying with?|คุณบินกับสายการบินไหน?|air + line|A2
+airport|แอร์-พอร์ต|สนามบิน|We arrived at the airport early.|เรามาถึงสนามบินแต่เช้า|air + port (ท่า)|A1
+alarm|อะ-ลาร์ม|นาฬิกาปลุก, สัญญาณเตือน|I set my alarm for 6 AM.|ฉันตั้งนาฬิกาปลุกตอน 6 โมงเช้า|alarm = เตือนภัย|B1
+album|แอล-บัม|อัลบั้ม(รูป/เพลง)|This is my favorite music album.|นี่คืออัลบั้มเพลงที่ฉันชอบ|album (สมุดภาพ)|B1
+alcohol|แอล-กอ-ฮอล|แอลกอฮอล์|He doesn't drink alcohol.|เขาไม่ดื่มแอลกอฮอล์|alcohol (สุรา)|B1
+alcoholic|แอล-กอ-ฮอล-ลิค|มีแอลกอฮอล์, คนติดเหล้า|Wine is an alcoholic drink.|ไวน์เป็นเครื่องดื่มแอลกอฮอล์|alcohol + ic|B1
+alive|อะ-ไลฟว|มีชีวิตอยู่|Are the plants still alive?|ต้นไม้ยังมีชีวิตอยู่ไหม?|a + live (อยู่)|A2
+all|ออล|ทั้งหมด|All of my friends are here.|เพื่อนฉันทั้งหมดอยู่ที่นี่|all (ทุกอย่าง)|A1
+all right|ออล ไรทฺ|ตกลง, ไม่เป็นไร|Is everything all right?|ทุกอย่างปกติดีไหม?|all + right|A2
+allow|อะ-ลาว|อนุญาต|Dogs are not allowed here.|ไม่อนุญาตให้นำสุนัขเข้ามา|allow = ยอม|A2
+almost|ออล-โมสทฺ|เกือบจะ|Dinner is almost ready.|อาหารเย็นเกือบเสร็จแล้ว|almost (จวนเจียน)|A2
+alone|อะ-โลน|คนเดียว, ลำพัง|She lives alone in a big house.|เธออยู่คนเดียวในบ้านหลังใหญ่|all + one = เหลือคนเดียว|A2
+along|อะ-ลอง|ตามแนว, พร้อมด้วย|We walked along the beach.|เราเดินไปตามชายหาด|along = เลียบไป|A2
+already|ออล-เรด-ดี|เรียบร้อยแล้ว|I have already finished my homework.|ฉันทำการบ้านเสร็จแล้ว|all + ready|A2
+also|ออล-โซ|ด้วย, เช่นกัน|I am also a student.|ฉันก็เป็นนักเรียนเช่นกัน|also (อีกด้วย)|A1
+alter|ออล-เทอะ|เปลี่ยนแปลง|We had to alter our plans.|เราต้องเปลี่ยนแผนของเรา|alter (เปลี่ยน)|B2
+alternative|ออล-เทอ-นะ-ทิฟว|ทางเลือก|Is there any alternative?|มีทางเลือกอื่นไหม?|alter = เปลี่ยนทาง|A2
+although|ออล-โธ|แม้ว่า|Although it rained, we enjoyed the trip.|แม้ว่าฝนตก เราก็สนุกกับทริป|all + though|A2
+always|ออล-เวย์ซ|เสมอ, ตลอด|He is always late.|เขามาสายเสมอ|all + ways = ทุกเวลา|A1
+amazed|อะ-เมซดฺ|รู้สึกประหลาดใจ|I was amazed by her voice.|ฉันทึ่งกับเสียงของเธอ|amaze (ทำให้ทึ่ง)|B1
+amazing|อะ-เม-ซิง|น่าประหลาดใจ, มหัศจรรย์|The view from the top is amazing.|วิวจากด้านบนน่าทึ่งมาก|amaze + ing|A1
+ambition|แอม-บิช-เชิน|ความทะเยอทะยาน|His ambition is to be a doctor.|ความทะเยอทะยานของเขาคือการเป็นหมอ|ambition (ความมุ่งมั่น)|B1
+ambulance|แอม-บิว-เลินซฺ|รถพยาบาล|Call an ambulance immediately!|เรียกรถพยาบาลด่วน!|ambulance (รถฉุกเฉิน)|B1
+among|อะ-มัง|ในหมู่, ท่ามกลาง|She sat among her friends.|เธอนั่งอยู่ท่ามกลางเพื่อนๆ|among (ปะปน)|A2
+amount|อะ-เมานทฺ|จำนวน|He owes me a large amount of money.|เขาติดหนี้ฉันเป็นเงินจำนวนมาก|amount (ยอดรวม)|A2
+analyse|แอน-นะ-ไลซ|วิเคราะห์|We need to analyse the data.|เราต้องวิเคราะห์ข้อมูล|ana (แยก) + lyse (คลาย)|B1
+analysis|อะ-แนล-ลิ-ซิส|การวิเคราะห์|The blood analysis takes two days.|การวิเคราะห์เลือดใช้เวลาสองวัน|analyse (v.) -> analysis (n.)|B1
+ancient|เอน-เชินทฺ|โบราณ|We visited an ancient temple.|เราไปเยี่ยมชมวัดโบราณ|ancient (เก่าแก่)|A2
+and|แอนดฺ|และ|I like apples and bananas.|ฉันชอบแอปเปิ้ลและกล้วย|and (กับ)|A1
+anger|แอง-เกอะ|ความโกรธ|He could not hide his anger.|เขาไม่สามารถซ่อนความโกรธได้|angry (adj.) -> anger (n.)|B2
+angle|แอง-เกิล|มุม|Look at it from a different angle.|ลองมองจากมุมที่ต่างออกไป|angle (องศา)|B2
+angry|แอง-กรี|โกรธ|Why are you so angry?|ทำไมคุณถึงโกรธขนาดนี้?|angry (โมโห)|A1
+animal|แอน-นิ-เมิล|สัตว์|The lion is a wild animal.|สิงโตเป็นสัตว์ป่า|animal (สิ่งมีชีวิต)|A1
+ankle|แอง-เคิล|ข้อเท้า|She sprained her ankle playing tennis.|เธอข้อเท้าแพลงตอนเล่นเทนนิส|ankle (ตาตุ่ม)|A2
+anniversary|แอน-นิ-เวอ-ซะ-รี|วันครบรอบ|Today is our wedding anniversary.|วันนี้คือวันครบรอบแต่งงานของเรา|ann (ปี) + vers (หมุน)|B2
+announce|อะ-เนาซฺ|ประกาศ|They announced the winner.|พวกเขาประกาศผู้ชนะ|announce (แจ้งให้ทราบ)|B1
+announcement|อะ-เนาซฺ-เมินทฺ|คำประกาศ|The principal made an announcement.|ครูใหญ่ได้ทำการประกาศ|announce + ment|B1
+annoy|อะ-นอย|รบกวน, ทำให้รำคาญ|Loud noise annoys me.|เสียงดังทำให้ฉันรำคาญ|annoy (กวนใจ)|B1
+annoyed|อะ-นอยดฺ|รู้สึกรำคาญ|She was annoyed by his behavior.|เธอรู้สึกรำคาญพฤติกรรมของเขา|annoy + ed|B1
+annoying|อะ-นอย-อิง|น่ารำคาญ|That buzzing sound is annoying.|เสียงหึ่งๆ นั้นน่ารำคาญ|annoy + ing|B1
+annual|แอน-นวล|ประจำปี|This is an annual event.|นี่คืองานประจำปี|ann (ปี) + ual|B2
+another|อะ-นัธ-เธอะ|อีกอันหนึ่ง, คนอื่น|Would you like another cup of tea?|คุณรับชาอีกถ้วยไหม?|an + other|A1
+answer|อาน-เซอะ|คำตอบ, ตอบ|I don't know the answer.|ฉันไม่รู้คำตอบ|answer (ตอบกลับ)|A1
+anxious|แอง-เชิส|วิตกกังวล|I feel anxious about the test.|ฉันรู้สึกกังวลเกี่ยวกับการสอบ|anxious (กระวนกระวาย)|B2
+any|เอน-นี|ใดๆ, เลย|Do you have any questions?|คุณมีคำถามใดๆ ไหม?|any (บ้างไหม)|A1
+anybody|เอน-นี-บอ-ดี|ใครๆ, ใครก็ตาม|Anybody can do this.|ใครๆ ก็ทำสิ่งนี้ได้|any + body|A2
+anymore|เอน-นี-มอร์|อีกต่อไป|I don't live there anymore.|ฉันไม่ได้อยู่ที่นั่นอีกต่อไป|any + more|A2
+anyone|เอน-นี-วัน|ใครๆ, ใครก็ตาม|Is anyone home?|มีใครอยู่บ้านไหม?|any + one|A1
+anything|เอน-นี-ธิง|สิ่งใดๆ|I didn't buy anything.|ฉันไม่ได้ซื้ออะไรเลย|any + thing|A1
+anyway|เอน-นี-เวย์|อย่างไรก็ตาม|Anyway, thanks for your help.|อย่างไรก็ตาม ขอบคุณสำหรับความช่วยเหลือ|any + way|A2
+anywhere|เอน-นี-แวร์|ที่ไหนก็ได้|You can sit anywhere you like.|คุณสามารถนั่งตรงไหนก็ได้ที่คุณชอบ|any + where|A2
+apart|อะ-พาร์ท|แยกจากกัน|We live miles apart.|เราอยู่ห่างกันหลายไมล์|a + part (ส่วน)|B1
+apartment|อะ-พาร์ท-เมินทฺ|ห้องชุด, อพาร์ตเมนต์|She lives in a small apartment.|เธออาศัยอยู่ในอพาร์ตเมนต์เล็กๆ|apartment (ที่พัก)|A1
+apologize|อะ-พอล-ลอ-ไจซ|ขอโทษ|I apologize for the delay.|ฉันขอโทษสำหรับความล่าช้า|apology (คำขอโทษ)|B1
+app|แอพ|แอปพลิเคชัน|I downloaded a new app.|ฉันดาวน์โหลดแอปใหม่|app (โปรแกรม)|A2
+apparent|อะ-แพ-เรินทฺ|ชัดเจน, เห็นได้ชัด|His sadness was apparent to everyone.|ความเศร้าของเขาเห็นได้ชัดสำหรับทุกคน|apparent (ประจักษ์)|B2
+apparently|อะ-แพ-เรินทฺ-ลี|ดูเหมือนว่า, อย่างที่เห็น|Apparently, he forgot our meeting.|ดูเหมือนว่าเขาลืมการประชุมของเรา|apparent + ly|B2
+appeal|อะ-พีล|ดึงดูดใจ, ร้องเรียน|The idea appeals to me.|ความคิดนี้ดึงดูดใจฉัน|appeal (อุทธรณ์)|B2
+appear|อะ-เพียร์|ปรากฏ, ดูเหมือน|A rainbow appeared in the sky.|รุ้งกินน้ำปรากฏบนท้องฟ้า|appear (โผล่)|A2
+appearance|อะ-เพียร์-เรินซฺ|รูปร่างหน้าตา, การปรากฏตัว|Don't judge people by their appearance.|อย่าตัดสินคนจากรูปร่างหน้าตา|appear + ance|A2
+apple|แอพ-เพิล|แอปเปิ้ล|She ate a red apple.|เธอกินแอปเปิ้ลสีแดง|apple (ผลไม้)|A1
+application|แอพ-พลิ-เค-เชิน|ใบสมัคร, การประยุกต์ใช้|I sent in my job application.|ฉันส่งใบสมัครงานไปแล้ว|apply -> application|B1
+apply|อะ-พลาย|สมัคร, นำมาใช้|I want to apply for this job.|ฉันต้องการสมัครงานนี้|apply (ขอเข้าร่วม)|A2
+appointment|อะ-พอยนทฺ-เมินทฺ|การนัดหมาย|I have a doctor's appointment.|ฉันมีการนัดหมายกับหมอ|appoint (นัด)|B1
+appreciate|อะ-พรี-ชี-เอท|ซาบซึ้ง, เห็นคุณค่า|I appreciate your help.|ฉันซาบซึ้งในความช่วยเหลือของคุณ|appreciate (ขอบคุณ)|B1
+approach|อะ-โพรช|เข้าใกล้, วิธีการ|The train is approaching the station.|รถไฟกำลังเข้าใกล้สถานี|approach (มุ่งหน้า)|B2
+appropriate|อะ-โพร-พรี-เอท|เหมาะสม|This movie is not appropriate for children.|ภาพยนตร์เรื่องนี้ไม่เหมาะสำหรับเด็ก|proper (เหมาะสม)|B2
+approval|อะ-พรูฟ-เวิล|การอนุมัติ, ความเห็นชอบ|The project needs the boss's approval.|โครงการต้องการการอนุมัติจากเจ้านาย|approve -> approval|B2
+approve|อะ-พรูฟว|อนุมัติ, เห็นด้วย|I don't approve of your behavior.|ฉันไม่เห็นด้วยกับพฤติกรรมของคุณ|approve (ยอมรับ)|B2
+approximate|อะ-พรอก-ซิ-เมท|ประมาณ, คร่าวๆ|What is the approximate cost?|ค่าใช้จ่ายโดยประมาณคือเท่าไหร่?|proximate (ใกล้เคียง)|B1
+approximately|อะ-พรอก-ซิ-เมท-ลี|โดยประมาณ|The journey takes approximately two hours.|การเดินทางใช้เวลาประมาณสองชั่วโมง|approximate + ly|B1
+April|เอ-พริล|เดือนเมษายน|My birthday is in April.|วันเกิดของฉันอยู่ในเดือนเมษายน|April (เดือนที่สี่)|A1
+architect|อาร์-คิ-เทคทฺ|สถาปนิก|The architect designed this building.|สถาปนิกออกแบบอาคารนี้|arch (หลัก) + tect (ผู้สร้าง)|A2
+architecture|อาร์-คิ-เทค-เชอะ|สถาปัตยกรรม|He studies ancient Roman architecture.|เขาเรียนสถาปัตยกรรมโรมันโบราณ|architect + ure|A2
+area|แอ-เรีย|พื้นที่, บริเวณ|This is a non-smoking area.|นี่คือพื้นที่ปลอดบุหรี่|area (เขต)|A1
+argue|อาร์-กิว|โต้เถียง|They always argue about money.|พวกเขามักจะโต้เถียงกันเรื่องเงินเสมอ|argue (ทะเลาะ)|A2
+argument|อาร์-กิว-เมินทฺ|การโต้เถียง, ข้อพิพาท|We had a big argument last night.|เรามีการโต้เถียงครั้งใหญ่เมื่อคืนนี้|argue + ment|A2
+arise|อะ-ไรซ|เกิดขึ้น|New problems arise every day.|ปัญหาใหม่ๆ เกิดขึ้นทุกวัน|arise (ผุดขึ้น)|B2
+arm|อาร์ม|แขน|He broke his left arm.|เขาแขนซ้ายหัก|arm (ท่อนแขน)|A1
+armed|อาร์มดฺ|มีอาวุธ|The robbers were armed with guns.|โจรมีปืนเป็นอาวุธ|arm (อาวุธ) + ed|B2
+army|อาร์-มี|กองทัพ|He joined the army after school.|เขาเข้าร่วมกองทัพหลังเลิกเรียน|arm (อาวุธ)|A2
+around|อะ-ราวดฺ|รอบๆ, ประมาณ|We walked around the park.|เราเดินเล่นรอบสวนสาธารณะ|around (โดยรอบ)|A1
+arrange|อะ-เรนจฺ|จัดเตรียม, จัดการ|I will arrange a meeting for us.|ฉันจะจัดการประชุมสำหรับพวกเรา|arrange (จัดวาง)|A2
+arrangement|อะ-เรนจฺ-เมินทฺ|การจัดการ, ข้อตกลง|We made an arrangement to meet early.|เราทำการตกลงที่จะพบกันแต่เช้า|arrange + ment|A2
+arrest|อะ-เรสทฺ|จับกุม|The police arrested the thief.|ตำรวจจับกุมหัวขโมย|arrest (หยุด/จับ)|B1
+arrival|อะ-ไร-เวิล|การมาถึง|We waited for his arrival.|เรารอการมาถึงของเขา|arrive -> arrival|B1
+arrive|อะ-ไรฟว|มาถึง|What time does the train arrive?|รถไฟมาถึงกี่โมง?|arrive (ถึง)|A1
+arrow|แอ-โร|ลูกศร, ธนู|Follow the red arrow.|ตามลูกศรสีแดงไป|arrow (หัวลูกศร)|B1
+art|อาร์ท|ศิลปะ|She studies art history.|เธอเรียนประวัติศาสตร์ศิลปะ|art (ศิลป์)|A1
+article|อาร์-ทิ-เคิล|บทความ, สิ่งของ|I read an interesting article today.|ฉันอ่านบทความที่น่าสนใจวันนี้|article (ชิ้น)|A1
+artificial|อาร์-ทิ-ฟิช-เชียล|เทียม, ประดิษฐ์ขึ้น|These flowers are artificial.|ดอกไม้พวกนี้เป็นของเทียม|art (สร้าง) + ficial|B2
+artist|อาร์-ทิสทฺ|ศิลปิน|He is a famous artist.|เขาเป็นศิลปินชื่อดัง|art + ist|A1
+artistic|อาร์-ทิส-ติค|เกี่ยวกับศิลปะ, มีศิลปะ|She has a very artistic eye.|เธอมีสายตาที่มีความเป็นศิลปะ|artist + ic|B2
+as|แอซ|ในฐานะ, เช่นเดียวกับ|He works as a teacher.|เขาทำงานในฐานะครู|as (เหมือน)|A1
+ashamed|อะ-เชมดฺ|ละอายใจ|You should be ashamed of yourself.|คุณควรจะละอายใจตัวเอง|shame (ความละอาย)|B2
+asleep|อะ-สลีพ|นอนหลับ|The baby is fast asleep.|เด็กทารกกำลังหลับสนิท|a + sleep (หลับ)|A2
+aspect|แอส-เปคทฺ|แง่มุม, มุมมอง|We must consider every aspect of the problem.|เราต้องพิจารณาทุกแง่มุมของปัญหา|spect (มอง)|B2
+assess|อะ-เซส|ประเมิน|They will assess the damage tomorrow.|พวกเขาจะประเมินความเสียหายในวันพรุ่งนี้|assess (ตีราคา)|B2
+assessment|อะ-เซส-เมินทฺ|การประยุกต์|The assessment was fair.|การประเมินนั้นยุติธรรม|assess + ment|B2
+assign|อะ-ไซน์|มอบหมาย|The teacher assigned a lot of homework.|ครูมอบหมายการบ้านมากมาย|sign (กำหนด)|B1
+assignment|อะ-ไซน์-เมินทฺ|งานที่ได้รับมอบหมาย|I have finished my assignment.|ฉันทำงานที่ได้รับมอบหมายเสร็จแล้ว|assign + ment|B1
+assist|อะ-ซิสทฺ|ช่วยเหลือ|She assists the manager.|เธอช่วยเหลือผู้จัดการ|assist (สนับสนุน)|B1
+assistant|อะ-ซิส-เทินทฺ|ผู้ช่วย|He is an assistant manager.|เขาเป็นผู้ช่วยผู้จัดการ|assist + ant|A2
+associate|อะ-โซ-ชี-เอท|เชื่อมโยง, คบหา|I don't associate with those people.|ฉันไม่คบหากับคนพวกนั้น|soci (สังคม)|B2
+associated|อะ-โซ-ชี-เอ-ทิด|ที่เกี่ยวข้อง|There are risks associated with smoking.|มีความเสี่ยงที่เกี่ยวข้องกับการสูบบุหรี่|associate + ed|B2
+association|อะ-โซ-ชี-เอ-เชิน|สมาคม, การรวมกัน|He joined the football association.|เขาเข้าร่วมสมาคมฟุตบอล|associate + ion|B2
+assume|อะ-ซูม|สมมติ, สันนิษฐาน|I assume you are right.|ฉันสันนิษฐานว่าคุณถูก|assume (ทึกทักเอา)|B2
+assure|อะ-ชัวร์|ทำให้มั่นใจ, รับรอง|I assure you it is safe.|ฉันรับรองกับคุณว่ามันปลอดภัย|sure (มั่นใจ)|B2
+at|แอท|ที่|I will see you at home.|ฉันจะเจอคุณที่บ้าน|at (ณ)|A1
+athlete|แอธ-ลีท|นักกีฬา|He is a professional athlete.|เขาเป็นนักกีฬาอาชีพ|athlete (ผู้แข่งขัน)|A2
+atmosphere|แอท-มอส-เฟียร์|บรรยากาศ|The restaurant has a great atmosphere.|ร้านอาหารนี้มีบรรยากาศที่ยอดเยี่ยม|atmos (ไอ) + sphere (ทรงกลม)|B1
+attach|อะ-แทช|แนบ, ติดกัน|Please attach your photo to the form.|โปรดแนบรูปถ่ายของคุณกับแบบฟอร์ม|attach (ผูกติด)|B1
+attack|อะ-แทค|โจมตี|The dog attacked the mailman.|สุนัขโจมตีบุรุษไปรษณีย์|attack (บุก)|A2
+attempt|อะ-เทมพฺทฺ|ความพยายาม|He made an attempt to escape.|เขาทำการพยายามที่จะหลบหนี|attempt (ลองทำ)|B1
+attend|อะ-เทนดฺ|เข้าร่วม|Are you attending the meeting?|คุณจะเข้าร่วมการประชุมไหม?|tend (ยื่นไป)|A2
+attention|อะ-เทน-เชิน|ความสนใจ|Pay attention to the teacher.|ให้ความสนใจกับคุณครู|attend -> attention|A2
+attitude|แอท-ทิ-ทิวดฺ|ทัศนคติ|She has a positive attitude.|เธอมีทัศนคติเชิงบวก|attitude (ท่าที)|B1
+attorney|อะ-เทอร์-นี|ทนายความ|You have the right to an attorney.|คุณมีสิทธิที่จะมีทนายความ|attorney (ผู้รับมอบอำนาจ)|B2
+attract|อะ-แทรคทฺ|ดึงดูด|Flowers attract bees.|ดอกไม้ดึงดูดผึ้ง|tract (ดึง)|B1
+attraction|อะ-แทรค-เชิน|สิ่งดึงดูดใจ, สถานที่ท่องเที่ยว|The Eiffel Tower is a major attraction.|หอไอเฟลเป็นสถานที่ท่องเที่ยวสำคัญ|attract + ion|B1
+attractive|อะ-แทรค-ทิฟว|มีเสน่ห์, ดึงดูด|She is a very attractive woman.|เธอเป็นผู้หญิงที่มีเสน่ห์มาก|attract + ive|A2
+audience|ออ-เดียนซฺ|ผู้ชม, ผู้ฟัง|The audience clapped loudly.|ผู้ชมปรบมือดังมาก|audio (การได้ยิน)|A2
+August|ออ-กัสทฺ|เดือนสิงหาคม|We are going on holiday in August.|เราจะไปพักร้อนในเดือนสิงหาคม|August|A1
+aunt|อานทฺ|ป้า, น้า(หญิง), อา(หญิง)|My aunt is a nurse.|ป้าของฉันเป็นพยาบาล|aunt|A1
+author|ออ-เธอะ|ผู้เขียน, นักประพันธ์|Who is the author of this book?|ใครคือผู้แต่งหนังสือเล่มนี้?|author (ผู้สร้าง)|A2
+authority|ออ-ธอ-ริ-ที|ผู้มีอำนาจ, เจ้าหน้าที่|You must report to the local authority.|คุณต้องรายงานต่อเจ้าหน้าที่ท้องถิ่น|author + ity|B1
+available|อะ-เวล-ละ-เบิล|มีอยู่, หาได้, ว่าง|Are there any tickets available?|มีตั๋วว่างบ้างไหม?|avail (ใช้เป็นประโยชน์)|A2
+average|แอฟ-เวอะ-ริจ|ค่าเฉลี่ย, ปานกลาง|The average age of the students is 15.|อายุเฉลี่ยของนักเรียนคือ 15 ปี|average (เกณฑ์เฉลี่ย)|A2
+avoid|อะ-วอยดฺ|หลีกเลี่ยง|Try to avoid eating too much sugar.|พยายามหลีกเลี่ยงการกินน้ำตาลมากเกินไป|void (ว่างเปล่า)|A2
+award|อะ-วอร์ด|รางวัล|She won an award for her acting.|เธอได้รับรางวัลจากการแสดงของเธอ|award (ตัดสินให้)|A2
+aware|อะ-แวร์|ตระหนักรู้, ทราบ|I am aware of the problem.|ฉันรับทราบถึงปัญหาแล้ว|aware (รู้ตัว)|B1
+away|อะ-เวย์|ออกไป, ห่างออกไป|The beach is a mile away.|ชายหาดอยู่ห่างออกไปหนึ่งไมล์|way (ทาง)|A1
+awful|ออ-ฟูล|แย่มาก, น่ากลัว|The weather is awful today.|อากาศแย่มากวันนี้|awe (หวาดหวั่น) + ful|A2
+awesome|ออ-ซัม|เจ๋งมาก, สุดยอด|That movie was awesome!|หนังเรื่องนั้นเจ๋งมาก!|awe (ยำเกรง) + some|A1
+baby|เบ-บี|ทารก|The baby is crying.|เด็กทารกกำลังร้องไห้|baby|A1
+back|แบค|หลัง, กลับ|Please call me back.|โปรดโทรกลับหาฉัน|back|A1
+background|แบค-กราวนดฺ|พื้นหลัง, ภูมิหลัง|She has a background in science.|เธอมีภูมิหลังด้านวิทยาศาสตร์|back + ground|A2
+bad|แบด|แย่, เลว|Smoking is bad for your health.|การสูบบุหรี่ส่งผลเสียต่อสุขภาพของคุณ|bad|A1
+badly|แบด-ลี|อย่างแย่, อย่างมาก|He was badly injured.|เขาได้รับบาดเจ็บอย่างสาหัส|bad + ly|A2
+bag|แบก|กระเป๋า|I bought a new bag.|ฉันซื้อกระเป๋าใบใหม่|bag|A1
+bake|เบค|อบ|She is baking a cake.|เธอกำลังอบเค้ก|bake|A2
+balance|บาล-ลานซฺ|ความสมดุล, ยอดคงเหลือ|You need to keep your balance.|คุณต้องรักษาความสมดุลของคุณไว้|balance (ตาชั่ง)|B1
+ball|บอล|ลูกบอล|He kicked the ball.|เขาเตะลูกบอล|ball|A1
+ban|แบน|ห้าม|They banned smoking in the building.|พวกเขาห้ามสูบบุหรี่ในอาคาร|ban (สั่งห้าม)|B1
+banana|บะ-นา-นะ|กล้วย|I eat a banana every morning.|ฉันกินกล้วยทุกเช้า|banana|A1
+band|แบนดฺ|วงดนตรี, แถบ|My favorite band is playing tonight.|วงดนตรีโปรดของฉันจะเล่นคืนนี้|band (มัดรวม)|A1
+bank|แบงคฺ|ธนาคาร, ตลิ่ง|I need to go to the bank.|ฉันต้องไปธนาคาร|bank (ที่เก็บเงิน)|A1
+bar|บาร์|บาร์, ท่อน|We met at a local bar.|เราพบกันที่บาร์ในท้องถิ่น|bar (ท่อนเหล็ก)|A1
+barrier|แบ-รี-เออะ|อุปสรรค, สิ่งกีดขวาง|Language can be a barrier.|ภาษาอาจเป็นอุปสรรคได้|bar (ท่อน) -> barrier|B2
+base|เบส|ฐาน, พื้นฐาน|The glass has a heavy base.|แก้วน้ำมีฐานที่หนัก|base (รากฐาน)|B1
+baseball|เบส-บอล|เบสบอล|He plays baseball on weekends.|เขาเล่นเบสบอลในช่วงวันหยุดสุดสัปดาห์|base + ball|A1
+basic|เบ-สิค|พื้นฐาน|I only have a basic knowledge of French.|ฉันมีความรู้ภาษาฝรั่งเศสแค่พื้นฐาน|base -> basic|A2
+basically|เบ-สิค-เคล-ลี|โดยพื้นฐานแล้ว|Basically, we agree with you.|โดยพื้นฐานแล้ว เราเห็นด้วยกับคุณ|basic + ally|B2
+basis|เบ-ซิส|เกณฑ์, มาตรฐาน|They work on a part-time basis.|พวกเขาทำงานตามเกณฑ์พาร์ทไทม์|base -> basis|B1
+basket|บาส-คิท|ตะกร้า|Put the fruits in the basket.|นำผลไม้ใส่ในตะกร้า|basket|A2
+basketball|บาส-คิท-บอล|บาสเกตบอล|Let's play basketball.|ไปเล่นบาสเกตบอลกันเถอะ|basket + ball|A1
+bath|บาธ|การอาบน้ำ|I like to take a warm bath.|ฉันชอบอาบน้ำอุ่น|bath|A1
+bathroom|บาธ-รูม|ห้องน้ำ|Where is the bathroom?|ห้องน้ำอยู่ที่ไหน?|bath + room|A1
+battery|แบท-เทอะ-รี|แบตเตอรี่|My phone battery is dead.|แบตเตอรี่โทรศัพท์ฉันหมด|battery|A2
+battle|แบท-เทิล|การต่อสู้, สงคราม|He died in battle.|เขาเสียชีวิตในสงคราม|battle (สู้รบ)|B1
+be|บี|เป็น, อยู่, คือ|I want to be a doctor.|ฉันอยากเป็นหมอ|be|A1
+beach|บีช|ชายหาด|We walked along the beach.|เราเดินไปตามชายหาด|beach|A1
+bean|บีน|ถั่ว|I love baked beans.|ฉันชอบถั่วอบ|bean|A2
+bear|แบร์|หมี, ทนรับ|I can't bear the pain.|ฉันทนความเจ็บปวดไม่ไหว|bear (ทนทาน)|A2
+beat|บีท|เอาชนะ, ตี|Our team beat theirs 3-0.|ทีมเราเอาชนะทีมพวกเขา 3-0|beat (จังหวะ/ตี)|A2
+beautiful|บิว-ทิ-ฟูล|สวยงาม|She is a beautiful girl.|เธอเป็นเด็กผู้หญิงที่สวยงาม|beauty + ful|A1
+beauty|บิว-ที|ความงาม|The scenery is of great beauty.|ทิวทัศน์มีความงามอย่างยิ่ง|beauty|A2
+because|บิ-คอซ|เพราะว่า|I stayed home because I was sick.|ฉันอยู่บ้านเพราะฉันป่วย|be + cause|A1
+become|บิ-คัม|กลายเป็น|He wants to become a teacher.|เขาต้องการกลายเป็นครู|be + come|A1
+bed|เบด|เตียง|It's time to go to bed.|ได้เวลาเข้านอนแล้ว|bed|A1
+bedroom|เบด-รูม|ห้องนอน|My bedroom is very small.|ห้องนอนของฉันเล็กมาก|bed + room|A1
+beef|บีฟ|เนื้อวัว|We had roast beef for dinner.|เรากินเนื้อวัวอบเป็นมื้อเย็น|beef|A2
+beer|เบียร์|เบียร์|He drank a glass of beer.|เขาดื่มเบียร์หนึ่งแก้ว|beer|A1
+before|บิ-ฟอร์|ก่อน|Wash your hands before eating.|ล้างมือก่อนรับประทานอาหาร|before|A1
+beg|เบก|ขอทาน, อ้อนวอน|He begged for forgiveness.|เขาอ้อนวอนขอการให้อภัย|beg|B2
+begin|บิ-กิน|เริ่มต้น|The movie begins at 8 PM.|ภาพยนตร์เริ่มเวลา 2 ทุ่ม|begin|A1
+beginning|บิ-กิน-นิง|การเริ่มต้น|I missed the beginning of the film.|ฉันพลาดช่วงเริ่มต้นของภาพยนตร์|begin + ning|A1
+behalf|บิ-ฮาฟ|ในนามของ|I am speaking on behalf of my team.|ฉันกำลังพูดในนามของทีมของฉัน|be + half|B2
+behave|บิ-เฮฟว|ประพฤติตัว|The children behaved well.|เด็กๆ ประพฤติตัวดี|be + have (ถือความประพฤติ)|A2
+behavior|บิ-เฮฟ-เวียร์|พฤติกรรม|His behavior is unacceptable.|พฤติกรรมของเขายอมรับไม่ได้|behave -> behavior|A2
+behind|บิ-ไฮนดฺ|ข้างหลัง|The dog is hiding behind the tree.|สุนัขซ่อนตัวอยู่หลังต้นไม้|behind|A1
+being|บี-อิง|ความเป็นอยู่, สิ่งมีชีวิต|A human being.|มนุษย์(สิ่งมีชีวิต)|be + ing|B2
+belief|บิ-ลีฟ|ความเชื่อ|It is my belief that we will win.|เป็นความเชื่อของฉันว่าเราจะชนะ|believe -> belief|B1
+believe|บิ-ลีฟว|เชื่อ|I believe you.|ฉันเชื่อคุณ|believe|A1
+bell|เบล|ระฆัง, กระดิ่ง|The school bell rang.|กริ่งโรงเรียนดังขึ้น|bell|A2
+belong|บิ-ลอง|เป็นของ, เข้าพวก|This book belongs to me.|หนังสือเล่มนี้เป็นของฉัน|be + long (อยู่รวมกัน)|A2
+below|บิ-โล|ด้านล่าง, ต่ำกว่า|Please sign below the line.|โปรดเซ็นชื่อใต้เส้น|below|A1
+belt|เบลทฺ|เข็มขัด|Please fasten your seat belt.|โปรดรัดเข็มขัดนิรภัยของคุณ|belt|A2
+bend|เบนดฺ|โค้ง, งอ|Bend your knees.|งอเข่าของคุณ|bend|B1
+beneath|บิ-นีธ|อยู่ข้างใต้|They found gold beneath the ground.|พวกเขาพบทองคำอยู่ใต้พื้นดิน|beneath|B2
+benefit|เบน-นิ-ฟิท|ประโยชน์|Exercise has many benefits.|การออกกำลังกายมีประโยชน์มากมาย|bene (ดี) + fit (ทำ)|A2
+bent|เบนทฺ|โค้งงอ|The wire was bent.|ลวดโค้งงอ|bend -> bent|B2
+beside|บิ-ไซดฺ|ข้างๆ|She sat beside me.|เธอนั่งข้างๆ ฉัน|be + side|B2
+best|เบสทฺ|ดีที่สุด|You are my best friend.|คุณคือเพื่อนที่ดีที่สุดของฉัน|best|A1
+bet|เบท|พนัน|I bet he will be late.|ฉันพนันเลยว่าเขาจะมาสาย|bet|B2
+better|เบท-เทอะ|ดีกว่า|I feel better today.|วันนี้ฉันรู้สึกดีขึ้น|better|A1
+between|บิ-ทวีน|ระหว่าง|The table is between the chairs.|โต๊ะอยู่ระหว่างเก้าอี้|between|A1
+beyond|บิ-ยอนดฺ|ไกลออกไป, นอกเหนือจาก|The town is beyond those mountains.|เมืองอยู่เลยภูเขาเหล่านั้นไป|beyond|B2
+bicycle|ไบ-ซิ-เคิล|จักรยาน|I ride my bicycle to work.|ฉันขี่จักรยานไปทำงาน|bi (สอง) + cycle (ล้อ)|A1
+big|บิก|ใหญ่|They live in a big house.|พวกเขาอาศัยอยู่ในบ้านหลังใหญ่|big|A1
+bike|ไบค์|จักรยาน|Can you ride a bike?|คุณขี่จักรยานเป็นไหม?|bike|A1
+bill|บิล|ใบแจ้งหนี้, ธนบัตร|Could I have the bill, please?|ขอใบเสร็จด้วยครับ?|bill|A1
+billion|บิล-เลียน|พันล้าน|The earth has billions of people.|โลกมีผู้คนหลายพันล้านคน|billion|A2
+bind|ไบนดฺ|ผูก, มัด|Bind the papers together.|มัดกระดาษเข้าด้วยกัน|bind|B2
+biological|ไบ-โอ-ลอจ-จิ-เคิล|ทางชีววิทยา|She is his biological mother.|เธอคือแม่แท้ๆ (ทางชีววิทยา) ของเขา|bio (ชีวิต) + logic + al|B2
+bird|เบิร์ด|นก|The bird is singing.|นกกำลังร้องเพลง|bird|A1
+birth|เบิร์ธ|การเกิด|What is your date of birth?|วันเกิดของคุณคือวันที่เท่าไหร่?|birth|A2
+birthday|เบิร์ธ-เดย์|วันเกิด|Happy birthday!|สุขสันต์วันเกิด!|birth + day|A1
+bit|บิท|ชิ้นเล็กๆ, นิดหน่อย|I need a little bit of time.|ฉันต้องการเวลาอีกนิดหน่อย|bit|A2
+bite|ไบทฺ|กัด|Does your dog bite?|สุนัขของคุณกัดไหม?|bite|B1
+bitter|บิท-เทอะ|ขม|The medicine tastes bitter.|ยามีรสขม|bitter|B2
+black|แบลค|สีดำ|She has black hair.|เธอมีผมสีดำ|black|A1
+blade|เบลด|ใบมีด|The knife blade is sharp.|ใบมีดคมมาก|blade|B2
+blame|เบลม|ตำหนิ, โทษ|Don't blame me for your mistake.|อย่าโทษฉันสำหรับความผิดพลาดของคุณ|blame|B2
+blank|แบลงคฺ|ว่างเปล่า|Fill in the blank spaces.|เติมคำในช่องว่าง|blank|A2
+blind|ไบลนดฺ|ตาบอด|He is blind in one eye.|เขาตาบอดข้างหนึ่ง|blind|B2
+block|บลอค|ชิ้นส่วน, สกัดกั้น|A fallen tree blocked the road.|ต้นไม้ล้มขวางถนน|block|B1
+blond|บลอนดฺ|ผมสีบลอนด์(ทอง)|She has long blond hair.|เธอมีผมยาวสีบลอนด์|blond|A1
+blood|บลัด|เลือด|He lost a lot of blood.|เขาเสียเลือดมาก|blood|A2
+blow|โบลว์|เป่า, พัด|The wind is blowing hard.|ลมพัดแรงมาก|blow|A2
+blue|บลู|สีฟ้า, สีน้ำเงิน|The sky is blue.|ท้องฟ้าเป็นสีฟ้า|blue|A1
+board|บอร์ด|กระดาน, คณะกรรมการ|The teacher wrote on the board.|ครูเขียนบนกระดาน|board|A2
+boat|โบท|เรือ|We rented a boat.|เราเช่าเรือ|boat|A1
+body|บอ-ดี|ร่างกาย|Exercise is good for the body.|การออกกำลังกายดีต่อร่างกาย|body|A1
+boil|บอยลฺ|ต้ม, เดือด|Water boils at 100 degrees.|น้ำเดือดที่ 100 องศา|boil|A2
+bomb|บอมบฺ|ระเบิด|The bomb exploded.|ระเบิดทำงาน|bomb|B1
+bone|โบน|กระดูก|The dog is chewing a bone.|สุนัขกำลังแทะกระดูก|bone|A2
+book|บุค|หนังสือ, จอง|I booked a flight to Paris.|ฉันจองเที่ยวบินไปปารีส|book|A1
+boot|บูท|รองเท้าบูท|He wore heavy winter boots.|เขาสวมรองเท้าบูทกันหนาวที่หนา|boot|A1
+border|บอร์-เดอะ|ชายแดน|We crossed the border at night.|เราข้ามพรมแดนตอนกลางคืน|border (ขอบ)|B1
+bored|บอร์ด|รู้สึกเบื่อ|I was bored during the movie.|ฉันรู้สึกเบื่อระหว่างดูหนัง|bore -> bored|A1
+boring|บอ-ริง|น่าเบื่อ|This game is boring.|เกมนี้น่าเบื่อ|bore -> boring|A1
+born|บอร์น|เกิด|I was born in 1990.|ฉันเกิดปี 1990|bear -> born|A1
+borrow|บอ-โร|ยืม|Can I borrow your pen?|ฉันขอยืมปากกาคุณได้ไหม?|borrow|A2
+boss|บอส|เจ้านาย|My boss is very strict.|เจ้านายฉันเข้มงวดมาก|boss|A2
+both|โบธ|ทั้งสอง|I like both cats and dogs.|ฉันชอบทั้งแมวและหมา|both|A1
+bother|บอ-เธอะ|รบกวน|Sorry to bother you.|ขอโทษที่รบกวนคุณ|bother (กวนใจ)|B1
+bottle|บอท-เทิล|ขวด|A bottle of water.|น้ำหนึ่งขวด|bottle|A1
+bottom|บอท-ทัม|ด้านล่าง, ก้น|The book is at the bottom of the pile.|หนังสืออยู่ล่างสุดของกอง|bottom (ก้นบึ้ง)|A2
+bound|บาวนดฺ|มีแนวโน้ม, ผูกพัน|We are bound to make mistakes.|เรามีแนวโน้มที่จะทำผิดพลาด|bind -> bound|B2
+bowl|โบลว์|ชาม|A bowl of soup.|ซุปหนึ่งชาม|bowl|A2
+box|บอกซฺ|กล่อง|What is in the box?|อะไรอยู่ในกล่อง?|box|A1
+boy|บอย|เด็กผู้ชาย|The boy is playing outside.|เด็กผู้ชายกำลังเล่นข้างนอก|boy|A1
+boyfriend|บอย-เฟรนดฺ|แฟนหนุ่ม|She is going out with her boyfriend.|เธอกำลังออกไปเที่ยวกับแฟนหนุ่มของเธอ|boy + friend|A1
+brain|เบรน|สมอง|The human brain is complex.|สมองมนุษย์ซับซ้อนมาก|brain|A2
+branch|บรานชฺ|กิ่งไม้, สาขา|Our bank has a branch in this city.|ธนาคารของเรามีสาขาในเมืองนี้|branch (กิ่งก้าน)|B1
+brand|แบรนดฺ|ยี่ห้อ|What brand of soap do you use?|คุณใช้สบู่ยี่ห้ออะไร?|brand (ตรา)|B1
+brave|เบรฟว|กล้าหาญ|He was a brave soldier.|เขาเป็นทหารที่กล้าหาญ|brave|B1
+bread|เบรด|ขนมปัง|I eat bread for breakfast.|ฉันกินขนมปังเป็นอาหารเช้า|bread|A1
+break|เบรค|แตก, หัก, พัก|Let's take a 10-minute break.|พักสัก 10 นาทีกันเถอะ|break|A1
+breakfast|เบรค-ฟาสทฺ|อาหารเช้า|I had eggs for breakfast.|ฉันกินไข่เป็นอาหารเช้า|break + fast|A1
+breast|เบรสทฺ|หน้าอก|Breast cancer is common in women.|มะเร็งเต้านมพบได้บ่อยในผู้หญิง|breast|B2
+breath|เบรธ|ลมหายใจ|Take a deep breath.|สูดลมหายใจลึกๆ|breath|B1
+breathe|บรีธ|หายใจ|It is hard to breathe in here.|มันหายใจลำบากในนี้|breathe|B1
+breathing|บรีธ-ธิง|การหายใจ|His breathing was slow.|การหายใจของเขาช้า|breathe + ing|B1
+bride|ไบรดฺ|เจ้าสาว|The bride looked beautiful.|เจ้าสาวดูสวยงามมาก|bride|B1
+bridge|บริดจฺ|สะพาน|We drove over the bridge.|เราขับรถข้ามสะพาน|bridge|A2
+brief|บรีฟ|สั้น, รวบรัด|We had a brief meeting.|เรามีการประชุมสั้นๆ|brief (สั้นๆ)|B1
+briefly|บรีฟ-ลี|อย่างสั้นๆ|He spoke briefly about the project.|เขาพูดสั้นๆ เกี่ยวกับโครงการ|brief + ly|B2
+bright|ไบรทฺ|สว่าง, ฉลาด|The sun is very bright today.|พระอาทิตย์สว่างมากวันนี้|bright|A2
+brilliant|บริล-เลียนทฺ|ฉลาดมาก, ยอดเยี่ยม|That is a brilliant idea!|นั่นเป็นความคิดที่ยอดเยี่ยมมาก!|brilliant (สุกใส)|B1
+bring|บริง|นำมา|Please bring me a glass of water.|โปรดนำน้ำมาให้ฉันแก้วหนึ่ง|bring|A1
+broad|บรอด|กว้าง|He has broad shoulders.|เขามีไหล่ที่กว้าง|broad|B2
+broadcast|บรอด-คาสทฺ|ออกอากาศ|The news was broadcast on TV.|ข่าวถูกออกอากาศทางโทรทัศน์|broad + cast|B2
+brother|บรา-เธอะ|พี่ชาย, น้องชาย|I have one older brother.|ฉันมีพี่ชายหนึ่งคน|brother|A1
+brown|บราวนฺ|สีน้ำตาล|He is wearing brown shoes.|เขาสวมรองเท้าสีน้ำตาล|brown|A1
+brush|บรัช|แปรง|Remember to brush your teeth.|อย่าลืมแปรงฟันของคุณ|brush|A2
+bubble|บับ-เบิล|ฟองสบู่|The children are blowing bubbles.|เด็กๆ กำลังเป่าฟองสบู่|bubble|B1
+budget|บัด-เจท|งบประมาณ|We have a strict budget this month.|เรามีงบประมาณที่จำกัดในเดือนนี้|budget|B2
+build|บิลดฺ|สร้าง|They are going to build a new bridge.|พวกเขาจะสร้างสะพานใหม่|build|A1
+building|บิล-ดิง|อาคาร, ตึก|This is the tallest building in the city.|นี่คือตึกที่สูงที่สุดในเมือง|build + ing|A1
+bullet|บุล-ลิท|กระสุนปืน|The police found a bullet at the scene.|ตำรวจพบกระสุนปืนในที่เกิดเหตุ|bullet|B2
+bunch|บันชฺ|พวง, ช่อ|She bought a bunch of flowers.|เธอซื้อดอกไม้หนึ่งช่อ|bunch|B2
+burn|เบิร์น|เผา, ไหม้|The house burned to the ground.|บ้านถูกไฟไหม้จนราบ|burn|A2
+bus|บัส|รถบัส, รถประจำทาง|I take the bus to school.|ฉันนั่งรถบัสไปโรงเรียน|bus|A1
+bush|บุช|พุ่มไม้|The cat hid in the bush.|แมวซ่อนตัวอยู่ในพุ่มไม้|bush|B2
+business|บิซ-นิส|ธุรกิจ|His business is very successful.|ธุรกิจของเขาประสบความสำเร็จมาก|busy + ness|A1
+businessman|บิซ-นิส-แมน|นักธุรกิจชาย|He is a wealthy businessman.|เขาเป็นนักธุรกิจที่ร่ำรวย|business + man|A2
+busy|บิ-ซี|ยุ่ง, ไม่ว่าง|I am too busy right now.|ตอนนี้ฉันยุ่งเกินไป|busy|A1
+but|บัท|แต่|I like tea, but I don't like coffee.|ฉันชอบชา แต่ไม่ชอบกาแฟ|but|A1
+butter|บัท-เทอะ|เนย|Spread some butter on the toast.|ทาเนยลงบนขนมปังปิ้ง|butter|A1
+button|บัท-เทิน|ปุ่ม, กระดุม|Push the red button.|กดปุ่มสีแดง|button|A2
+buy|บาย|ซื้อ|Where did you buy that shirt?|คุณซื้อเสื้อเชิ้ตตัวนั้นที่ไหน?|buy|A1
+by|บาย|โดย, ด้วย, ใกล้|The book was written by him.|หนังสือเล่มนี้ถูกเขียนโดยเขา|by|A1
+bye|บาย|ลาก่อน|Bye! See you tomorrow.|ลาก่อน! เจอกันพรุ่งนี้|bye|A1
+cabin|แคบ-บิน|กระท่อม, เคบิน|We stayed in a log cabin in the woods.|เราพักในกระท่อมไม้ซุงในป่า|cabin|B2
+cabinet|แคบ-บิ-เนท|คณะรัฐมนตรี, ตู้|Store the cups in the cabinet.|เก็บถ้วยไว้ในตู้|cabinet|B2
+cable|เค-เบิล|สายเคเบิล|We need a longer cable for the TV.|เราต้องการสายเคเบิลที่ยาวกว่านี้สำหรับทีวี|cable|B2
+cafe|คา-เฟ่|ร้านกาแฟ|Let's meet at the cafe.|เจอกันที่ร้านกาแฟนะ|cafe|A1
+calculate|แคล-คิว-เลท|คำนวณ|Use a calculator to calculate the total.|ใช้เครื่องคิดเลขคำนวณยอดรวม|calculate|B2
+call|คอล|เรียก, โทรศัพท์|I will call you later.|ฉันจะโทรหาคุณทีหลัง|call|A1
+calm|คาม|สงบ|Please keep calm.|โปรดอยู่ในความสงบ|calm|B1
+camera|แคม-เมอะ-ระ|กล้องถ่ายรูป|She bought a new digital camera.|เธอซื้อกล้องดิจิตอลตัวใหม่|camera|A1
+camp|แคมพฺ|ค่าย, ตั้งแคมป์|We went camping in the mountains.|เราไปตั้งแคมป์บนภูเขา|camp|A2
+campaign|แคม-เปน|การรณรงค์|The anti-smoking campaign was successful.|แคมเปญต่อต้านการสูบบุหรี่ประสบความสำเร็จ|campaign|B1
+can|แคน|สามารถ, กระป๋อง|I can swim very fast.|ฉันสามารถว่ายน้ำได้เร็วมาก|can|A1
+cancel|แคน-เซิล|ยกเลิก|They had to cancel the flight.|พวกเขาต้องยกเลิกเที่ยวบิน|cancel|B2
+cancer|แคน-เซอะ|โรคมะเร็ง|He is fighting lung cancer.|เขากำลังต่อสู้กับมะเร็งปอด|cancer|B2
+candidate|แคน-ดิ-เดท|ผู้สมัคร|There are three candidates for the job.|มีผู้สมัครสามคนสำหรับตำแหน่งนี้|candidate|B2
+cannot|แคน-นอท|ไม่สามารถ|I cannot understand this.|ฉันไม่สามารถเข้าใจเรื่องนี้ได้|can + not|A1
+cap|แคป|หมวกแก๊ป, ฝาขวด|He is wearing a blue cap.|เขาสวมหมวกแก๊ปสีน้ำเงิน|cap|A2
+capable|เค-พะ-เบิล|สามารถ, มีความสามารถ|She is capable of doing the job.|เธอมีความสามารถในการทำงานนี้|cap (จับ/รับ) + able|B2
+capacity|คะ-พาส-ซิ-ที|ความจุ, ความสามารถ|The stadium has a seating capacity of 50,000.|สนามกีฬาที่นี่มีความจุที่นั่ง 50,000 ที่|cap + acity|B2
+capital|แคพ-พิ-เทิล|เมืองหลวง, เงินทุน|Paris is the capital of France.|ปารีสเป็นเมืองหลวงของฝรั่งเศส|capital|A1
+captain|แคพ-เทิน|กัปตัน, หัวหน้าทีม|He is the captain of the football team.|เขาเป็นกัปตันทีมฟุตบอล|captain|B1
+capture|แคพ-เชอะ|จับ, ยึด|The police captured the thief.|ตำรวจจับกุมขโมยได้|capture|B2
+car|คาร์|รถยนต์|She drives a red car.|เธอขับรถยนต์สีแดง|car|A1
+card|คาร์ด|บัตร, การ์ด|Here is my business card.|นี่คือนามบัตรของฉัน|card|A1
+care|แคร์|ดูแล, ความใส่ใจ|Take care of yourself.|ดูแลตัวเองด้วยนะ|care|A2
+career|คะ-เรียร์|อาชีพ|He wants a career in medicine.|เขาต้องการอาชีพในสายการแพทย์|career|A2
+careful|แคร์-ฟูล|ระมัดระวัง|Be careful when crossing the street.|ระมัดระวังเมื่อข้ามถนน|care + ful|A2
+carefully|แคร์-ฟูล-ลี|อย่างระมัดระวัง|Drive carefully!|ขับรถอย่างระมัดระวัง!|careful + ly|A2
+careless|แคร์-เลส|ประมาท|It was careless of you to leave the door open.|คุณประมาทมากที่เปิดประตูทิ้งไว้|care + less|B1
+carpet|คาร์-พิท|พรม|We bought a new carpet for the living room.|เราซื้อพรมผืนใหม่สำหรับห้องนั่งเล่น|carpet|A2
+carrot|แค-รอท|แครอท|Rabbits love to eat carrots.|กระต่ายชอบกินแครอท|carrot|A1
+carry|แค-รี|ถือ, แบก|Can you carry this bag for me?|คุณช่วยถือกระเป๋าใบนี้ให้ฉันได้ไหม?|carry|A1
+case|เคส|กรณี, กล่อง|In that case, I will go.|ในกรณีนั้น ฉันจะไป|case|A2
+cash|แคช|เงินสด|Are you paying by cash or credit card?|คุณจ่ายด้วยเงินสดหรือบัตรเครดิต?|cash|A2
+cast|คาสทฺ|ขว้าง, นักแสดง(ทั้งเรื่อง)|He was cast in the leading role.|เขาได้รับคัดเลือกให้รับบทนำ|cast|B2
+cat|แคท|แมว|I have a pet cat.|ฉันมีแมวเป็นสัตว์เลี้ยง|cat|A1
+catch|แคช|จับ, ตามทัน|Catch the ball!|รับลูกบอลสิ!|catch|A2
+category|แคท-ทิ-กอ-รี|หมวดหมู่, ประเภท|This book falls into the fiction category.|หนังสือเล่มนี้จัดอยู่ในหมวดหมู่นวนิยาย|category|B1
+cause|คอส|สาเหตุ, ทำให้เกิด|What was the cause of the fire?|อะไรคือสาเหตุของไฟไหม้?|cause|A2
+CD|ซี-ดี|แผ่นซีดี|I listen to music on CD.|ฉันฟังเพลงจากแผ่นซีดี|CD|A1
+ceiling|ซีล-ลิง|เพดาน|The ceiling is painted white.|เพดานทาสีขาว|ceiling|B1
+celebrate|เซล-ลิ-เบรท|เฉลิมฉลอง|We celebrated his birthday at a restaurant.|เราเฉลิมฉลองวันเกิดของเขาที่ร้านอาหาร|celebrate|A2
+celebration|เซล-ลิ-เบร-เชิน|การเฉลิมฉลอง|The victory celebration lasted all night.|การเฉลิมฉลองชัยชนะกินเวลาตลอดคืน|celebrate + ion|B1
+cell|เซลล์|เซลล์, ห้องขัง|A human body is made of cells.|ร่างกายมนุษย์ประกอบด้วยเซลล์|cell|B2
+cent|เซนทฺ|เซ็นต์ (หน่วยเงิน)|The pencil costs 50 cents.|ดินสอราคา 50 เซ็นต์|cent (หนึ่งร้อย)|A1
+center|เซน-เทอะ|ศูนย์กลาง|The hotel is in the center of town.|โรงแรมอยู่ใจกลางเมือง|center|A1
+central|เซน-เทริล|ส่วนกลาง, เป็นศูนย์กลาง|The central bank sets the interest rates.|ธนาคารกลางเป็นผู้กำหนดอัตราดอกเบี้ย|center + al|B1
+century|เซน-ชะ-รี|ศตวรรษ (100 ปี)|We are living in the 21st century.|เราอยู่ในศตวรรษที่ 21|cent (ร้อย)|A2
+ceremony|เซ-ริ-มอ-นี|พิธี|The wedding ceremony was beautiful.|พิธีแต่งงานงดงามมาก|ceremony|B1
+certain|เซอร์-เทิน|แน่นอน, มั่นใจ|I am certain that he will come.|ฉันแน่ใจว่าเขาจะมา|certain|A2
+certainly|เซอร์-เทิน-ลี|อย่างแน่นอน|I will certainly help you.|ฉันจะช่วยคุณอย่างแน่นอน|certain + ly|A2
+chain|เชน|โซ่, เครือข่าย|The prisoner was kept in chains.|นักโทษถูกล่ามโซ่|chain|B1
+chair|แชร์|เก้าอี้|Please sit on the chair.|เชิญนั่งบนเก้าอี้|chair|A1
+chairman|แชร์-แมน|ประธาน|He is the chairman of the board.|เขาเป็นประธานกรรมการ|chair + man|B2
+challenge|แชล-ลินจฺ|ความท้าทาย|This new job is a big challenge.|งานใหม่นี้เป็นความท้าทายครั้งใหญ่|challenge|B1
+champion|แชม-เปียน|แชมป์, ผู้ชนะเลิศ|They are the world champions.|พวกเขาคือแชมป์โลก|champion|B1
+chance|ชานซฺ|โอกาส|Give me one more chance.|ให้โอกาสฉันอีกครั้งหนึ่ง|chance|A2
+change|เชนจฺ|เปลี่ยน, เงินทอน|You need to change your clothes.|คุณต้องเปลี่ยนเสื้อผ้า|change|A1
+channel|แชน-เนิล|ช่อง(โทรทัศน์), ช่องทาง|What is on Channel 4?|ช่อง 4 มีรายการอะไรบ้าง?|channel|B1
+chapter|แชพ-เทอะ|บท(ในหนังสือ)|Read chapter one for homework.|อ่านบทที่หนึ่งเป็นการบ้าน|chapter|B1
+character|แค-รัค-เทอะ|ตัวละคร, ลักษณะนิสัย|Mickey Mouse is a famous cartoon character.|มิกกี้เมาส์เป็นตัวการ์ตูนที่มีชื่อเสียง|character|A2
+characteristic|แค-รัค-เทอะ-ริส-ติค|ลักษณะเฉพาะ|Kindness is his best characteristic.|ความใจดีคือลักษณะเฉพาะที่ดีที่สุดของเขา|character + istic|B2
+charge|ชาร์จ|คิดราคา, ข้อหา, ชาร์จไฟ|How much do they charge for a haircut?|พวกเขาคิดค่าตัดผมเท่าไหร่?|charge|B1
+charity|แช-ริ-ที|องค์กรการกุศล|She donates money to charity.|เธอบริจาคเงินให้การกุศล|charity|B1
+chart|ชาร์ท|แผนภูมิ|Look at the chart on page 10.|ดูแผนภูมิในหน้า 10|chart|A2
+chase|เชส|ไล่ตาม|The dog chased the cat.|สุนัขไล่ตามแมว|chase|B1
+chat|แชท|คุยเล่น|I had a chat with my friend.|ฉันคุยเล่นกับเพื่อน|chat|A2
+cheap|ชีพ|ราคาถูก|This shirt is very cheap.|เสื้อตัวนี้ราคาถูกมาก|cheap|A1
+cheat|ชีท|โกง|He cheated on the exam.|เขาโกงข้อสอบ|cheat|B1
+check|เชค|ตรวจสอบ, เช็คเงิน|Please check your answers.|โปรดตรวจสอบคำตอบของคุณ|check|A1
+cheerful|เชียร์-ฟูล|ร่าเริง|She is a very cheerful person.|เธอเป็นคนที่ร่าเริงมาก|cheer + ful|B1
+cheese|ชีซ|ชีส|I like cheese in my sandwich.|ฉันชอบชีสในแซนด์วิช|cheese|A1
+chef|เชฟ|พ่อครัว|He is a famous chef.|เขาเป็นเชฟที่มีชื่อเสียง|chef|A2
+chemical|เคม-มิ-เคิล|สารเคมี, ทางเคมี|The factory produces chemicals.|โรงงานผลิตสารเคมี|chemic + al|B1
+chemistry|เคม-มิส-ทรี|วิชาเคมี|I study chemistry at school.|ฉันเรียนวิชาเคมีที่โรงเรียน|chemistry|B1
+chest|เชสทฺ|หน้าอก, หีบ|He has a broad chest.|เขามีหน้าอกที่กว้าง|chest|B1
+chew|ชิว|เคี้ยว|Chew your food well.|เคี้ยวอาหารของคุณให้ละเอียด|chew|B2
+chicken|ชิค-เคิน|ไก่|We had fried chicken for dinner.|เรากินไก่ทอดเป็นมื้อเย็น|chicken|A1
+chief|ชีฟ|หัวหน้า, สำคัญที่สุด|He is the chief of police.|เขาเป็นหัวหน้าตำรวจ|chief|B2
+child|ไชลดฺ|เด็ก|She is my only child.|เธอเป็นลูกคนเดียวของฉัน|child|A1
+childhood|ไชลดฺ-ฮูด|วัยเด็ก|I had a happy childhood.|ฉันมีวัยเด็กที่มีความสุข|child + hood|B1
+chip|ชิพ|ชิป, แผ่นมันฝรั่งทอด|I bought a bag of potato chips.|ฉันซื้อมันฝรั่งทอดหนึ่งถุง|chip|A2
+chocolate|ชอค-คอ-ลิท|ช็อกโกแลต|She loves chocolate cake.|เธอชอบเค้กช็อกโกแลต|chocolate|A1
+choice|ชอยซฺ|ทางเลือก|You have no choice.|คุณไม่มีทางเลือก|choose -> choice|A2
+choose|ชูซ|เลือก|Please choose a color.|โปรดเลือกสี|choose|A1
+church|เชิร์ช|โบสถ์|They go to church on Sundays.|พวกเขาไปโบสถ์วันอาทิตย์|church|A2
+cigarette|ซิก-กะ-เรท|บุหรี่|Smoking cigarettes is bad for you.|การสูบบุหรี่ไม่ดีต่อคุณ|cigar + ette|A2
+cinema|ซิน-เนอะ-มะ|โรงภาพยนตร์|Let's go to the cinema tonight.|คืนนี้ไปดูหนังกันเถอะ|cinema|A1
+circle|เซอ-เคิล|วงกลม|Draw a circle on the paper.|วาดวงกลมลงบนกระดาษ|circle|A2
+circumstance|เซอ-คัม-สแตนซฺ|สถานการณ์, แวดล้อม|I can't work under these circumstances.|ฉันทำงานภายใต้สถานการณ์แบบนี้ไม่ได้|circum (รอบ) + stance|B2
+citizen|ซิท-ทิ-เซิน|พลเมือง|He is a citizen of the USA.|เขาเป็นพลเมืองของสหรัฐอเมริกา|city -> citizen|B2
+city|ซิท-ที|เมือง|Bangkok is a big city.|กรุงเทพฯ เป็นเมืองใหญ่|city|A1
+civil|ซิ-วิล|พลเรือน, ที่มีมารยาท|We must protect civil rights.|เราต้องปกป้องสิทธิพลเมือง|civil|B2
+claim|เคลม|เรียกร้อง, อ้างว่า|He claims that he is innocent.|เขาอ้างว่าเขาบริสุทธิ์|claim|B1
+class|คลาส|ชั้นเรียน, ประเภท|I have an English class at 10.|ฉันมีเรียนภาษาอังกฤษตอน 10 โมง|class|A1
+classic|คลาส-สิค|คลาสสิก, ยอดเยี่ยม|This car is a classic.|รถคันนี้เป็นรถคลาสสิก|class + ic|B2
+classical|คลาส-สิ-เคิล|ดั้งเดิม, คลาสสิก|Do you like classical music?|คุณชอบดนตรีคลาสสิกไหม?|classic + al|A2
+classroom|คลาส-รูม|ห้องเรียน|Please be quiet in the classroom.|โปรดเงียบในห้องเรียน|class + room|A1
+clean|คลีน|สะอาด, ทำความสะอาด|Keep your room clean.|รักษาห้องของคุณให้สะอาด|clean|A1
+clear|เคลียร์|ใส, ชัดเจน|The water is very clear.|น้ำใสมาก|clear|A2
+clearly|เคลียร์-ลี|อย่างชัดเจน|He spoke clearly so everyone could hear.|เขาพูดอย่างชัดเจนเพื่อให้ทุกคนได้ยิน|clear + ly|A2
+clerk|เคลิร์ค|เสมียน, พนักงานร้าน|The clerk helped me find the book.|พนักงานร้านช่วยฉันหาหนังสือ|clerk|B2
+clever|เคลฟ-เวอะ|ฉลาด|She is a clever girl.|เธอเป็นเด็กที่ฉลาด|clever|A2
+click|คลิค|คลิก, เสียงคลิก|Click on the link to start.|คลิกที่ลิงก์เพื่อเริ่มต้น|click|A2
+client|ไคล-เอินทฺ|ลูกค้า|The lawyer met with his client.|ทนายความพบกับลูกค้าของเขา|client|B1
+climate|ไคล-เมท|สภาพภูมิอากาศ|Thailand has a tropical climate.|ประเทศไทยมีสภาพภูมิอากาศแบบเขตร้อน|climate|A2
+climb|ไคลมฺบฺ|ปีน, ไต่|We climbed the mountain.|เราปีนภูเขา|climb|A1
+clock|คลอค|นาฬิกา|Look at the clock, it's late!|ดูนาฬิกาสิ สายแล้ว!|clock|A1
+close|โคลส|ปิด, ใกล้ชิด|Please close the door.|โปรดปิดประตู|close|A1
+closely|โคลส-ลี|อย่างใกล้ชิด|Look closely at this picture.|ดูภาพนี้อย่างใกล้ชิด|close + ly|B2
+cloth|คลอธ|ผ้า|Use a damp cloth to wipe the table.|ใช้ผ้าหมาดๆ เช็ดโต๊ะ|cloth|B1
+clothes|โคลธซฺ|เสื้อผ้า|I need to wash my clothes.|ฉันต้องซักเสื้อผ้า|clothes|A1
+clothing|โคลธ-ธิง|เครื่องแต่งกาย|Bring warm clothing for the trip.|นำเครื่องแต่งกายที่อบอุ่นสำหรับทริปมาด้วย|cloth + ing|A2
+cloud|คลาวดฺ|เมฆ|There is not a single cloud in the sky.|ไม่มีเมฆแม้แต่ก้อนเดียวบนท้องฟ้า|cloud|A2
+club|คลับ|สโมสร, คลับ|I joined the tennis club.|ฉันเข้าร่วมสโมสรเทนนิส|club|A1
+coach|โคช|โค้ช, รถบัสทางไกล|The coach praised the players.|โค้ชกล่าวชมผู้เล่น|coach|A2
+coal|โคล|ถ่านหิน|Coal is a fossil fuel.|ถ่านหินเป็นเชื้อเพลิงฟอสซิล|coal|B1
+coast|โคสทฺ|ชายฝั่ง|We drove along the coast.|เราขับรถไปตามชายฝั่ง|coast|A2
+coat|โคท|เสื้อโค้ท|Put on your coat, it's cold.|สวมเสื้อโค้ทสิ อากาศหนาว|coat|A1
+code|โคด|รหัส|What is the passcode?|รหัสผ่านคืออะไร?|code|A2
+coffee|คอฟ-ฟี|กาแฟ|I drink coffee every morning.|ฉันดื่มกาแฟทุกเช้า|coffee|A1
+coin|คอยน์|เหรียญ|I found a gold coin.|ฉันพบเหรียญทอง|coin|B1
+cold|โคลดฺ|หนาว, หวัด|It is very cold outside.|ข้างนอกหนาวมาก|cold|A1
+collapse|คอ-แลพซฺ|พังทลาย, ล้มลง|The old bridge collapsed.|สะพานเก่าพังทลายลง|collapse|B2
+colleague|คอล-ลีก|เพื่อนร่วมงาน|He is a trusted colleague.|เขาเป็นเพื่อนร่วมงานที่ไว้ใจได้|colleague|B1
+collect|คอ-เลคทฺ|สะสม, รวบรวม|I collect stamps.|ฉันสะสมแสตมป์|collect|A2
+collection|คอ-เลค-เชิน|การสะสม, ชุดสะสม|He has a large collection of books.|เขามีหนังสือสะสมชุดใหญ่|collect + ion|B1
+college|คอล-ลิจ|วิทยาลัย|She is studying at a local college.|เธอกำลังศึกษาที่วิทยาลัยในท้องถิ่น|college|A1
+color|คัล-เลอะ|สี|What is your favorite color?|คุณชอบสีอะไร?|color|A1
+column|คอล-ลัมน์|คอลัมน์, เสา|Read the first column on the page.|อ่านคอลัมน์แรกในหน้า|column|A2
+combination|คอม-บิ-เน-เชิน|การรวมกัน|Pink is a combination of red and white.|สีชมพูคือการผสมกันของสีแดงและสีขาว|combine -> combination|B2
+combine|คอม-ไบนฺ|รวมกัน|Combine all the ingredients in a bowl.|รวมส่วนผสมทั้งหมดในชาม|combine|B1
+come|คัม|มา|Please come here.|โปรดมาที่นี่|come|A1
+comedy|คอม-มิ-ดี|เรื่องตลก, ละครตลก|I love watching comedy movies.|ฉันชอบดูหนังตลก|comedy|A2
+comfort|คัม-เฟิร์ท|ความสะดวกสบาย, ปลอบโยน|The hotel offers a high level of comfort.|โรงแรมมอบความสะดวกสบายระดับสูง|comfort|B2
+comfortable|คัม-เฟิร์ท-ทะ-เบิล|สะดวกสบาย|This chair is very comfortable.|เก้าอี้ตัวนี้สบายนั่งมาก|comfort + able|A2
+command|คะ-มานดฺ|คำสั่ง, สั่งการ|The dog obeys every command.|สุนัขทำตามทุกคำสั่ง|command|B2
+comment|คอม-เมนทฺ|ความคิดเห็น|Leave a comment below.|แสดงความคิดเห็นด้านล่าง|comment|A2
+commercial|คะ-เมอ-เชียล|เกี่ยวกับการค้า, โฆษณา|They are shooting a TV commercial.|พวกเขากำลังถ่ายทำโฆษณาทีวี|commerce -> commercial|B1
+commission|คะ-มิช-เชิน|คณะกรรมาธิการ, ค่านายหน้า|He gets a 10% commission on sales.|เขาได้ค่านายหน้า 10% จากยอดขาย|commit -> commission|B2
+commit|คะ-มิท|กระทำผิด, ผูกมัดตัวเอง|He committed a crime.|เขากระทำอาชญากรรม|commit|B1
+commitment|คะ-มิท-เมินทฺ|ความมุ่งมั่น, ภาระผูกพัน|Marriage is a lifelong commitment.|การแต่งงานเป็นภาระผูกพันตลอดชีวิต|commit + ment|B2
+committee|คะ-มิท-ที|คณะกรรมการ|The committee will decide tomorrow.|คณะกรรมการจะตัดสินใจในวันพรุ่งนี้|commit + tee|B2
+common|คอม-เมิน|ธรรมดา, ทั่วไป|Colds are very common in winter.|ไข้หวัดเป็นเรื่องธรรมดามากในฤดูหนาว|common|A1
+commonly|คอม-เมิน-ลี|โดยทั่วไป|This word is commonly used.|คำนี้ถูกใช้โดยทั่วไป|common + ly|B2
+communicate|คะ-มิว-นิ-เคท|สื่อสาร|We communicate by email.|เราสื่อสารกันทางอีเมล|communicate|A2
+communication|คะ-มิว-นิ-เค-เชิน|การสื่อสาร|Good communication is important.|การสื่อสารที่ดีเป็นสิ่งสำคัญ|communicate + ion|B1
+community|คะ-มิว-นิ-ที|ชุมชน|We live in a friendly community.|เราอาศัยอยู่ในชุมชนที่เป็นมิตร|commune -> community|A2
+company|คัม-พะ-นี|บริษัท, เพื่อนฝูง|He works for a software company.|เขาทำงานให้บริษัทซอฟต์แวร์|company|A1
+compare|คัม-แพร์|เปรียบเทียบ|Don't compare yourself to others.|อย่าเปรียบเทียบตัวเองกับคนอื่น|compare|A2
+comparison|คัม-แพ-ริ-เซิน|การเปรียบเทียบ|In comparison to last year, profits are up.|เมื่อเปรียบเทียบกับปีที่แล้ว กำไรเพิ่มขึ้น|compare -> comparison|B1
+compete|คัม-พีท|แข่งขัน|They will compete in the race.|พวกเขาจะแข่งขันในการวิ่งแข่ง|compete|A2
+competition|คอม-พิ-ทิช-เชิน|การแข่งขัน|She won the singing competition.|เธอชนะการแข่งขันร้องเพลง|compete -> competition|A2
+competitive|คัม-เพท-ทิ-ทิฟว|เกี่ยวกับการแข่งขัน, ชอบแข่งขัน|He is a very competitive player.|เขาเป็นผู้เล่นที่ชอบแข่งขันมาก|compete + ive|B1
+complain|คัม-เพลน|บ่น, ร้องเรียน|The customer complained about the food.|ลูกค้าบ่นเกี่ยวกับอาหาร|complain|A2
+complaint|คัม-เพลนทฺ|ข้อร้องเรียน|We received a complaint from a neighbor.|เราได้รับข้อร้องเรียนจากเพื่อนบ้าน|complain -> complaint|B1
+complete|คัม-พลีท|สมบูรณ์, ทำให้เสร็จ|I have completed my work.|ฉันทำงานเสร็จแล้ว|complete|A1
+completely|คัม-พลีท-ลี|อย่างสมบูรณ์, ทั้งหมด|I completely forgot about the meeting.|ฉันลืมเรื่องการประชุมไปเสียสนิท|complete + ly|A2
+complex|คอม-เพลคซฺ|ซับซ้อน|The problem is very complex.|ปัญหานี้ซับซ้อนมาก|complex|B1
+complicate|คอม-พลิ-เคท|ทำให้ซับซ้อน|Don't complicate things.|อย่าทำให้เรื่องมันซับซ้อน|complicate|B2
+complicated|คอม-พลิ-เค-ทิด|ซับซ้อน, ยุ่งยาก|The instructions are too complicated.|คำแนะนำมันซับซ้อนเกินไป|complicate + ed|B1
+computer|คัม-พิว-เทอะ|คอมพิวเตอร์|I bought a new computer.|ฉันซื้อคอมพิวเตอร์เครื่องใหม่|compute + er|A1
+concentrate|คอน-เซิน-เทรท|มีสมาธิ, จดจ่อ|I can't concentrate with all this noise.|ฉันไม่มีสมาธิเลยกับเสียงดังพวกนี้|center -> concentrate|B1
+concentration|คอน-เซิน-เทร-เชิน|ความตั้งใจ, สมาธิ|This game requires high concentration.|เกมนี้ต้องใช้สมาธิสูง|concentrate + ion|B2
+concept|คอน-เซพทฺ|แนวคิด|The concept of time travel is fascinating.|แนวคิดเรื่องการข้ามเวลาช่างน่าหลงใหล|concept (แนวคิด)|B2
+concern|คัน-เซิร์น|ความกังวล, เกี่ยวข้อง|My main concern is safety.|ความกังวลหลักของฉันคือความปลอดภัย|concern (ห่วงใย)|B2
+concerned|คัน-เซิร์นดฺ|เป็นห่วง|I am concerned about his health.|ฉันเป็นห่วงสุขภาพของเขา|concern + ed|B2
+conclude|คัน-คลูด|สรุป|Let me conclude by saying thank you.|ขออนุญาตสรุปด้วยการกล่าวขอบคุณ|clude (ปิด)|B1
+conclusion|คัน-คลู-เชิน|ข้อสรุป|In conclusion, the project was a success.|โดยสรุปแล้วโครงการนี้ประสบความสำเร็จ|conclude -> conclusion|B1
+condition|คัน-ดิช-เชิน|เงื่อนไข, สภาพ|The car is in good condition.|รถอยู่ในสภาพดี|condition (สภาพ)|A2
+conduct|คอน-ดัคทฺ|ความประพฤติ, จัดการ(งาน)|They are conducting a survey.|พวกเขากำลังจัดการสำรวจ|duct (นำ)|B2
+conference|คอน-เฟอ-เรินซฺ|การประชุม|She is attending a conference in London.|เธอเข้าร่วมการประชุมในลอนดอน|confer -> conference|A2
+confidence|คอน-ฟิ-เดินซฺ|ความมั่นใจ|He lacks confidence.|เขาขาดความมั่นใจ|confide (เชื่อใจ) -> confidence|B2
+confident|คอน-ฟิ-เดินทฺ|มั่นใจ|I am confident we will win.|ฉันมั่นใจว่าเราจะชนะ|confide -> confident|B1
+confirm|คัน-เฟิร์ม|ยืนยัน|Please confirm your reservation.|โปรดยืนยันการจองของคุณ|firm (มั่นคง) -> confirm|B1
+conflict|คอน-ฟลิคทฺ|ความขัดแย้ง|The conflict between the two countries continues.|ความขัดแย้งระหว่างสองประเทศยังคงดำเนินต่อไป|conflict (ขัดแย้ง)|B2
+confuse|คัน-ฟิวซ|ทำให้สับสน|Don't confuse him with too many details.|อย่าทำให้เขาสับสนด้วยรายละเอียดที่มากเกินไป|fuse (เท/หลอม)|B1
+confused|คัน-ฟิวซดฺ|สับสน|I am completely confused.|ฉันสับสนอย่างสมบูรณ์|confuse + ed|B1
+confusing|คัน-ฟิว-ซิง|น่าสับสน|The directions were confusing.|ทิศทางที่บอกมานั้นน่าสับสน|confuse + ing|B2
+connect|คะ-เนคทฺ|เชื่อมต่อ|Connect the printer to your computer.|เชื่อมต่อเครื่องพิมพ์กับคอมพิวเตอร์ของคุณ|connect|A2
+connection|คะ-เนค-เชิน|การเชื่อมต่อ, ความสัมพันธ์|My internet connection is slow.|การเชื่อมต่ออินเทอร์เน็ตของฉันช้า|connect + ion|B1
+conscious|คอน-เชิส|มีสติ, ตระหนัก|The patient was conscious during the operation.|คนไข้มีสติระหว่างการผ่าตัด|conscious (รู้ตัว)|B2
+consequence|คอน-ซิ-คเวนซฺ|ผลที่ตามมา|You must face the consequences of your actions.|คุณต้องเผชิญกับผลที่ตามมาจากการกระทำของคุณ|sequ (ตาม)|B2
+conservative|คัน-เซอ-วะ-ทิฟว|อนุรักษ์นิยม|He has conservative views on education.|เขามีมุมมองอนุรักษ์นิยมเกี่ยวกับการศึกษา|conserve -> conservative|B2
+consider|คัน-ซิด-เดอะ|พิจารณา|We will consider your request.|เราจะพิจารณาคำขอของคุณ|consider (คิดรอบคอบ)|B1
+considerable|คัน-ซิด-เดอ-ระ-เบิล|มากมาย, สำคัญ|A considerable amount of money was spent.|มีการใช้เงินจำนวนมาก|consider + able|B2
+consideration|คัน-ซิด-เดอ-เร-เชิน|การพิจารณา, ความเห็นอกเห็นใจ|Please give this matter your careful consideration.|โปรดให้การพิจารณาเรื่องนี้อย่างรอบคอบ|consider + ation|B2
+consist|คัน-ซิสทฺ|ประกอบด้วย|The team consists of five players.|ทีมประกอบด้วยผู้เล่นห้าคน|consist (ประกอบด้วย)|B1
+constant|คอน-สแตนทฺ|คงที่, ต่อเนื่อง|The baby needs constant attention.|เด็กทารกต้องการความเอาใจใส่อย่างต่อเนื่อง|stant (ยืน/ตั้งอยู่)|B2
+constantly|คอน-สแตนทฺ-ลี|อย่างสม่ำเสมอ|He is constantly checking his phone.|เขาเช็คโทรศัพท์อย่างต่อเนื่อง|constant + ly|B2
+construct|คัน-สตรัคทฺ|สร้าง|The new highway is being constructed.|ทางหลวงเส้นใหม่กำลังถูกสร้าง|struct (สร้าง)|B2
+construction|คัน-สตรัค-เชิน|การก่อสร้าง|The building is under construction.|อาคารกำลังอยู่ระหว่างการก่อสร้าง|construct + ion|B2
+consume|คัน-ซูม|บริโภค, ผลาญ|This car consumes a lot of gas.|รถคันนี้กินน้ำมันมาก|consume (ใช้หมดไป)|B1
+consumer|คัน-ซู-เมอะ|ผู้บริโภค|The new laws will protect consumers.|กฎหมายใหม่จะปกป้องผู้บริโภค|consume + er|B1
+contact|คอน-แทคทฺ|ติดต่อ|Please contact me if you need help.|โปรดติดต่อฉันถ้าคุณต้องการความช่วยเหลือ|contact (สัมผัส)|B1
+contain|คัน-เทน|บรรจุ, ประกอบด้วย|This box contains books.|กล่องนี้บรรจุหนังสือ|contain (มีอยู่ข้างใน)|A2
+container|คัน-เท-เนอะ|ภาชนะ|Store the food in an airtight container.|เก็บอาหารในภาชนะที่ปิดสนิท|contain + er|B1
+contemporary|คัน-เทม-พะ-เรอ-รี|ร่วมสมัย|I enjoy contemporary art.|ฉันชอบศิลปะร่วมสมัย|temp (เวลา)|B2
+content|คอน-เทนทฺ|เนื้อหา|The content of the book is very interesting.|เนื้อหาของหนังสือน่าสนใจมาก|content|B1
+contest|คอน-เทสทฺ|การแข่งขัน|She won a beauty contest.|เธอชนะการประกวดความงาม|contest (แข่ง)|B2
+context|คอน-เทคซฺทฺ|บริบท|We need to look at the historical context.|เราต้องดูบริบททางประวัติศาสตร์|text (ข้อความ)|B2
+continue|คัน-ทิน-นิว|ทำต่อไป|Please continue reading.|โปรดอ่านต่อไป|continue|A2
+continuous|คัน-ทิน-นิว-อัส|ต่อเนื่อง|The rain was continuous for three days.|ฝนตกต่อเนื่องเป็นเวลาสามวัน|continue + ous|B1
+contract|คอน-แทรคทฺ|สัญญา|Sign the contract at the bottom.|เซ็นสัญญาที่ด้านล่าง|contract (ข้อตกลง)|B2
+contrast|คอน-ทราสทฺ|ความแตกต่าง, การเปรียบเทียบ|In contrast to her sister, she is very tall.|ในทางตรงข้ามกับพี่สาวของเธอ เธอสูงมาก|contrast (ความขัดแย้ง)|B1
+contribute|คัน-ทริบ-บิวทฺ|บริจาค, มีส่วนทำให้|Everyone should contribute to the discussion.|ทุกคนควรมีส่วนร่วมในการอภิปราย|tribute (มอบให้)|B2
+contribution|คอน-ทริ-บิว-เชิน|การบริจาค, ผลงาน|He made a great contribution to science.|เขาสร้างผลงานที่ยิ่งใหญ่ให้กับวงการวิทยาศาสตร์|contribute + ion|B2
+control|คัน-โทรล|ควบคุม|He lost control of the car.|เขาเสียการควบคุมรถ|control|A2
+convenient|คัน-วี-เนียนทฺ|สะดวก|Is 3 PM convenient for you?|บ่าย 3 โมงสะดวกสำหรับคุณไหม?|convenient (สะดวก)|B1
+conversation|คอน-เวอ-เซ-เชิน|การสนทนา|I had an interesting conversation with him.|ฉันมีการสนทนาที่น่าสนใจกับเขา|converse -> conversation|A1
+convert|คัน-เวิร์ท|เปลี่ยน, แปลง|Convert the dollars into euros.|แปลงเงินดอลลาร์เป็นยูโร|vert (หมุน/เปลี่ยน)|B2
+convince|คัน-วินซฺ|โน้มน้าว|He convinced me to go with him.|เขาโน้มน้าวให้ฉันไปกับเขา|convince (ทำให้เชื่อ)|B1
+cook|คุค|ทำอาหาร, พ่อครัว|I love to cook Italian food.|ฉันชอบทำอาหารอิตาเลียน|cook|A1
+cookie|คุค-คี|คุกกี้|She baked chocolate chip cookies.|เธออบคุกกี้ช็อกโกแลตชิป|cookie|A2
+cooking|คุค-คิง|การทำอาหาร|Cooking is my favorite hobby.|การทำอาหารคืองานอดิเรกที่ฉันชอบ|cook + ing|A2
+cool|คูล|เย็น, เจ๋ง|It's a cool autumn day.|มันเป็นวันที่ฤดูใบไม้ร่วงอากาศเย็นสบาย|cool|A1
+copy|คอ-พี|สำเนา, คัดลอก|Could you make a copy of this document?|คุณช่วยถ่ายสำเนาเอกสารนี้ได้ไหม?|copy|A2
+core|คอร์|แก่นกลาง, สำคัญ|The core of the problem is lack of communication.|แก่นของปัญหาคือการขาดการสื่อสาร|core (แกน)|B2
+corn|คอร์น|ข้าวโพด|We grew corn in our garden.|เราปลูกข้าวโพดในสวนของเรา|corn|B1
+corner|คอร์-เนอะ|มุม|The shop is on the corner of the street.|ร้านอยู่ตรงมุมถนน|corner|A2
+corporate|คอร์-พะ-ริท|เกี่ยวกับบริษัท|He wears a corporate suit.|เขาสวมชุดสูทของบริษัท|corporate (องค์กร)|B2
+correct|คะ-เรคทฺ|ถูกต้อง, แก้ไข|Your answer is correct.|คำตอบของคุณถูกต้อง|correct|A1
+correctly|คะ-เรคทฺ-ลี|อย่างถูกต้อง|He spelled the word correctly.|เขาสะกดคำได้อย่างถูกต้อง|correct + ly|A2
+cost|คอสทฺ|ราคา, มีมูลค่า|How much does it cost?|มันราคาเท่าไหร่?|cost|A1
+cottage|คอท-ทิจ|กระท่อม|They live in a small cottage near the lake.|พวกเขาอาศัยอยู่ในกระท่อมเล็กๆ ใกล้ทะเลสาบ|cottage|B1
+cotton|คอท-เทิน|ผ้าฝ้าย, ปุยฝ้าย|This shirt is made of 100% cotton.|เสื้อตัวนี้ทำจากผ้าฝ้าย 100%|cotton|B1
+cough|คอฟ|ไอ|He has a bad cough.|เขามีอาการไออย่างหนัก|cough|B1
+could|คูด|สามารถ(อดีตของ can)|I could run fast when I was young.|ฉันสามารถวิ่งได้เร็วตอนฉันยังเด็ก|could|A1
+council|เคานฺ-ซิล|สภา|The city council meets on Tuesdays.|สภาเมืองประชุมกันในวันอังคาร|council|B2
+count|เคานทฺ|นับ|Count to ten and open your eyes.|นับถึงสิบแล้วลืมตาขึ้น|count|A2
+country|คัน-ทรี|ประเทศ, ชนบท|Thailand is a beautiful country.|ประเทศไทยเป็นประเทศที่สวยงาม|country|A1
+countryside|คัน-ทรี-ไซดฺ|ชนบท|We took a drive in the countryside.|เราขับรถเที่ยวในชนบท|country + side|B1
+county|เคานฺ-ที|มณฑล, เทศมณฑล|He lives in Orange County.|เขาอาศัยอยู่ในเทศมณฑลออเรนจ์|county|B2
+couple|คัพ-เพิล|คู่(คนหรือของสองสิ่ง)|A married couple live next door.|คู่แต่งงานอาศัยอยู่ข้างบ้าน|couple|A2
+courage|เคอ-ริจ|ความกล้าหาญ|It takes courage to speak the truth.|การพูดความจริงต้องใช้ความกล้าหาญ|courage (ความกล้า)|B1
+course|คอร์ส|หลักสูตร, เส้นทาง|I am taking an English course.|ฉันกำลังเรียนหลักสูตรภาษาอังกฤษ|course|A1
+court|คอร์ท|ศาล, สนาม(เทนนิส/บาส)|He appeared in court today.|เขาไปขึ้นศาลวันนี้|court|B1
+cousin|คัซ-ซิน|ลูกพี่ลูกน้อง|My cousin is visiting from Canada.|ลูกพี่ลูกน้องของฉันมาเยี่ยมจากแคนาดา|cousin|A1
+cover|คัฟ-เวอะ|ปกคลุม, หน้าปก|Cover the pot with a lid.|ปิดหม้อด้วยฝา|cover|A2
+cow|คาว|วัว(ตัวเมีย)|The cow is eating grass.|วัวกำลังกินหญ้า|cow|A1
+crack|แครค|รอยร้าว, แตก|There is a crack in the mirror.|มีรอยร้าวที่กระจก|crack|B2
+craft|คราฟทฺ|งานฝีมือ|She enjoys learning new crafts.|เธอชอบเรียนรู้งานฝีมือใหม่ๆ|craft|B2
+crash|แครช|ชน, พัง|The car crashed into a tree.|รถชนต้นไม้|crash|B2
+crazy|เคร-ซี|บ้า, คลั่งไคล้|You must be crazy to do that!|คุณต้องบ้าไปแล้วแน่ๆ ที่ทำแบบนั้น!|crazy|A2
+cream|ครีม|ครีม|Would you like milk or cream in your coffee?|คุณรับนมหรือครีมในกาแฟไหม?|cream|A2
+create|ครี-เอท|สร้างสรรค์|We need to create a new plan.|เราต้องสร้างแผนใหม่|create|A2
+creation|ครี-เอ-เชิน|การสร้าง, สิ่งประดิษฐ์|This painting is his greatest creation.|ภาพวาดนี้คือผลงานสร้างสรรค์ที่ยิ่งใหญ่ที่สุดของเขา|create + ion|B2
+creative|ครี-เอ-ทิฟว|มีความคิดสร้างสรรค์|She is a very creative artist.|เธอเป็นศิลปินที่มีความคิดสร้างสรรค์มาก|create + ive|B1
+creature|ครี-เชอะ|สิ่งมีชีวิต|Dogs are loyal creatures.|สุนัขเป็นสัตว์ที่ซื่อสัตย์|create -> creature|B2
+credit|เคร-ดิท|สินเชื่อ, ความน่าเชื่อถือ|Can I pay by credit card?|ฉันจ่ายด้วยบัตรเครดิตได้ไหม?|credit|A2
+crew|ครู|ลูกเรือ, ทีมงาน|The ship's crew worked hard.|ลูกเรือของเรือทำงานอย่างหนัก|crew|B2
+crime|ไครมฺ|อาชญากรรม|He committed a serious crime.|เขาก่ออาชญากรรมร้ายแรง|crime|B1
+criminal|คริม-มิ-เนิล|อาชญากร|The criminal was sent to prison.|อาชญากรถูกส่งตัวเข้าคุก|crime -> criminal|B1
+crisis|ไคร-ซิส|วิกฤตการณ์|The country is facing an economic crisis.|ประเทศกำลังเผชิญกับวิกฤตเศรษฐกิจ|crisis|B2
+critic|คริ-ทิค|นักวิจารณ์|The food critic loved the restaurant.|นักวิจารณ์อาหารชอบร้านอาหารนี้|critic|B2
+critical|คริ-ทิ-เคิล|วิกฤต, เชิงวิจารณ์|The patient is in critical condition.|ผู้ป่วยอยู่ในอาการวิกฤต|critic + al|B2
+criticism|คริ-ทิ-ซิ-ซึม|การวิจารณ์|He cannot accept any criticism.|เขารับคำวิจารณ์ไม่ได้เลย|critic + ism|B2
+criticize|คริ-ทิ-ไซซ|วิจารณ์|Don't criticize him in front of others.|อย่าวิจารณ์เขาต่อหน้าคนอื่น|critic + ize|B2
+crop|ครอพ|พืชผล|The farmers had a good crop this year.|ปีนี้ชาวนามีพืชผลที่ดี|crop|B2
+cross|ครอส|ข้าม, กากบาท|Cross the street at the traffic lights.|ข้ามถนนตรงสัญญาณไฟจราจร|cross|A2
+crowd|คราวดฺ|ฝูงชน|A large crowd gathered in the square.|ฝูงชนกลุ่มใหญ่รวมตัวกันที่จัตุรัส|crowd|A2
+crowded|คราวดฺ-เด็ด|แออัด|The train was very crowded.|รถไฟแออัดมาก|crowd + ed|A2
+crucial|ครู-เชียล|สำคัญมาก|This match is crucial for our team.|การแข่งขันนัดนี้สำคัญมากสำหรับทีมของเรา|crucial|B2
+cruel|ครู-เอิล|โหดร้าย|It is cruel to hit a dog.|การตีสุนัขเป็นเรื่องโหดร้าย|cruel|B1
+cry|คราย|ร้องไห้, ตะโกน|The baby started to cry.|เด็กร้องไห้|cry|A1
+cultural|คัล-ชะ-เริล|ทางวัฒนธรรม|Kyoto is the cultural heart of Japan.|เกียวโตเป็นหัวใจทางวัฒนธรรมของญี่ปุ่น|culture + al|B1
+culture|คัล-เชอะ|วัฒนธรรม|I love learning about Japanese culture.|ฉันชอบเรียนรู้วัฒนธรรมญี่ปุ่น|culture|A2
+cup|คัพ|ถ้วย|Would you like a cup of tea?|รับชาสักถ้วยไหม?|cup|A1
+cupboard|คับ-บอร์ด|ตู้กับข้าว, ตู้เก็บของ|The plates are in the cupboard.|จานอยู่ในตู้|cup + board|A2
+cure|เคียวร์|รักษา(ให้หาย)|There is currently no cure for this disease.|ปัจจุบันยังไม่มีวิธีรักษาโรคนี้|cure|B2
+curious|คิว-เรียส|อยากรู้อยากเห็น|Cats are very curious animals.|แมวเป็นสัตว์ที่อยากรู้อยากเห็นมาก|curious|B1
+curl|เคิร์ล|ม้วน, ดัดลอน|She curled her hair for the party.|เธอม้วนผมสำหรับงานปาร์ตี้|curl|B2
+curly|เคอร์-ลี|หยิก, เป็นลอน|He has short curly hair.|เขามีผมหยิกสั้น|curl + y|A2
+current|เคอ-เรินทฺ|ปัจจุบัน, กระแส|What is your current address?|ที่อยู่ปัจจุบันของคุณคืออะไร?|current|B1
+currently|เคอ-เรินทฺ-ลี|ในปัจจุบัน|I am currently working in London.|ตอนนี้ฉันกำลังทำงานในลอนดอน|current + ly|B1
+curve|เคิร์ฟว|โค้ง|The road curves to the left.|ถนนโค้งไปทางซ้าย|curve|B2
+curved|เคิร์ฟว-ดฺ|ซึ่งโค้งงอ|The sword has a curved blade.|ดาบมีใบมีดที่โค้งงอ|curve + d|B2
+custom|คัส-ทัม|ประเพณี, ธรรมเนียม|It is a local custom to bow.|การโค้งคำนับเป็นธรรมเนียมท้องถิ่น|custom|B1
+customer|คัส-เทอะ-เมอะ|ลูกค้า|The shop has many loyal customers.|ร้านค้านี้มีลูกค้าประจำมากมาย|custom + er|A1
+cut|คัท|ตัด|She cut the paper with scissors.|เธอตัดกระดาษด้วยกรรไกร|cut|A1
+cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The water cycle is a natural process.|วัฏจักรของน้ำคือกระบวนการตามธรรมชาติ|cycle|A2
+`;
+
+      let vocabData = [];
+      let srsData = JSON.parse(localStorage.getItem("ox3k_srs_data")) || {};
+      let userProgress = JSON.parse(
+        localStorage.getItem("ox3k_user_progress"),
+      ) || { currentChapter: 1, completedChapters: [] };
+
+      const ONE_DAY = 24 * 60 * 60 * 1000;
+      const WORDS_PER_CHAPTER = 20;
+      let customBatches = [];
+      try {
+        customBatches =
+          JSON.parse(localStorage.getItem("ox3k_custom_batches")) || [];
+      } catch (e) {
+        customBatches = [];
+      }
+      let chapterList = [];
+
+      // Chapters: built-in words split by 20, then each imported JSON file = 1 chapter
+      function buildChapters(baseCount, batchRanges) {
+        chapterList = [];
+        let runStart = 0;
+        for (let i = 1; i <= baseCount; i++) {
+          if (
+            i === baseCount ||
+            vocabData[i].cefr !== vocabData[runStart].cefr
+          ) {
+            const lv = vocabData[runStart].cefr;
+            for (let st = runStart; st < i; st += WORDS_PER_CHAPTER) {
+              chapterList.push({
+                start: st,
+                end: Math.min(st + WORDS_PER_CHAPTER, i),
+                name: lv,
+                zone: lv,
+              });
+            }
+            runStart = i;
+          }
+        }
+        batchRanges.forEach((r) => {
+          if (r.end > r.start) chapterList.push({ ...r, zone: "import" });
+        });
+        if (chapterList.length === 0)
+          chapterList.push({ start: 0, end: 0, name: "" });
+      }
+      function getChapter(ch) {
+        return chapterList[Math.min(Math.max(1, ch), chapterList.length) - 1];
+      }
+
+      let currentMode = "dashboard";
+      let sessionQueue = [];
+      let currentCardIndex = 0;
+      let isFlipped = false;
+      let activeSessionType = "daily";
+      let currentActiveChapter = 1;
+
+      // Quiz game variables
+      let quizScore = 0;
+      let quizStreak = 0;
+      let quizLives = 3;
+      let currentQuizWordIdx = 0;
+      let timerInterval;
+      let timeLeft = 100;
+      let quizActive = false;
+      let quizScope = "all";
+      let quizChapterScope = 1;
+
+      // Audio Speech Synthesis
+      function speakWord(e) {
+        if (e) e.stopPropagation();
+        if ("speechSynthesis" in window) {
+          const vocabIdx = sessionQueue[currentCardIndex];
+          const text = vocabData[vocabIdx] ? vocabData[vocabIdx].word : "";
+          if (!text) return;
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = "en-US";
+          utterance.rate = 0.9;
+          window.speechSynthesis.speak(utterance);
+        }
+      }
+
+      // Modal Utility
+      function showModal(title, message, buttonText = "ตกลง", callback = null) {
+        const modal = document.getElementById("custom-modal");
+        document.getElementById("modal-title").textContent = title;
+        document.getElementById("modal-message").textContent = message;
+
+        const btn = document.getElementById("modal-btn");
+        btn.textContent = buttonText;
+
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+
+        newBtn.addEventListener("click", () => {
+          modal.classList.add("hidden");
+          if (callback) callback();
+        });
+
+        modal.classList.remove("hidden");
+      }
+
+      // Initialize App
+      function init() {
+        const rawLines = RAW_VOCAB.trim().split("\n");
+        vocabData = rawLines.map((line) => {
+          const p = line.split("|");
+          return {
+            id: p[0].trim().toLowerCase(),
+            word: p[0].trim(),
+            pron: p[1] ? p[1].trim() : "",
+            mean: p[2] ? p[2].trim() : "",
+            exEn: p[3] ? p[3].trim() : "",
+            exTh: p[4] ? p[4].trim() : "",
+            mem: p[5] ? p[5].trim() : "",
+            cefr: p[6] ? p[6].trim() : "B1",
+          };
+        });
+
+        // Order built-in words by CEFR difficulty (A1 -> C2); inside each level, shuffle
+        // with a fixed seed so first letters are mixed but chapters stay the same on every reload.
+        const CEFR_RANK = { A1: 0, A2: 1, B1: 2, B2: 3, C1: 4, C2: 5 };
+        let seedState = 20240601;
+        const rand = () => {
+          seedState = (seedState + 0x6d2b79f5) | 0;
+          let t = Math.imul(seedState ^ (seedState >>> 15), 1 | seedState);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+        const byLevel = {};
+        vocabData.forEach((v) => {
+          (byLevel[v.cefr] = byLevel[v.cefr] || []).push(v);
+        });
+        // 1) shuffle only the built-in words (fixed seed -> stable chapters)
+        Object.values(byLevel).forEach((arr) => {
+          for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(rand() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+          }
+        });
+        // 2) imported JSON words are appended to the END of their own CEFR level (file order),
+        //    so existing chapters in that level stay the same and new words fill the last/new chapters.
+        const seen = new Set(vocabData.map((v) => v.id));
+        customBatches.forEach((batch) => {
+          (batch.words || []).forEach((w) => {
+            const id = String(w.word).trim().toLowerCase();
+            if (!id || seen.has(id)) return;
+            seen.add(id);
+            const lv = w.cefr in CEFR_RANK ? w.cefr : "B1";
+            (byLevel[lv] = byLevel[lv] || []).push({
+              id,
+              word: String(w.word).trim(),
+              pron: w.pron || "",
+              mean: w.mean || "",
+              exEn: w.exEn || "",
+              exTh: w.exTh || "",
+              mem: w.mem || "",
+              cefr: lv,
+              custom: true,
+            });
+          });
+        });
+        vocabData = [];
+        Object.keys(byLevel)
+          .sort((a, b) => (CEFR_RANK[a] ?? 9) - (CEFR_RANK[b] ?? 9))
+          .forEach((lv) => vocabData.push(...byLevel[lv]));
+        buildChapters(vocabData.length, []);
+
+        // Initialize SRS Data
+        let isModified = false;
+        vocabData.forEach((item) => {
+          if (!srsData[item.id]) {
+            srsData[item.id] = {
+              level: 0,
+              nextReview: 0,
+              lastReviewed: 0,
+              consecutiveCorrect: 0,
+            };
+            isModified = true;
+          }
+        });
+        if (isModified) saveSRSData();
+
+        updateDashboardStats();
+        renderListCards();
+        switchMode("dashboard");
+      }
+
+      function saveSRSData() {
+        localStorage.setItem("ox3k_srs_data", JSON.stringify(srsData));
+        updateDashboardStats();
+      }
+
+      function saveUserProgress() {
+        localStorage.setItem(
+          "ox3k_user_progress",
+          JSON.stringify(userProgress),
+        );
+        updateDashboardStats();
+      }
+
+      function updateDashboardStats() {
+        const now = Date.now();
+        let newCount = 0,
+          reviewCount = 0;
+        let mastered = 0,
+          learning = 0,
+          remaining = 0;
+
+        vocabData.forEach((item) => {
+          const srs = srsData[item.id];
+          if (!srs) return;
+
+          if (srs.level === 0) remaining++;
+          else if (srs.level === 1 || srs.level === 2) learning++;
+          else if (srs.level >= 3) mastered++;
+
+          if (srs.level === 0 && newCount < 10) newCount++;
+          if (srs.level > 0 && srs.nextReview <= now && reviewCount < 15)
+            reviewCount++;
+        });
+
+        document.getElementById("stat-mastered").textContent = mastered;
+        document.getElementById("stat-learning").textContent = learning;
+        document.getElementById("stat-remaining").textContent = remaining;
+
+        document.getElementById("dash-new-count").textContent = newCount;
+        document.getElementById("dash-review-count").textContent = reviewCount;
+
+        updateChapterBannerInfo();
+      }
+
+      function updateChapterBannerInfo() {
+        const totalChapters = chapterList.length;
+        const currentCh = Math.min(
+          Math.max(1, userProgress.currentChapter || 1),
+          totalChapters,
+        );
+        userProgress.currentChapter = currentCh;
+
+        const startIdx = getChapter(currentCh).start;
+        const endIdx = getChapter(currentCh).end;
+        const totalInCh = endIdx - startIdx;
+
+        let learnedInCh = 0;
+        let masteredInCh = 0;
+        for (let i = startIdx; i < endIdx; i++) {
+          const srs = srsData[vocabData[i].id];
+          if (srs && srs.level > 0) learnedInCh++;
+          if (srs && srs.level >= 3) masteredInCh++;
+        }
+
+        let completedChCount = 0;
+        for (let ch = 1; ch <= totalChapters; ch++) {
+          const sIdx = getChapter(ch).start;
+          const eIdx = getChapter(ch).end;
+          let allMastered = true;
+          for (let i = sIdx; i < eIdx; i++) {
+            const srs = srsData[vocabData[i].id];
+            if (!srs || srs.level < 3) {
+              allMastered = false;
+              break;
+            }
+          }
+          if (allMastered && eIdx > sIdx) completedChCount++;
+        }
+
+        const percent =
+          totalInCh > 0 ? Math.round((learnedInCh / totalInCh) * 100) : 0;
+
+        document.getElementById("total-chapters-badge").textContent =
+          `สำเร็จแล้ว ${completedChCount} / ${totalChapters} บท`;
+        document.getElementById("current-chapter-title").textContent =
+          `บทที่ ${currentCh}${getChapter(currentCh).name ? " · " + getChapter(currentCh).name : ""} (คำที่ ${startIdx + 1} - ${endIdx})`;
+        document.getElementById("current-chapter-desc").textContent =
+          `เรียนรู้แล้ว ${learnedInCh}/${totalInCh} คำ (${percent}%) • แม่นยำ ${masteredInCh} คำ`;
+        document.getElementById("current-chapter-progress-bar").style.width =
+          `${percent}%`;
+      }
+
+      // ---------- JSON import ----------
+      // Accepts: [ {word,...}, ... ]  or  { "chapterName": "...", "words": [ ... ] }
+      // Field aliases: word | pron/pronunciation | mean/meaning | exEn/example | exTh/exampleTh | mem/mnemonic/trick | cefr/level
+      function normalizeWord(w) {
+        if (!w || typeof w !== "object") return null;
+        const pick = (...keys) => {
+          for (const k of keys)
+            if (w[k] != null && String(w[k]).trim() !== "")
+              return String(w[k]).trim();
+          return "";
+        };
+        const word = pick("word", "vocab", "en");
+        const mean = pick("mean", "meaning", "th", "translation");
+        if (!word || !mean) return null;
+        const cefr = pick("cefr", "level").toUpperCase();
+        return {
+          word,
+          mean,
+          pron: pick("pron", "pronunciation", "phonetic"),
+          exEn: pick("exEn", "example", "sentence", "exampleEn"),
+          exTh: pick("exTh", "exampleTh", "sentenceTh"),
+          mem: pick("mem", "mnemonic", "trick", "memory"),
+          cefr: ["A1", "A2", "B1", "B2", "C1", "C2"].includes(cefr)
+            ? cefr
+            : "B1",
+        };
+      }
+
+      function handleJSONImport(event) {
+        const file = event.target.files[0];
+        event.target.value = "";
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const data = JSON.parse(reader.result);
+            const arr = Array.isArray(data)
+              ? data
+              : data.words || data.vocab || [];
+            const name =
+              (!Array.isArray(data) &&
+                (data.chapterName || data.name || data.title)) ||
+              file.name.replace(/\.json$/i, "");
+            const words = arr.map(normalizeWord).filter(Boolean);
+            if (words.length === 0) throw new Error("empty");
+
+            const existing = new Set(vocabData.map((v) => v.id));
+            const fresh = [],
+              seenNew = new Set();
+            words.forEach((w) => {
+              const id = w.word.toLowerCase();
+              if (existing.has(id) || seenNew.has(id)) return;
+              seenNew.add(id);
+              fresh.push(w);
+            });
+            const skipped = words.length - fresh.length;
+            if (fresh.length === 0) {
+              showModal(
+                "ไม่มีคำใหม่",
+                "คำทั้งหมดในไฟล์นี้มีอยู่ในแอปแล้ว จึงไม่ได้เพิ่มบทใหม่",
+              );
+              return;
+            }
+            customBatches.push({ name: String(name), words: fresh });
+            localStorage.setItem(
+              "ox3k_custom_batches",
+              JSON.stringify(customBatches),
+            );
+            init();
+            openChapterModal();
+            const perLv = {};
+            fresh.forEach((w) => (perLv[w.cefr] = (perLv[w.cefr] || 0) + 1));
+            const where = Object.keys(perLv)
+              .sort()
+              .map((k) => `${k}: ${perLv[k]} คำ`)
+              .join(" • ");
+            showModal(
+              "นำเข้าสำเร็จ 🎉",
+              `เพิ่ม ${fresh.length} คำ เข้าโซนตามระดับ CEFR (${where})` +
+                (skipped ? ` • ข้ามคำซ้ำ ${skipped} คำ` : ""),
+            );
+          } catch (e) {
+            showModal(
+              "อ่านไฟล์ไม่ได้",
+              "รูปแบบ JSON ไม่ถูกต้อง หรือไม่มีคำศัพท์ที่มี word และ mean กดดาวน์โหลดตัวอย่างเพื่อดูรูปแบบที่ใช้ได้",
+            );
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      function downloadSampleJSON() {
+        const sample = {
+          chapterName: "ตัวอย่างบทใหม่",
+          words: [
+            {
+              word: "brave",
+              pron: "เบรฟว",
+              mean: "กล้าหาญ",
+              exEn: "The brave boy saved the cat.",
+              exTh: "เด็กชายผู้กล้าหาญช่วยแมวไว้",
+              mem: "เบรฟ = เบ่ง + ใจ → กล้า",
+              cefr: "B1",
+            },
+            {
+              word: "gentle",
+              pron: "เจน-เทิล",
+              mean: "อ่อนโยน",
+              exEn: "She has a gentle voice.",
+              exTh: "เธอมีเสียงอ่อนโยน",
+              mem: "gentle ~ gentleman สุภาพบุรุษ",
+              cefr: "B2",
+            },
+          ],
+        };
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(
+          new Blob([JSON.stringify(sample, null, 2)], {
+            type: "application/json",
+          }),
+        );
+        a.download = "sample_chapter.json";
+        a.click();
+      }
+
+      function openChapterModal() {
+        renderChapterGrid();
+        document.getElementById("chapter-modal").classList.remove("hidden");
+      }
+
+      function closeChapterModal() {
+        document.getElementById("chapter-modal").classList.add("hidden");
+      }
+
+      function renderChapterGrid() {
+        const container = document.getElementById("chapter-grid-container");
+        container.innerHTML = "";
+
+        const totalChapters = chapterList.length;
+
+        const ZONE_INFO = {
+          A1: ["A1 · เริ่มต้น", "bg-emerald-100 text-emerald-700"],
+          A2: ["A2 · พื้นฐาน", "bg-sky-100 text-sky-700"],
+          B1: ["B1 · กลาง", "bg-amber-100 text-amber-700"],
+          B2: ["B2 · กลางค่อนสูง", "bg-rose-100 text-rose-700"],
+          C1: ["C1 · สูง", "bg-purple-100 text-purple-700"],
+          C2: ["C2 · ชำนาญ", "bg-slate-200 text-slate-700"],
+          import: ["📥 บทที่นำเข้าจาก JSON", "bg-indigo-100 text-indigo-700"],
+        };
+        let lastZone = null;
+        for (let ch = 1; ch <= totalChapters; ch++) {
+          const zone = getChapter(ch).zone;
+          if (zone && zone !== lastZone) {
+            lastZone = zone;
+            const chInZone = chapterList.filter((c) => c.zone === zone);
+            const wordsInZone = chInZone.reduce(
+              (n, c) => n + (c.end - c.start),
+              0,
+            );
+            const info = ZONE_INFO[zone] || [
+              zone,
+              "bg-slate-100 text-slate-600",
+            ];
+            const h = document.createElement("div");
+            h.className =
+              "col-span-full flex items-center justify-between mt-3 first:mt-0 pt-1 border-t border-slate-100 first:border-0";
+            h.innerHTML = `<span class="text-xs font-extrabold px-3 py-1.5 rounded-full ${info[1]}">โซน ${info[0]}</span>
+                        <span class="text-[11px] text-slate-400 font-semibold">${chInZone.length} บท • ${wordsInZone} คำ</span>`;
+            container.appendChild(h);
+          }
+          const startIdx = getChapter(ch).start;
+          const endIdx = getChapter(ch).end;
+          const totalInCh = endIdx - startIdx;
+
+          let masteredInCh = 0,
+            learningInCh = 0;
+          for (let i = startIdx; i < endIdx; i++) {
+            const srs = srsData[vocabData[i].id];
+            if (srs.level >= 3) masteredInCh++;
+            else if (srs.level > 0) learningInCh++;
+          }
+
+          const isCurrent = userProgress.currentChapter === ch;
+          const isCompleted = masteredInCh === totalInCh;
+          const isStarted = masteredInCh + learningInCh > 0;
+
+          let badgeColor = "bg-slate-100 text-slate-500";
+          let statusText = "ยังไม่เริ่ม";
+          if (isCompleted) {
+            badgeColor = "bg-green-100 text-green-700";
+            statusText = "🟢 ครบถ้วน";
+          } else if (isStarted) {
+            badgeColor = "bg-yellow-100 text-yellow-700";
+            statusText = `🟡 ${masteredInCh + learningInCh}/${totalInCh} คำ`;
+          }
+
+          const btn = document.createElement("button");
+          btn.className = `p-4 rounded-2xl border text-left flex flex-col justify-between transition-all active:scale-95 ${
+            isCurrent
+              ? "border-blue-500 bg-blue-50 shadow-sm ring-2 ring-blue-500/20"
+              : "border-slate-200 hover:border-blue-300 bg-white"
+          }`;
+
+          btn.onclick = () => {
+            closeChapterModal();
+            startChapterSession(ch);
+          };
+
+          btn.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-sm font-extrabold text-slate-800">บทที่ ${ch}</span>
+                        ${isCurrent ? '<span class="text-[9px] font-bold bg-blue-600 text-white px-1.5 py-0.5 rounded">ปัจจุบัน</span>' : ""}
+                    </div>
+                    <p class="text-[11px] text-slate-500 font-medium mb-3">${getChapter(ch).zone === "import" ? getChapter(ch).name + " · " : ""}คำที่ ${startIdx + 1} - ${endIdx}</p>
+                    <div class="text-[10px] font-bold px-2 py-1 rounded-md ${badgeColor} inline-block self-start">
+                        ${statusText}
+                    </div>
+                `;
+
+          container.appendChild(btn);
+        }
+      }
+
+      function startChapterSession(chapterNum) {
+        activeSessionType = "chapter";
+        currentActiveChapter = chapterNum;
+        userProgress.currentChapter = chapterNum;
+        saveUserProgress();
+
+        const startIdx = getChapter(chapterNum).start;
+        const endIdx = getChapter(chapterNum).end;
+
+        sessionQueue = [];
+        for (let i = startIdx; i < endIdx; i++) {
+          sessionQueue.push(i);
+        }
+
+        if (sessionQueue.length === 0) {
+          showModal("ไม่มีคำศัพท์", "ไม่พบคำศัพท์ในบทเรียนนี้");
+          return;
+        }
+
+        currentCardIndex = 0;
+        switchMode("flashcards");
+        loadFlashcard();
+      }
+
+      function startDailySession() {
+        activeSessionType = "daily";
+        const now = Date.now();
+        sessionQueue = [];
+
+        let dueReviews = [];
+        vocabData.forEach((item, index) => {
+          const srs = srsData[item.id];
+          if (srs.level > 0 && srs.nextReview <= now) {
+            dueReviews.push(index);
+          }
+        });
+
+        sessionQueue = dueReviews.slice(0, 15);
+
+        let neededNew = 10;
+        for (let i = 0; i < vocabData.length && neededNew > 0; i++) {
+          if (srsData[vocabData[i].id].level === 0) {
+            sessionQueue.push(i);
+            neededNew--;
+          }
+        }
+
+        sessionQueue = sessionQueue.sort(() => Math.random() - 0.5);
+
+        if (sessionQueue.length === 0) {
+          showModal(
+            "เรียนครบแล้ว! 🎉",
+            "วันนี้คุณเรียนรู้และทบทวนคำศัพท์ที่ต้องทำครบหมดแล้ว!",
+          );
+          return;
+        }
+
+        currentCardIndex = 0;
+        switchMode("flashcards");
+        loadFlashcard();
+      }
+
+      function switchMode(mode) {
+        currentMode = mode;
+        clearInterval(timerInterval);
+        quizActive = false;
+
+        document
+          .querySelectorAll(".mode-section")
+          .forEach((el) => el.classList.add("hidden"));
+        document.querySelectorAll(".tab-btn").forEach((el) => {
+          el.classList.remove("bg-white", "text-blue-600", "shadow-sm");
+          el.classList.add("text-slate-500");
+        });
+
+        document.getElementById(`mode-${mode}`).classList.remove("hidden");
+        let activeTab = document.getElementById(`tab-${mode}`);
+        activeTab.classList.remove("text-slate-500");
+        activeTab.classList.add("bg-white", "text-blue-600", "shadow-sm");
+
+        if (mode === "quiz") {
+          startNewQuiz();
+        } else if (mode === "list") {
+          renderListCards();
+        } else if (mode === "dashboard") {
+          updateDashboardStats();
+        }
+      }
+
+      // Flashcards Logic
+      function loadFlashcard() {
+        if (currentCardIndex >= sessionQueue.length) {
+          document.getElementById("fc-active-area").classList.add("hidden");
+          document.getElementById("fc-empty-state").classList.remove("hidden");
+          updateDashboardStats();
+          return;
+        }
+
+        document.getElementById("fc-active-area").classList.remove("hidden");
+        document.getElementById("fc-empty-state").classList.add("hidden");
+
+        const vocabIdx = sessionQueue[currentCardIndex];
+        const data = vocabData[vocabIdx];
+        const srs = srsData[data.id];
+
+        document.getElementById("session-progress-text").textContent =
+          `คำที่ ${currentCardIndex + 1} / ${sessionQueue.length}`;
+        document.getElementById("session-progress-bar").style.width =
+          `${(currentCardIndex / sessionQueue.length) * 100}%`;
+
+        let badgeHtml = "⚪️ คำศัพท์ใหม่";
+        let badgeClass = "bg-slate-100 text-slate-700";
+        if (srs.level === 1) {
+          badgeHtml = "🔴 ต้องทวนซ้ำ";
+          badgeClass = "bg-red-100 text-red-700";
+        } else if (srs.level === 2) {
+          badgeHtml = "🟡 กำลังจำ";
+          badgeClass = "bg-yellow-100 text-yellow-700";
+        } else if (srs.level >= 3) {
+          badgeHtml = "🟢 จำได้แม่น";
+          badgeClass = "bg-green-100 text-green-700";
+        }
+
+        const badge = document.getElementById("fc-status-badge");
+        badge.innerHTML = badgeHtml;
+        badge.className = `text-[10px] px-2 py-1 rounded-md font-bold ${badgeClass}`;
+
+        document.getElementById("fc-word").textContent = data.word;
+        document.getElementById("fc-pronunciation-front").textContent =
+          `[ ${data.pron} ]`;
+        document.getElementById("fc-pronunciation-back").textContent =
+          `[ ${data.pron} ]`;
+        document.getElementById("fc-cefr-front").textContent =
+          `CEFR ${data.cefr}`;
+
+        document.getElementById("fc-meaning").textContent = data.mean;
+        document.getElementById("fc-mnemonic").textContent = data.mem;
+        document.getElementById("fc-example-en").textContent = `"${data.exEn}"`;
+        document.getElementById("fc-example-th").textContent = `"${data.exTh}"`;
+
+        let daysIfGood =
+          srs.level === 0 ? 1 : Math.min(14, (srs.consecutiveCorrect + 1) * 2);
+        let daysIfEasy =
+          srs.level === 0 ? 3 : Math.min(30, (srs.consecutiveCorrect + 2) * 3);
+
+        document.getElementById("lbl-rate-2").textContent =
+          `ทวนใน ${daysIfGood} วัน`;
+        document.getElementById("lbl-rate-3").textContent =
+          `ทวนใน ${daysIfEasy} วัน`;
+
+        if (isFlipped) toggleFlip();
+        document
+          .getElementById("fc-rating-buttons")
+          .classList.add("opacity-0", "pointer-events-none", "translate-y-4");
+        document.getElementById("fc-instruction").classList.remove("hidden");
+      }
+
+      function toggleFlip() {
+        const card = document.getElementById("fc-container");
+        card.classList.toggle("flipped");
+        isFlipped = !isFlipped;
+
+        if (isFlipped) {
+          document
+            .getElementById("fc-rating-buttons")
+            .classList.remove(
+              "opacity-0",
+              "pointer-events-none",
+              "translate-y-4",
+            );
+          document
+            .getElementById("fc-rating-buttons")
+            .classList.add("opacity-100", "translate-y-0");
+          document.getElementById("fc-instruction").classList.add("hidden");
+        }
+      }
+
+      function rateWord(rating) {
+        const vocabIdx = sessionQueue[currentCardIndex];
+        const wordId = vocabData[vocabIdx].id;
+        let srs = srsData[wordId];
+        const now = Date.now();
+
+        if (rating === 1) {
+          srs.level = 1;
+          srs.consecutiveCorrect = 0;
+          srs.nextReview = now;
+          sessionQueue.push(vocabIdx);
+        } else if (rating === 2) {
+          srs.level = srs.level === 0 ? 2 : Math.min(3, srs.level + 1);
+          srs.consecutiveCorrect += 1;
+          srs.nextReview = now + srs.consecutiveCorrect * ONE_DAY;
+        } else if (rating === 3) {
+          srs.level = 3;
+          srs.consecutiveCorrect += 2;
+          srs.nextReview = now + srs.consecutiveCorrect * 2 * ONE_DAY;
+        }
+
+        srs.lastReviewed = now;
+        srsData[wordId] = srs;
+        saveSRSData();
+
+        const card = document.getElementById("fc-container");
+        card.classList.add("opacity-0", "scale-95");
+        setTimeout(() => {
+          currentCardIndex++;
+          loadFlashcard();
+          card.classList.remove("opacity-0", "scale-95");
+        }, 300);
+      }
+
+      // Quiz Logic
+      function startNewQuiz() {
+        quizScope = "all";
+        initQuizUI();
+      }
+
+      function startChapterQuiz(chapterNum) {
+        quizScope = "chapter";
+        quizChapterScope = chapterNum;
+        switchMode("quiz");
+
+        setTimeout(() => {
+          quizScope = "chapter";
+          quizChapterScope = chapterNum;
+          initQuizUI();
+        }, 50);
+      }
+
+      // Quiz pools: questions and wrong options come from words the user knows well (level >= 3),
+      // so newly imported / unlearned words never show up as confusing choices.
+      function getQuizPools() {
+        const lvl = (i) => (srsData[vocabData[i].id] || {}).level || 0;
+        const all = vocabData.map((_, i) => i);
+        const mastered = all.filter((i) => lvl(i) >= 3);
+        const learned = all.filter((i) => lvl(i) > 0);
+        let base = null,
+          fallback = false;
+        if (mastered.length >= 4) base = mastered;
+        else if (learned.length >= 4) {
+          base = learned;
+          fallback = true;
+        }
+        return { base, fallback, all };
+      }
+
+      function initQuizUI() {
+        if (quizScope !== "chapter" && !getQuizPools().base) {
+          quizActive = false;
+          showModal(
+            "ยังทำควิซไม่ได้",
+            "ควิซนี้ใช้คำที่คุณจำแม่นแล้ว ต้องมีอย่างน้อย 4 คำ ลองท่องศัพท์ก่อนแล้วกลับมาใหม่",
+            "ตกลง",
+            () => switchMode("dashboard"),
+          );
+          return;
+        }
+        quizScore = 0;
+        quizStreak = 0;
+        quizLives = 3;
+        quizActive = true;
+
+        const badge = document.getElementById("quiz-scope-badge");
+        if (quizScope === "chapter") {
+          badge.textContent = `โหมด: ควิซบทที่ ${quizChapterScope}`;
+          badge.className =
+            "text-[10px] font-bold bg-orange-100 text-orange-700 px-2 py-1 rounded-md";
+        } else {
+          badge.textContent = getQuizPools().fallback
+            ? "โหมด: ทายศัพท์ที่เรียนแล้ว (ยังจำแม่น < 4 คำ)"
+            : "โหมด: ทายศัพท์ที่จำแม่น (สุ่ม)";
+          badge.className =
+            "text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-md";
+        }
+
+        document.getElementById("quiz-play-area").classList.remove("hidden");
+        document.getElementById("quiz-game-over").classList.add("hidden");
+        updateQuizHUD();
+        nextQuizQuestion();
+      }
+
+      function updateQuizHUD() {
+        document.getElementById("quiz-score").textContent = quizScore;
+        document.getElementById("quiz-streak").textContent = quizStreak;
+
+        const livesContainer = document.getElementById("quiz-lives");
+        livesContainer.innerHTML = "";
+        for (let i = 0; i < 3; i++) {
+          if (i < quizLives) {
+            livesContainer.innerHTML +=
+              '<i class="fa-solid fa-heart text-red-500 pop-in"></i>';
+          } else {
+            livesContainer.innerHTML +=
+              '<i class="fa-solid fa-heart text-slate-200"></i>';
+          }
+        }
+      }
+
+      function nextQuizQuestion() {
+        if (!quizActive || currentMode !== "quiz") return;
+        document
+          .getElementById("quiz-card")
+          .classList.remove("shake-animation");
+
+        let candidates = [];
+        if (quizScope === "chapter") {
+          const startIdx = getChapter(quizChapterScope).start;
+          const endIdx = getChapter(quizChapterScope).end;
+          for (let i = startIdx; i < endIdx; i++) candidates.push(i);
+        } else {
+          candidates = getQuizPools().base || [];
+          if (candidates.length === 0) {
+            quizActive = false;
+            return;
+          }
+        }
+
+        currentQuizWordIdx =
+          candidates[Math.floor(Math.random() * candidates.length)];
+        const correctData = vocabData[currentQuizWordIdx];
+
+        // Randomize between word-to-meaning OR sentence completion quiz
+        const isSentenceQuiz =
+          correctData.exEn.includes(correctData.word) && Math.random() > 0.5;
+
+        if (isSentenceQuiz) {
+          document.getElementById("quiz-question-type").textContent =
+            "เติมคำศัพท์ในประโยคให้ถูกต้อง";
+          const maskedSentence = correctData.exEn.replace(
+            new RegExp(correctData.word, "gi"),
+            "________",
+          );
+          document.getElementById("quiz-word").textContent =
+            `"${maskedSentence}"`;
+          document.getElementById("quiz-subtext").textContent = correctData.exTh
+            ? `(${correctData.exTh})`
+            : "";
+        } else {
+          document.getElementById("quiz-question-type").textContent =
+            "คำนี้แปลว่าอะไร?";
+          document.getElementById("quiz-word").textContent = correctData.word;
+          document.getElementById("quiz-subtext").textContent =
+            `[ ${correctData.pron} ] • CEFR ${correctData.cefr}`;
+        }
+
+        // Wrong options: random words from the well-known pool (fallback: all words if the pool is too small)
+        const pools = getQuizPools();
+        const correctText = isSentenceQuiz
+          ? correctData.word
+          : correctData.mean;
+        const pick = (arr) => {
+          const shuffled = [...arr].sort(() => Math.random() - 0.5);
+          const out = [];
+          for (const idx of shuffled) {
+            const t = isSentenceQuiz
+              ? vocabData[idx].word
+              : vocabData[idx].mean;
+            if (
+              idx !== currentQuizWordIdx &&
+              t !== correctText &&
+              !out.includes(t) &&
+              !wrongOptionsSet.has(t)
+            ) {
+              out.push(t);
+              wrongOptionsSet.add(t);
+            }
+            if (out.length + wrongOptions.length >= 3) break;
+          }
+          return out;
+        };
+        const wrongOptionsSet = new Set();
+        let wrongOptions = [];
+        wrongOptions.push(...pick(pools.base || pools.all));
+        if (wrongOptions.length < 3) wrongOptions.push(...pick(pools.all));
+        wrongOptions = wrongOptions.slice(0, 3);
+
+        const correctAnswerText = isSentenceQuiz
+          ? correctData.word
+          : correctData.mean;
+        let options = [...wrongOptions, correctAnswerText].sort(
+          () => Math.random() - 0.5,
+        );
+
+        const optionsContainer = document.getElementById(
+          "quiz-options-container",
+        );
+        optionsContainer.innerHTML = "";
+
+        options.forEach((opt) => {
+          const btn = document.createElement("button");
+          btn.className =
+            "quiz-btn w-full text-left bg-white border-2 border-slate-200 hover:border-blue-400 hover:bg-blue-50 text-slate-700 font-bold py-4 px-5 rounded-2xl shadow-sm transition-all focus:outline-none flex justify-between items-center active:scale-[0.98] text-sm";
+          btn.innerHTML = `<span>${opt}</span><i class="fa-solid fa-circle text-slate-200 text-xs option-icon"></i>`;
+          btn.onclick = () => handleQuizAnswer(opt, btn, correctAnswerText);
+          optionsContainer.appendChild(btn);
+        });
+
+        timeLeft = 100;
+        startQuizTimer();
+      }
+
+      function startQuizTimer() {
+        clearInterval(timerInterval);
+        const step = 0.5;
+
+        timerInterval = setInterval(() => {
+          timeLeft -= step;
+          const bar = document.getElementById("quiz-timer-bar");
+          bar.style.width = `${Math.max(0, timeLeft)}%`;
+
+          if (timeLeft < 30)
+            bar.className =
+              "h-full bg-red-500 w-full transition-all ease-linear";
+          else if (timeLeft < 60)
+            bar.className =
+              "h-full bg-orange-500 w-full transition-all ease-linear";
+          else
+            bar.className =
+              "h-full bg-blue-500 w-full transition-all ease-linear";
+
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            const correctData = vocabData[currentQuizWordIdx];
+            handleQuizAnswer(null, null, correctData.mean);
+          }
+        }, 50);
+      }
+
+      function handleQuizAnswer(selectedAns, clickedBtn, correctAns) {
+        clearInterval(timerInterval);
+        const buttons = document.querySelectorAll(".quiz-btn");
+        buttons.forEach((b) => (b.onclick = null));
+
+        const isCorrect = selectedAns === correctAns;
+
+        if (isCorrect) {
+          quizStreak++;
+          quizScore += 10 * quizStreak + Math.floor(timeLeft / 10);
+          if (clickedBtn) {
+            clickedBtn.className =
+              "w-full text-left border-2 border-green-500 bg-green-50 text-green-800 font-bold py-4 px-5 rounded-2xl shadow-sm flex justify-between items-center text-sm pop-in";
+            clickedBtn.querySelector("i").className =
+              "fa-solid fa-circle-check text-green-500 text-lg";
+          }
+        } else {
+          quizStreak = 0;
+          quizLives--;
+          document.getElementById("quiz-card").classList.add("shake-animation");
+
+          if (clickedBtn) {
+            clickedBtn.className =
+              "w-full text-left border-2 border-red-500 bg-red-50 text-red-800 font-bold py-4 px-5 rounded-2xl shadow-sm flex justify-between items-center text-sm";
+            clickedBtn.querySelector("i").className =
+              "fa-solid fa-circle-xmark text-red-500 text-lg";
+          }
+
+          buttons.forEach((b) => {
+            if (b.querySelector("span").textContent === correctAns) {
+              b.className =
+                "w-full text-left border-2 border-green-500 bg-green-50 text-green-800 font-bold py-4 px-5 rounded-2xl shadow-sm flex justify-between items-center text-sm opacity-90";
+              b.querySelector("i").className =
+                "fa-solid fa-circle-check text-green-500 text-lg";
+            }
+          });
+        }
+
+        updateQuizHUD();
+
+        setTimeout(() => {
+          if (quizLives <= 0) {
+            endQuiz();
+          } else {
+            nextQuizQuestion();
+          }
+        }, 1400);
+      }
+
+      function endQuiz() {
+        quizActive = false;
+        document.getElementById("quiz-play-area").classList.add("hidden");
+        document.getElementById("quiz-game-over").classList.remove("hidden");
+        document.getElementById("go-score").textContent = quizScore;
+        document.getElementById("go-streak").textContent = quizStreak;
+      }
+
+      // Dictionary List
+      function renderListCards() {
+        const container = document.getElementById("list-grid-container");
+        container.innerHTML = "";
+
+        vocabData.forEach((item) => {
+          const srs = srsData[item.id];
+          let srsBadgeHTML = `<span class="text-[10px] font-bold px-2 py-1 rounded-md bg-slate-100 text-slate-600 border border-slate-200">⚪️ คำใหม่</span>`;
+          let dataStatus = "new";
+
+          if (srs.level >= 3) {
+            srsBadgeHTML = `<span class="text-[10px] font-bold px-2 py-1 rounded-md bg-green-100 text-green-700 border border-green-200">🟢 จำได้แม่น</span>`;
+            dataStatus = "mastered";
+          } else if (srs.level === 2) {
+            srsBadgeHTML = `<span class="text-[10px] font-bold px-2 py-1 rounded-md bg-yellow-100 text-yellow-700 border border-yellow-200">🟡 กำลังจำ</span>`;
+            dataStatus = "learning";
+          } else if (srs.level === 1) {
+            srsBadgeHTML = `<span class="text-[10px] font-bold px-2 py-1 rounded-md bg-red-100 text-red-700 border border-red-200">🔴 ต้องทวน</span>`;
+            dataStatus = "review";
+          }
+
+          const card = document.createElement("div");
+          card.className =
+            "vocab-card bg-white p-5 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between hover:shadow-md transition-all";
+
+          card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="text-xl font-extrabold text-slate-800 break-words">${item.word}</h3>
+                                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">CEFR ${item.cefr}</span>
+                            </div>
+                            <div>${srsBadgeHTML}</div>
+                        </div>
+                        <p class="text-xs font-semibold text-blue-500 mb-2">[ ${item.pron} ]</p>
+                        <p class="text-sm font-bold text-slate-700 mb-3">${item.mean}</p>
+                        
+                        <div class="bg-amber-50 p-2.5 rounded-2xl border border-amber-100 mb-3">
+                            <p class="text-[10px] font-bold text-amber-800 mb-0.5"><i class="fa-solid fa-lightbulb mr-1"></i>เทคนิคจำ:</p>
+                            <p class="text-xs text-amber-900 leading-snug">${item.mem}</p>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-100 mt-auto">
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mb-0.5">ตัวอย่าง</p>
+                        <p class="text-xs font-semibold text-slate-600 italic">"${item.exEn}"</p>
+                        <p class="text-[10px] text-slate-400 mt-0.5">"${item.exTh}"</p>
+                    </div>
+                `;
+
+          card.setAttribute(
+            "data-search",
+            `${item.word} ${item.mean} ${item.exEn} ${item.mem}`.toLowerCase(),
+          );
+          card.setAttribute("data-status", dataStatus);
+          card.setAttribute("data-cefr", item.cefr);
+
+          container.appendChild(card);
+        });
+        filterList();
+      }
+
+      function filterList() {
+        const query = document
+          .getElementById("search-input")
+          .value.toLowerCase();
+        const statusFilter = document.getElementById("filter-status").value;
+        const cefrFilter = document.getElementById("filter-cefr").value;
+        const cards = document.querySelectorAll(".vocab-card");
+        let visibleCount = 0;
+
+        cards.forEach((card) => {
+          const text = card.getAttribute("data-search");
+          const status = card.getAttribute("data-status");
+          const cefr = card.getAttribute("data-cefr");
+
+          const matchesQuery = text.includes(query);
+          const matchesStatus =
+            statusFilter === "all" || statusFilter === status;
+          const matchesCefr = cefrFilter === "all" || cefrFilter === cefr;
+
+          if (matchesQuery && matchesStatus && matchesCefr) {
+            card.style.display = "flex";
+            visibleCount++;
+          } else {
+            card.style.display = "none";
+          }
+        });
+
+        const emptyState = document.getElementById("list-empty-state");
+        if (visibleCount === 0) {
+          emptyState.classList.remove("hidden");
+        } else {
+          emptyState.classList.add("hidden");
+        }
+      }
+
+      function goToFilteredList(status) {
+        switchMode("list");
+        document.getElementById("filter-status").value = status;
+        filterList();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      window.onload = init;
+    </script>
+  </body>
+</html>
