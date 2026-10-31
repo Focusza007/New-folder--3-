@@ -6,12 +6,48 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>Oxford 3000 Vocabulary Master</title>
-    <!-- Tailwind CSS -->
+    <title>Vocabulary & Alphabet Master</title>
+    
+    <!-- Tailwind CSS with Custom Config for Dynamic Theming -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Prompt for Thai typography -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                50: 'var(--color-p50)',
+                100: 'var(--color-p100)',
+                200: 'var(--color-p200)',
+                300: 'var(--color-p300)',
+                400: 'var(--color-p400)',
+                500: 'var(--color-p500)',
+                600: 'var(--color-p600)',
+                700: 'var(--color-p700)',
+                800: 'var(--color-p800)',
+                900: 'var(--color-p900)'
+              },
+              secondary: {
+                50: 'var(--color-s50)',
+                100: 'var(--color-s100)',
+                200: 'var(--color-s200)',
+                300: 'var(--color-s300)',
+                400: 'var(--color-s400)',
+                500: 'var(--color-s500)',
+                600: 'var(--color-s600)',
+                700: 'var(--color-s700)',
+                800: 'var(--color-s800)',
+                900: 'var(--color-s900)'
+              }
+            }
+          }
+        }
+      }
+    </script>
+    
+    <!-- Google Fonts -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap"
       rel="stylesheet"
     />
     <!-- FontAwesome for Icons -->
@@ -21,10 +57,45 @@
     />
 
     <style>
+      :root {
+        /* English Theme: Blue (Primary) & Indigo (Secondary) */
+        --color-p50: #eff6ff; --color-p100: #dbeafe; --color-p200: #bfdbfe;
+        --color-p300: #93c5fd; --color-p400: #60a5fa; --color-p500: #3b82f6;
+        --color-p600: #2563eb; --color-p700: #1d4ed8; --color-p800: #1e40af;
+        --color-p900: #1e3a8a;
+
+        --color-s50: #eef2ff; --color-s100: #e0e7ff; --color-s200: #c7d2fe;
+        --color-s300: #a5b4fc; --color-s400: #818cf8; --color-s500: #6366f1;
+        --color-s600: #4f46e5; --color-s700: #4338ca; --color-s800: #3730a3;
+        --color-s900: #312e81;
+
+        --bg-body: #f8fafc;
+      }
+
+      body.theme-jp {
+        /* Japanese Theme: Rose (Primary) & Red (Secondary) */
+        --color-p50: #fff1f2; --color-p100: #ffe4e6; --color-p200: #fecdd3;
+        --color-p300: #fda4af; --color-p400: #fb7185; --color-p500: #f43f5e;
+        --color-p600: #e11d48; --color-p700: #be123c; --color-p800: #9f1239;
+        --color-p900: #881337;
+
+        --color-s50: #fef2f2; --color-s100: #fee2e2; --color-s200: #fecaca;
+        --color-s300: #fca5a5; --color-s400: #f87171; --color-s500: #ef4444;
+        --color-s600: #dc2626; --color-s700: #b91c1c; --color-s800: #991b1b;
+        --color-s900: #7f1d1d;
+
+        --bg-body: #fff0f5; /* Light pinkish */
+      }
+
       body {
         font-family: "Prompt", sans-serif;
-        background-color: #f8fafc;
+        background-color: var(--bg-body);
         -webkit-tap-highlight-color: transparent;
+        transition: background-color 0.5s ease;
+      }
+      
+      .jp-font {
+        font-family: "Noto Sans JP", sans-serif;
       }
 
       /* 3D Flip Card CSS */
@@ -67,7 +138,7 @@
       }
 
       .flip-card-front {
-        background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+        background: linear-gradient(135deg, var(--color-p600) 0%, var(--color-s600) 100%);
         color: white;
         justify-content: center;
         align-items: center;
@@ -129,7 +200,7 @@
       }
     </style>
   </head>
-  <body class="antialiased min-h-screen flex flex-col text-slate-800">
+  <body class="antialiased min-h-screen flex flex-col text-slate-800 transition-colors duration-300">
     <!-- Custom Notification Modal -->
     <div
       id="custom-modal"
@@ -140,11 +211,11 @@
         id="modal-content"
       >
         <div
-          class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4 mx-auto"
+          class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mb-4 mx-auto"
           id="modal-icon-container"
         >
           <i
-            class="fa-solid fa-lightbulb text-2xl text-blue-600"
+            class="fa-solid fa-lightbulb text-2xl text-primary-600"
             id="modal-icon"
           ></i>
         </div>
@@ -162,7 +233,7 @@
         </p>
         <button
           id="modal-btn"
-          class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 active:scale-95 transition-all shadow-md"
+          class="w-full bg-primary-600 text-white font-bold py-3.5 rounded-xl hover:bg-primary-700 active:scale-95 transition-all shadow-md"
         >
           ตกลง
         </button>
@@ -182,27 +253,25 @@
         >
           <div>
             <h3 class="text-xl font-extrabold text-slate-800">
-              <i class="fa-solid fa-book-bookmark text-blue-600 mr-2"></i
+              <i class="fa-solid fa-book-bookmark text-primary-600 mr-2"></i
               >เลือกบทเรียน (Chapters)
             </h3>
-            <p class="text-xs text-slate-500 mt-0.5">
-              แบ่งเป็นโซนตามระดับ CEFR เรียงจากง่ายไปยาก บทละไม่เกิน 20 คำ
-              สามารถเลือกสลับบทเรียนได้ตามต้องการ • คำจากไฟล์ JSON
-              จะกระจายเข้าโซนตามระดับ CEFR ของแต่ละคำ
+            <p class="text-xs text-slate-500 mt-0.5" id="modal-chapter-desc">
+              แบ่งเป็นโซนตามระดับ เรียงจากง่ายไปยาก บทละไม่เกิน 20 คำ
               <a
                 href="#"
                 onclick="
                   downloadSampleJSON();
                   return false;
                 "
-                class="text-blue-600 underline"
+                class="text-primary-600 underline"
                 >ดาวน์โหลดตัวอย่าง</a
               >
             </p>
           </div>
           <button
             onclick="document.getElementById('json-import-input').click()"
-            class="mr-2 px-3 h-9 rounded-full bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 flex items-center gap-1.5 whitespace-nowrap"
+            class="mr-2 px-3 h-9 rounded-full bg-primary-600 text-white text-xs font-bold hover:bg-primary-700 flex items-center gap-1.5 whitespace-nowrap"
           >
             <i class="fa-solid fa-file-import"></i> นำเข้า JSON
           </button>
@@ -226,64 +295,73 @@
     <header
       class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-slate-200"
     >
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
-          class="flex flex-col sm:flex-row justify-between items-center py-3 gap-3"
+          class="flex flex-col md:flex-row justify-between items-center py-3 gap-3"
         >
           <!-- Logo Area -->
           <div
-            class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-start"
+            class="flex items-center space-x-3 w-full md:w-auto justify-between md:justify-start"
           >
             <div class="flex items-center space-x-3">
               <div
-                class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-md flex items-center justify-center text-white font-extrabold text-xl"
+                class="w-10 h-10 bg-gradient-to-br from-primary-600 to-secondary-600 rounded-xl shadow-md flex items-center justify-center text-white font-extrabold text-xl transition-all duration-300"
+                id="app-logo-box"
               >
-                O3k
+                <span id="app-logo-text">O3k</span>
               </div>
               <div>
                 <h1
-                  class="text-lg font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 leading-tight"
+                  class="text-lg font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-secondary-600 leading-tight transition-all duration-300"
+                  id="app-title"
                 >
                   Oxford 3000
                 </h1>
                 <p
-                  class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider"
+                  class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider transition-all duration-300"
+                  id="app-subtitle"
                 >
                   Vocabulary Master & Quiz
                 </p>
               </div>
             </div>
+
+            <!-- Language Toggle Switch (Mobile view inline) -->
+            <div class="flex items-center bg-slate-100 rounded-full p-1 shadow-inner cursor-pointer" onclick="toggleLanguage()">
+              <div id="lang-en" class="px-2.5 py-1 rounded-full text-[10px] font-bold transition-all bg-white text-slate-800 shadow-sm">ENG</div>
+              <div id="lang-jp" class="px-2.5 py-1 rounded-full text-[10px] font-bold transition-all text-slate-400">JPN</div>
+            </div>
           </div>
 
           <!-- Main Nav Tabs -->
           <nav
-            class="flex space-x-1 bg-slate-100 p-1.5 rounded-2xl w-full sm:w-auto overflow-x-auto justify-center"
+            class="flex space-x-1 bg-slate-100 p-1.5 rounded-2xl w-full md:w-auto overflow-x-auto justify-center"
           >
             <button
               onclick="switchMode('dashboard')"
               id="tab-dashboard"
-              class="tab-btn flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap bg-white text-blue-600 shadow-sm"
+              class="tab-btn flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap bg-white text-primary-600 shadow-sm"
             >
               <i class="fa-solid fa-house mr-1.5"></i>หน้าแรก
             </button>
             <button
               onclick="switchMode('flashcards')"
               id="tab-flashcards"
-              class="tab-btn flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-500 hover:text-blue-600 transition-all whitespace-nowrap"
+              class="tab-btn flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-500 hover:text-primary-600 transition-all whitespace-nowrap"
             >
               <i class="fa-solid fa-layer-group mr-1.5"></i>เรียนรู้ (Cards)
             </button>
             <button
               onclick="switchMode('quiz')"
               id="tab-quiz"
-              class="tab-btn flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-500 hover:text-blue-600 transition-all whitespace-nowrap"
+              class="tab-btn flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-500 hover:text-primary-600 transition-all whitespace-nowrap"
             >
               <i class="fa-solid fa-gamepad mr-1.5"></i>ทำควิซ (Quiz)
             </button>
             <button
               onclick="switchMode('list')"
               id="tab-list"
-              class="tab-btn flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-500 hover:text-blue-600 transition-all whitespace-nowrap"
+              class="tab-btn flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-500 hover:text-primary-600 transition-all whitespace-nowrap"
             >
               <i class="fa-solid fa-book mr-1.5"></i>คลังศัพท์
             </button>
@@ -303,7 +381,7 @@
       >
         <!-- Chapter Banner -->
         <div
-          class="w-full bg-white rounded-3xl p-6 border border-slate-200 shadow-sm mb-6"
+          class="w-full bg-white rounded-3xl p-6 border border-primary-100 shadow-sm mb-6"
         >
           <div
             class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4"
@@ -311,7 +389,7 @@
             <div>
               <div class="flex items-center space-x-2 mb-1">
                 <span
-                  class="text-[10px] font-extrabold uppercase tracking-wider bg-blue-100 text-blue-700 px-3 py-1 rounded-full"
+                  class="text-[10px] font-extrabold uppercase tracking-wider bg-primary-100 text-primary-700 px-3 py-1 rounded-full"
                   >ความคืบหน้าบทเรียนปัจจุบัน</span
                 >
                 <span
@@ -333,9 +411,9 @@
             <div class="flex gap-2 w-full sm:w-auto">
               <button
                 onclick="startChapterSession(userProgress.currentChapter)"
-                class="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-2xl text-xs transition-all shadow-md active:scale-95 flex items-center justify-center"
+                class="flex-1 sm:flex-none bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-5 rounded-2xl text-xs transition-all shadow-md active:scale-95 flex items-center justify-center"
               >
-                <i class="fa-solid fa-play mr-2"></i> ท่องศัพท์บทนี้
+                <i class="fa-solid fa-play mr-2"></i> เรียนบทนี้
               </button>
               <button
                 onclick="startChapterQuiz(userProgress.currentChapter)"
@@ -364,14 +442,14 @@
           >
             <div
               id="current-chapter-progress-bar"
-              class="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full w-0 transition-all duration-500"
+              class="h-full bg-gradient-to-r from-primary-500 to-secondary-600 rounded-full w-0 transition-all duration-500"
             ></div>
           </div>
         </div>
 
         <!-- Daily SRS Target Banner -->
         <div
-          class="w-full bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-blue-200 mb-6 relative overflow-hidden"
+          class="w-full bg-gradient-to-br from-primary-600 to-secondary-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-primary-200 mb-6 relative overflow-hidden"
         >
           <div
             class="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"
@@ -386,8 +464,8 @@
                 เป้าหมายทบทวนประจำวัน 🚀
               </h2>
             </div>
-            <p class="text-blue-100 text-sm mb-6 leading-relaxed">
-              ระบบผสมคำศัพท์ใหม่และคำศัพท์เก่าที่ถึงเวลาต้องทวนตามหลัก Spaced
+            <p class="text-primary-100 text-sm mb-6 leading-relaxed">
+              ระบบผสมเนื้อหาใหม่และเก่าที่ถึงเวลาต้องทวนตามหลัก Spaced
               Repetition (SRS) เพื่อย้ายความจำเข้าสู่ Long-term Memory
             </p>
 
@@ -396,10 +474,10 @@
                 class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20"
               >
                 <p
-                  class="text-[11px] uppercase tracking-wider text-blue-100 font-bold mb-1 flex items-center"
+                  class="text-[11px] uppercase tracking-wider text-primary-100 font-bold mb-1 flex items-center"
                 >
                   <i class="fa-solid fa-sparkles mr-1.5 text-yellow-300"></i
-                  >คำศัพท์ใหม่วันนี้
+                  >เนื้อหาใหม่วันนี้
                 </p>
                 <p class="text-3xl font-extrabold" id="dash-new-count">0</p>
               </div>
@@ -407,10 +485,10 @@
                 class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20"
               >
                 <p
-                  class="text-[11px] uppercase tracking-wider text-blue-100 font-bold mb-1 flex items-center"
+                  class="text-[11px] uppercase tracking-wider text-primary-100 font-bold mb-1 flex items-center"
                 >
                   <i class="fa-solid fa-rotate-left mr-1.5 text-red-300"></i
-                  >คำที่ต้องทบทวน
+                  >ที่ต้องทบทวน
                 </p>
                 <p
                   class="text-3xl font-extrabold text-amber-300"
@@ -423,9 +501,9 @@
 
             <button
               onclick="startDailySession()"
-              class="w-full bg-white text-blue-700 hover:bg-blue-50 font-extrabold py-4 px-6 rounded-2xl transition-all active:scale-95 shadow-lg text-base flex justify-center items-center"
+              class="w-full bg-white text-primary-700 hover:bg-primary-50 font-extrabold py-4 px-6 rounded-2xl transition-all active:scale-95 shadow-lg text-base flex justify-center items-center"
             >
-              <i class="fa-solid fa-play mr-2"></i> เริ่มฝึกคำศัพท์วันนี้
+              <i class="fa-solid fa-play mr-2"></i> เริ่มฝึกวันนี้
             </button>
           </div>
         </div>
@@ -528,7 +606,7 @@
           </p>
           <button
             onclick="switchMode('dashboard')"
-            class="bg-blue-600 text-white px-6 py-3.5 rounded-2xl font-bold hover:bg-blue-700 active:scale-95 transition-all shadow-md"
+            class="bg-primary-600 text-white px-6 py-3.5 rounded-2xl font-bold hover:bg-primary-700 active:scale-95 transition-all shadow-md"
           >
             กลับหน้าหลัก
           </button>
@@ -554,7 +632,7 @@
           >
             <div
               id="session-progress-bar"
-              class="h-full bg-blue-600 w-0 transition-all duration-300"
+              class="h-full bg-primary-600 w-0 transition-all duration-300"
             ></div>
           </div>
 
@@ -575,12 +653,13 @@
 
                 <div class="flex items-center justify-center gap-2 mb-2">
                   <h3
-                    class="text-4xl sm:text-5xl font-extrabold tracking-tight text-center break-words"
+                    class="text-5xl sm:text-6xl font-extrabold tracking-tight text-center break-words jp-font"
                     id="fc-word"
                   >
                     word
                   </h3>
                   <button
+                    id="fc-audio-front"
                     onclick="speakWord(event)"
                     class="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white transition-all ml-1"
                   >
@@ -589,7 +668,7 @@
                 </div>
 
                 <p
-                  class="text-blue-100 text-lg font-medium tracking-wide"
+                  class="text-primary-100 text-lg font-medium tracking-wide"
                   id="fc-pronunciation-front"
                 ></p>
                 <span
@@ -606,7 +685,7 @@
                   <div class="mb-3 flex justify-between items-start">
                     <div>
                       <h3
-                        class="text-2xl font-bold text-blue-700 mb-1"
+                        class="text-2xl font-bold text-primary-700 mb-1"
                         id="fc-meaning"
                       >
                         ความหมาย
@@ -618,7 +697,7 @@
                     </div>
                     <button
                       onclick="speakWord(event)"
-                      class="w-9 h-9 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-100 transition-all"
+                      class="w-9 h-9 bg-primary-50 text-primary-600 rounded-full flex items-center justify-center hover:bg-primary-100 transition-all"
                     >
                       <i class="fa-solid fa-volume-high"></i>
                     </button>
@@ -648,11 +727,11 @@
                     <p
                       class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1"
                     >
-                      <i class="fa-solid fa-quote-left mr-1.5 text-blue-400"></i
+                      <i class="fa-solid fa-quote-left mr-1.5 text-primary-400"></i
                       >ตัวอย่างการใช้งาน
                     </p>
                     <p
-                      class="text-slate-800 font-semibold text-xs sm:text-sm italic mb-1 leading-relaxed"
+                      class="text-slate-800 font-semibold text-sm italic mb-1 leading-relaxed jp-font"
                       id="fc-example-en"
                     >
                       "English example sentence."
@@ -726,9 +805,9 @@
         <div id="quiz-hud" class="w-full mb-4">
           <div class="flex justify-between items-center mb-2 px-1">
             <span
-              class="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-md"
+              class="text-[10px] font-bold bg-primary-100 text-primary-700 px-2 py-1 rounded-md"
               id="quiz-scope-badge"
-              >โหมด: ควิซรวมศัพท์</span
+              >โหมด: ควิซรวม</span
             >
           </div>
           <div
@@ -755,7 +834,7 @@
                 <span class="text-[9px] uppercase font-bold text-slate-400"
                   >Score</span
                 >
-                <span class="text-blue-600 font-bold text-base" id="quiz-score"
+                <span class="text-primary-600 font-bold text-base" id="quiz-score"
                   >0</span
                 >
               </div>
@@ -767,7 +846,7 @@
           >
             <div
               id="quiz-timer-bar"
-              class="h-full bg-blue-500 w-full transition-all ease-linear"
+              class="h-full bg-primary-500 w-full transition-all ease-linear"
             ></div>
           </div>
         </div>
@@ -786,7 +865,7 @@
               คำถามทดสอบความหมาย
             </p>
             <h3
-              class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight mb-2 break-words"
+              class="text-3xl sm:text-5xl font-extrabold text-slate-800 tracking-tight mb-2 break-words jp-font"
               id="quiz-word"
             >
               word
@@ -825,7 +904,7 @@
               <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">
                 คะแนนรวม
               </p>
-              <p class="text-2xl font-bold text-blue-600" id="go-score">0</p>
+              <p class="text-2xl font-bold text-primary-600" id="go-score">0</p>
             </div>
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
               <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">
@@ -837,7 +916,7 @@
 
           <button
             onclick="startNewQuiz()"
-            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-8 rounded-2xl shadow-lg shadow-blue-200 transition-all active:scale-95 text-base"
+            class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3.5 px-8 rounded-2xl shadow-lg shadow-primary-200 transition-all active:scale-95 text-base"
           >
             <i class="fa-solid fa-rotate-right mr-2"></i> เล่นอีกครั้ง
           </button>
@@ -860,29 +939,25 @@
               type="text"
               id="search-input"
               onkeyup="filterList()"
-              placeholder="ค้นหาคำศัพท์, คำแปล, ประโยคตัวอย่าง..."
-              class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-sm text-slate-700 font-medium transition-all"
+              placeholder="ค้นหา..."
+              class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white text-sm text-slate-700 font-medium transition-all"
             />
           </div>
           <div class="flex flex-col sm:flex-row gap-2 min-w-[300px]">
             <select
               id="filter-cefr"
               onchange="filterList()"
-              class="w-full sm:w-1/2 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+              class="w-full sm:w-1/2 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer"
             >
-              <option value="all">ทุกระดับ (CEFR)</option>
-              <option value="A1">ระดับ A1</option>
-              <option value="A2">ระดับ A2</option>
-              <option value="B1">ระดับ B1</option>
-              <option value="B2">ระดับ B2</option>
+              <!-- Populated dynamically based on language -->
             </select>
             <select
               id="filter-status"
               onchange="filterList()"
-              class="w-full sm:w-1/2 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+              class="w-full sm:w-1/2 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer"
             >
               <option value="all">ทุกสถานะความจำ</option>
-              <option value="new">⚪️ คำศัพท์ใหม่</option>
+              <option value="new">⚪️ เพิ่งเริ่ม</option>
               <option value="review">🔴 ต้องทวนซ้ำ</option>
               <option value="learning">🟡 กำลังจำ</option>
               <option value="mastered">🟢 จำได้แม่น</option>
@@ -908,9 +983,9 @@
           >
             <i class="fa-solid fa-magnifying-glass text-2xl text-slate-400"></i>
           </div>
-          <h3 class="text-lg font-bold text-slate-700">ไม่พบคำศัพท์ที่ค้นหา</h3>
+          <h3 class="text-lg font-bold text-slate-700">ไม่พบเนื้อหาที่ค้นหา</h3>
           <p class="text-slate-500 text-sm">
-            ลองค้นหาด้วยคำอื่น หรือเปลี่ยนตัวกรองระดับภาษา
+            ลองค้นหาด้วยคำอื่น หรือเปลี่ยนตัวกรอง
           </p>
         </div>
       </section>
@@ -918,8 +993,10 @@
 
     <!-- JavaScript Logic -->
     <script>
-      // Raw dataset containing Oxford 3000 vocabulary words with CEFR, meanings, mnemonics, and example sentences
-      const RAW_VOCAB = `
+      // -------------------------------------------------------------
+      // DATA ARRAYS (English & Japanese)
+      // -------------------------------------------------------------
+      const RAW_VOCAB_EN = `
 abandon|อะ-แบน-เดิน|ละทิ้ง, ปล่อยทิ้ง|They had to abandon the old house.|พวกเขาต้องละทิ้งบ้านหลังเก่า|a + bandon = ละทิ้งไป|B2
 ability|อะ-บิล-ลิ-ที|ความสามารถ|Reading is an important ability.|การอ่านเป็นความสามารถที่สำคัญ|ability นึกถึง able (สามารถ)|A2
 able|เอ-เบิล|สามารถ|She is able to swim.|เธอสามารถว่ายน้ำได้|able = สามารถทำได้|A2
@@ -1566,37 +1643,266 @@ cut|คัท|ตัด|She cut the paper with scissors.|เธอตัดก�
 cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The water cycle is a natural process.|วัฏจักรของน้ำคือกระบวนการตามธรรมชาติ|cycle|A2
 `;
 
-      let vocabData = [];
-      let srsData = JSON.parse(localStorage.getItem("ox3k_srs_data")) || {};
-      let userProgress = JSON.parse(
-        localStorage.getItem("ox3k_user_progress"),
-      ) || { currentChapter: 1, completedChapters: [] };
+      // Format: Word/Char | Pronunciation [Thai] | Meaning | Example (JP) | Example TH | Mnemonic/Trick | Category
+      const RAW_VOCAB_JP = `
+あ|a [อะ]|เสียง อะ|あかい (Akai)|สีแดง|จำหน้าตาเหมือนตัว a หางม้วน|Hiragana
+い|i [อิ]|เสียง อิ|いいえ (Iie)|ไม่ใช่|เหมือนตะขอคู่|Hiragana
+う|u [อุ]|เสียง อุ|うみ (Umi)|ทะเล|คล้ายหู|Hiragana
+え|e [เอะ]|เสียง เอะ|えき (Eki)|สถานีรถไฟ|คล้ายคนวิ่งวิ่งเข้าสถานี|Hiragana
+お|o [โอะ]|เสียง โอะ|おおきい (Ookii)|ใหญ่|คล้าย あ แต่มีขีดขวา|Hiragana
+か|ka [คะ]|เสียง คะ|かさ (Kasa)|ร่ม|เหมือนไม้กางเขนมีขีด|Hiragana
+き|ki [คิ]|เสียง คิ|きのう (Kinou)|เมื่อวาน|เหมือนกุญแจ (key)|Hiragana
+く|ku [คุ]|เสียง คุ|くるま (Kuruma)|รถยนต์|ปากนก|Hiragana
+け|ke [เคะ]|เสียง เคะ|けさ (Kesa)|เมื่อเช้านี้|ไม้กางเขนมีเส้นด้าย|Hiragana
+こ|ko [โคะ]|เสียง โคะ|こども (Kodomo)|เด็ก|เส้นขนานบนล่าง|Hiragana
+さ|sa [ซะ]|เสียง ซะ|さくら (Sakura)|ซากุระ|คล้าย き แต่มีเส้นเดียว|Hiragana
+し|shi [ชิ]|เสียง ชิ|しろい (Shiroi)|สีขาว|ตะขอเบ็ด|Hiragana
+す|su [ซุ]|เสียง ซุ|すいか (Suika)|แตงโม|ม้วนเป็นเกลียว|Hiragana
+せ|se [เสะ]|เสียง เสะ|せんせい (Sensei)|คุณครู|คล้ายหน้าคนหันข้าง|Hiragana
+そ|so [โสะ]|เสียง โสะ|そら (Sora)|ท้องฟ้า|เส้นซิกแซก|Hiragana
+た|ta [ทะ]|เสียง ทะ|たべる (Taberu)|กิน|ตัว T กับเครื่องหมายเท่ากับ|Hiragana
+ち|chi [จิ]|เสียง จิ|ちいさい (Chiisai)|เล็ก|คล้ายเลข 5|Hiragana
+つ|tsu [ทสึ]|เสียง ทสึ|つき (Tsuki)|พระจันทร์|คลื่นน้ำ|Hiragana
+て|te [เทะ]|เสียง เทะ|て (Te)|มือ|มือยื่นออกมา|Hiragana
+と|to [โทะ]|เสียง โทะ|ともだち (Tomodachi)|เพื่อน|นิ้วเท้า (toe) มีเล็บ|Hiragana
+な|na [นะ]|เสียง นะ|なまえ (Namae)|ชื่อ|ไม้กางเขนกับปลา|Hiragana
+に|ni [นิ]|เสียง นิ|にく (Niku)|เนื้อ|คล้ายเข็มสองเล่ม|Hiragana
+ぬ|nu [นุ]|เสียง นุ|いぬ (Inu)|สุนัข|ตะเกียบไขว้กันมีม้วน|Hiragana
+ね|ne [เนะ]|เสียง เนะ|ねこ (Neko)|แมว|ต้นไม้มีรากม้วน|Hiragana
+の|no [โนะ]|เสียง โนะ|のみもの (Nomimono)|เครื่องดื่ม|สัญลักษณ์ห้าม (no)|Hiragana
+は|ha [ฮะ]|เสียง ฮะ|はい (Hai)|ใช่|เหมือน に แต่ตัวแรกยาว|Hiragana
+ひ|hi [ฮิ]|เสียง ฮิ|ひと (Hito)|คน|รอยยิ้มแบบฮิฮิ|Hiragana
+ふ|fu [ฟุ]|เสียง ฟุ|ふね (Fune)|เรือ|ภูเขาไฟฟูจิพ่นควัน|Hiragana
+へ|he [เฮะ]|เสียง เฮะ|へや (Heya)|ห้อง|หลังคาบ้าน|Hiragana
+ほ|ho [โฮะ]|เสียง โฮะ|ほん (Hon)|หนังสือ|เหมือน は แต่มีสองขีด|Hiragana
+ま|ma [มะ]|เสียง มะ|まち (Machi)|เมือง|มีเส้นขนานสองเส้น|Hiragana
+み|mi [มิ]|เสียง มิ|みず (Mizu)|น้ำ|คล้ายตัว H หางม้วน|Hiragana
+む|mu [มุ]|เสียง มุ|むし (Mushi)|แมลง|คล้ายวัว (moo)|Hiragana
+め|me [เมะ]|เสียง เมะ|め (Me)|ตา|เหมือน ぬ แต่ไม่ม้วนหาง|Hiragana
+も|mo [โมะ]|เสียง โมะ|もの (Mono)|สิ่งของ|คล้ายเบ็ดตกปลาสองขีด|Hiragana
+や|ya [ยะ]|เสียง ยะ|やま (Yama)|ภูเขา|เรือยอร์ชกำลังแล่น|Hiragana
+ゆ|yu [ยุ]|เสียง ยุ|ゆき (Yuki)|หิมะ|ปลาว่ายน้ำ|Hiragana
+よ|yo [โยะ]|เสียง โยะ|よる (Yoru)|กลางคืน|เส้นตัดกับห่วง|Hiragana
+ら|ra [ระ]|เสียง ระ|らいしゅう (Raishuu)|สัปดาห์หน้า|เลข 5 มีหมวก|Hiragana
+り|ri [ริ]|เสียง ริ|りんご (Ringo)|แอปเปิ้ล|เส้นโค้งสองเส้น|Hiragana
+る|ru [รุ]|เสียง รุ|くるま (Kuruma)|รถยนต์|คล้ายเลข 3 ม้วนหาง|Hiragana
+れ|re [เระ]|เสียง เระ|れいぞうこ (Reizouko)|ตู้เย็น|เส้นซิกแซกตวัดออก|Hiragana
+ろ|ro [โระ]|เสียง โระ|ろく (Roku)|หก|คล้ายเลข 3 แต่ไม่ม้วน|Hiragana
+わ|wa [วะ]|เสียง วะ|わたし (Watashi)|ฉัน|คล้าย ね แต่หางไม่ม้วน|Hiragana
+を|wo [โวะ]|เสียง โวะ|みずをのむ (Mizu wo nomu)|ดื่มน้ำ|ใช้เป็นคำช่วยเท่านั้น|Hiragana
+ん|n [อึน/อึม]|เสียง อึน|にほん (Nihon)|ญี่ปุ่น|คล้ายตัว h|Hiragana
+が|ga [งะ/กะ]|เสียง งะ|がっこう (Gakkou)|โรงเรียน|か มีเต็นเต็น|Hiragana
+ぎ|gi [งิ/กิ]|เสียง งิ|ぎんこう (Ginkou)|ธนาคาร|き มีเต็นเต็น|Hiragana
+ぐ|gu [งุ/กุ]|เสียง งุ|ぐらい (Gurai)|ประมาณ|く มีเต็นเต็น|Hiragana
+げ|ge [เงะ/เกะ]|เสียง เงะ|げんき (Genki)|สบายดี|け มีเต็นเต็น|Hiragana
+ご|go [โงะ/โกะ]|เสียง โงะ|ごはん (Gohan)|ข้าว|こ มีเต็นเต็น|Hiragana
+ざ|za [ซะ]|เสียง ซะ (ก้อง)|ざっし (Zasshi)|นิตยสาร|さ มีเต็นเต็น|Hiragana
+じ|ji [จิ]|เสียง จิ (ก้อง)|じかん (Jikan)|เวลา|し มีเต็นเต็น|Hiragana
+ず|zu [ซุ]|เสียง ซุ (ก้อง)|みず (Mizu)|น้ำ|す มีเต็นเต็น|Hiragana
+ぜ|ze [เซะ]|เสียง เซะ (ก้อง)|ぜんぶ (Zenbu)|ทั้งหมด|せ มีเต็นเต็น|Hiragana
+ぞ|zo [โสะ]|เสียง โสะ (ก้อง)|かぞく (Kazoku)|ครอบครัว|そ มีเต็นเต็น|Hiragana
+だ|da [ดะ]|เสียง ดะ|だいがく (Daigaku)|มหาวิทยาลัย|た มีเต็นเต็น|Hiragana
+ぢ|ji [จิ]|เสียง จิ (ก้อง)|はなぢ (Hanaji)|เลือดกำเดา|ち มีเต็นเต็น|Hiragana
+づ|zu [ซุ]|เสียง ซุ (ก้อง)|つづく (Tsuduku)|ดำเนินต่อไป|つ มีเต็นเต็น|Hiragana
+で|de [เดะ]|เสียง เดะ|でんわ (Denwa)|โทรศัพท์|て มีเต็นเต็น|Hiragana
+ど|do [โดะ]|เสียง โดะ|ドア (Doa)|ประตู|と มีเต็นเต็น|Hiragana
+ば|ba [บะ]|เสียง บะ|ばす (Basu)|รถบัส|は มีเต็นเต็น|Hiragana
+び|bi [บิ]|เสียง บิ|びょういん (Byouin)|โรงพยาบาล|ひ มีเต็นเต็น|Hiragana
+ぶ|bu [บุ]|เสียง บุ|ぶた (Buta)|หมู|ふ มีเต็นเต็น|Hiragana
+べ|be [เบะ]|เสียง เบะ|べんきょう (Benkyou)|การเรียน|へ มีเต็นเต็น|Hiragana
+ぼ|bo [โบะ]|เสียง โบะ|ぼうし (Boushi)|หมวก|ほ มีเต็นเต็น|Hiragana
+ぱ|pa [ปะ]|เสียง ปะ|ぱん (Pan)|ขนมปัง|は มีมารุ (วงกลม)|Hiragana
+ぴ|pi [ปิ]|เสียง ปิ|ぴかぴか (Pikapika)|วิบวับ|ひ มีมารุ (วงกลม)|Hiragana
+ぷ|pu [ปุ]|เสียง ปุ|ぷーる (Puuru)|สระว่ายน้ำ|ふ มีมารุ (วงกลม)|Hiragana
+ぺ|pe [เปะ]|เสียง เปะ|ぺん (Pen)|ปากกา|へ มีมารุ (วงกลม)|Hiragana
+ぽ|po [โปะ]|เสียง โปะ|ぽけっと (Poketto)|กระเป๋าเสื้อ/กางเกง|ほ มีมารุ (วงกลม)|Hiragana
+きゃ|kya [เคียะ]|เสียง เคียะ|きゃく (Kyaku)|แขก, ลูกค้า|き + ゃ เล็ก|Hiragana
+きゅ|kyu [คิว]|เสียง คิว|きゅうり (Kyuuri)|แตงกวา|き + ゅ เล็ก|Hiragana
+きょ|kyo [เคียว]|เสียง เคียว|きょう (Kyou)|วันนี้|き + ょ เล็ก|Hiragana
+しゃ|sha [ชะ]|เสียง ชะ|しゃしん (Shashin)|รูปถ่าย|し + ゃ เล็ก|Hiragana
+しゅ|shu [ชุ]|เสียง ชุ|しゅくだい (Shukudai)|การบ้าน|し + ゅ เล็ก|Hiragana
+しょ|sho [โชะ]|เสียง โชะ|しょくどう (Shokudou)|โรงอาหาร|し + ょ เล็ก|Hiragana
+ちゃ|cha [ชะ]|เสียง ชะ|おちゃ (Ocha)|ชา|ち + ゃ เล็ก|Hiragana
+ちゅ|chu [ชุ]|เสียง ชุ|ちゅうごく (Chuugoku)|ประเทศจีน|ち + ゅ เล็ก|Hiragana
+ちょ|cho [โชะ]|เสียง โชะ|ちょっと (Chotto)|นิดหน่อย|ち + ょ เล็ก|Hiragana
+にゃ|nya [เนียะ]|เสียง เนียะ|こんにゃく (Konnyaku)|บุก|に + ゃ เล็ก|Hiragana
+にゅ|nyu [นิว]|เสียง นิว|ぎゅうにゅう (Gyuunyuu)|นมวัว|に + ゅ เล็ก|Hiragana
+にょ|nyo [เนียว]|เสียง เนียว|にょうぼう (Nyoubou)|ภรรยา|に + ょ เล็ก|Hiragana
+ひゃ|hya [เฮียะ]|เสียง เฮียะ|ひゃく (Hyaku)|ร้อย|ひ + ゃ เล็ก|Hiragana
+ひゅ|hyu [ฮิว]|เสียง ฮิว|ひゅるひゅる (Hyuruhyuru)|เสียงลมพัด|ひ + ゅ เล็ก|Hiragana
+ひょ|hyo [เฮียว]|เสียง เฮียว|ひょう (Hyou)|ตาราง|ひ + ょ เล็ก|Hiragana
+みゃ|mya [เมียะ]|เสียง เมียะ|みゃく (Myaku)|ชีพจร|み + ゃ เล็ก|Hiragana
+みゅ|myu [มิว]|เสียง มิว|みゅーじっく (Myuujikku)|ดนตรี|み + ゅ เล็ก|Hiragana
+みょ|myo [เมียว]|เสียง เมียว|みょうじ (Myouji)|นามสกุล|み + ょ เล็ก|Hiragana
+りゃ|rya [เรียะ]|เสียง เรียะ|りゃく (Ryaku)|ย่อ|り + ゃ เล็ก|Hiragana
+りゅ|ryu [ริว]|เสียง ริว|りゅう (Ryuu)|มังกร|り + ゅ เล็ก|Hiragana
+りょ|ryo [เรียว]|เสียง เรียว|りょこう (Ryokou)|การท่องเที่ยว|り + ょ เล็ก|Hiragana
+ぎゃ|gya [เงียะ]|เสียง เงียะ|ぎゃく (Gyaku)|ตรงกันข้าม|ぎ + ゃ เล็ก|Hiragana
+ぎゅ|gyu [งิว]|เสียง งิว|ぎゅうにく (Gyuuniku)|เนื้อวัว|ぎ + ゅ เล็ก|Hiragana
+ぎょ|gyo [เงียว]|เสียง เงียว|きんぎょ (Kingyo)|ปลาทอง|ぎ + ょ เล็ก|Hiragana
+じゃ|ja [จะ]|เสียง จะ|じゃがいも (Jagaimo)|มันฝรั่ง|じ + ゃ เล็ก|Hiragana
+じゅ|ju [จุ]|เสียง จุ|じゅぎょう (Jugyou)|คาบเรียน|じ + ゅ เล็ก|Hiragana
+じょ|jo [โจะ]|เสียง โจะ|じょせい (Josei)|ผู้หญิง|じ + ょ เล็ก|Hiragana
+びゃ|bya [เบียะ]|เสียง เบียะ|さんびゃく (Sanbyaku)|สามร้อย|び + ゃ เล็ก|Hiragana
+びゅ|byu [บิว]|เสียง บิว|びゅんびゅん (Byunbyun)|เสียงพัดเร็วๆ|び + ゅ เล็ก|Hiragana
+びょ|byo [เบียว]|เสียง เบียว|びょうき (Byouki)|ป่วย|び + ょ เล็ก|Hiragana
+ぴゃ|pya [เปียะ]|เสียง เปียะ|ろっぴゃく (Roppyaku)|หกร้อย|ぴ + ゃ เล็ก|Hiragana
+ぴゅ|pyu [ปิว]|เสียง ปิว|ぴゅー (Pyuu)|เสียงเป่าปาก|ぴ + ゅ เล็ก|Hiragana
+ぴょ|pyo [เปียว]|เสียง เปียว|ぴょんぴょん (Pyonpyon)|กระโดดเด้งๆ|ぴ + ょ เล็ก|Hiragana
+ア|a [อะ]|เสียง อะ|アイス (Aisu)|ไอศกรีม|คล้ายตัว T ตะแคง|Katakana
+イ|i [อิ]|เสียง อิ|インターネット (Intaanetto)|อินเทอร์เน็ต|คล้ายตัว T|Katakana
+ウ|u [อุ]|เสียง อุ|ウイスキー (Uisukii)|วิสกี้|มีขีดด้านบน|Katakana
+エ|e [เอะ]|เสียง เอะ|エアコン (Eakon)|แอร์|คล้ายตัว I ตัวใหญ่|Katakana
+オ|o [โอะ]|เสียง โอะ|オレンジ (Orenji)|ส้ม|คนกางขา|Katakana
+カ|ka [คะ]|เสียง คะ|カメラ (Kamera)|กล้อง|คล้าย か แต่ไม่มีขีด|Katakana
+キ|ki [คิ]|เสียง คิ|キロ (Kiro)|กิโล|คล้าย き แต่ไม่มีฐาน|Katakana
+ク|ku [คุ]|เสียง คุ|クラス (Kurasu)|ชั้นเรียน|มุมกล่อง|Katakana
+ケ|ke [เคะ]|เสียง เคะ|ケーキ (Keeki)|เค้ก|คล้ายตัว K|Katakana
+コ|ko [โคะ]|เสียง โคะ|コーヒー (Koohii)|กาแฟ|กล่องสี่เหลี่ยมด้านล่างหาย|Katakana
+サ|sa [ซะ]|เสียง ซะ|サラダ (Sarada)|สลัด|เส้นสองเส้นตัดกัน|Katakana
+シ|shi [ชิ]|เสียง ชิ|シャツ (Shatsu)|เสื้อเชิ้ต|ตวัดขึ้นจากล่าง|Katakana
+ス|su [ซุ]|เสียง ซุ|スーツ (Suutsu)|ชุดสูท|เหมือนไม้แขวนเสื้อ|Katakana
+セ|se [เสะ]|เสียง เสะ|センター (Sentaa)|ศูนย์กลาง|คล้าย せ แต่เหลี่ยม|Katakana
+ソ|so [โสะ]|เสียง โสะ|ソース (Soosu)|ซอส|ตวัดลงจากบน|Katakana
+タ|ta [ทะ]|เสียง ทะ|タクシー (Takushii)|รถแท็กซี่|คล้ายตัว K เอียง|Katakana
+チ|chi [จิ]|เสียง จิ|チーズ (Chiizu)|ชีส|คล้าย 千 (พัน)|Katakana
+ツ|tsu [ทสึ]|เสียง ทสึ|ツアー (Tsuaa)|ทัวร์|คล้าย シ แต่ตวัดลง|Katakana
+テ|te [เทะ]|เสียง เทะ|テスト (Tesuto)|การสอบ|เส้นขนานสองเส้นมีหาง|Katakana
+ト|to [โทะ]|เสียง โทะ|トマト (Tomato)|มะเขือเทศ|เส้นตั้งมีขีดข้าง|Katakana
+ナ|na [นะ]|เสียง นะ|ナイフ (Naifu)|มีด|คล้ายไม้กางเขน|Katakana
+ニ|ni [นิ]|เสียง นิ|ニュース (Nyuusu)|ข่าว|ขีดสองขีดขนานกัน|Katakana
+ヌ|nu [นุ]|เสียง นุ|ヌードル (Nuudoru)|ก๋วยเตี๋ยว|เหมือนตะเกียบคีบ|Katakana
+ネ|ne [เนะ]|เสียง เนะ|ネクタイ (Nekutai)|เนกไท|คล้ายเสื้อ|Katakana
+ノ|no [โนะ]|เสียง โนะ|ノート (Nooto)|สมุดโน้ต|ขีดเฉียงลงเส้นเดียว|Katakana
+ハ|ha [ฮะ]|เสียง ฮะ|ハンバーガー (Hanbaagaa)|แฮมเบอร์เกอร์|คล้ายเต็นท์|Katakana
+ヒ|hi [ฮิ]|เสียง ฮิ|ヒーター (Hiitaa)|เครื่องทำความร้อน|สี่เหลี่ยมพับครึ่ง|Katakana
+フ|fu [ฟุ]|เสียง ฟุ|フォーク (Fooku)|ส้อม|คล้ายเลข 7|Katakana
+ヘ|he [เฮะ]|เสียง เฮะ|ヘリコプター (Herikoputaa)|เฮลิคอปเตอร์|เหมือน へ ในฮิรางานะ|Katakana
+ホ|ho [โฮะ]|เสียง โฮะ|ホテル (Hoteru)|โรงแรม|เหมือนต้นไม้|Katakana
+マ|ma [มะ]|เสียง มะ|マウス (Mausu)|เมาส์|มุมแหลมชี้ขวา|Katakana
+ミ|mi [มิ]|เสียง มิ|ミルク (Miruku)|นม|สามขีดเอียงๆ|Katakana
+ム|mu [มุ]|เสียง มุ|メニュー (Menyuu)|เมนู(ตัวมุอยู่ในคำอื่น)|สามเหลี่ยมเปิดขวา|Katakana
+メ|me [เมะ]|เสียง เมะ|メロン (Meron)|เมลอน|กากบาทเอียงๆ|Katakana
+モ|mo [โมะ]|เสียง โมะ|モニター (Monitaa)|หน้าจอ|คล้าย も แต่เหลี่ยม|Katakana
+ヤ|ya [ยะ]|เสียง ยะ|ヤンキー (Yankii)|แยงกี้|เหมือน や แต่เหลี่ยม|Katakana
+ユ|yu [ยุ]|เสียง ยุ|ユニフォーム (Yunifoomu)|ยูนิฟอร์ม|สี่เหลี่ยมเปิดบน|Katakana
+ヨ|yo [โยะ]|เสียง โยะ|ヨーロッパ (Yooroppa)|ยุโรป|คล้ายตัว E กลับด้าน|Katakana
+ラ|ra [ระ]|เสียง ระ|ラジオ (Rajio)|วิทยุ|เส้นบนกับมุมเหลี่ยม|Katakana
+リ|ri [ริ]|เสียง ริ|リボン (Ribon)|ริบบิ้น|เหมือน り ในฮิรางานะ|Katakana
+ル|ru [รุ]|เสียง รุ|ルーム (Ruumu)|ห้อง|สองเส้นโค้ง|Katakana
+レ|re [เระ]|เสียง เระ|レストラン (Resutoran)|ร้านอาหาร|ตะขอปลายแหลม|Katakana
+ロ|ro [โระ]|เสียง โระ|ロボット (Robotto)|หุ่นยนต์|สี่เหลี่ยมจัตุรัส|Katakana
+ワ|wa [วะ]|เสียง วะ|ワイン (Wain)|ไวน์|คล้าย ウ แต่ไม่มีขีดบน|Katakana
+ヲ|wo [โวะ]|เสียง โวะ|ヲタク (Wotaku)|โอตาคุ|เส้นขวางสองเส้นตวัดลง|Katakana
+ン|n [อึน/อึม]|เสียง อึน|パン (Pan)|ขนมปัง|คล้าย ソ แต่ตวัดขึ้น|Katakana
+日|nichi / hi [นิจิ / ฮิ]|พระอาทิตย์, วัน|日本 (Nihon)|ประเทศญี่ปุ่น|รูปพระอาทิตย์|Kanji
+月|getsu / tsuki [เกะทสึ / สึคิ]|พระจันทร์, เดือน|月曜日 (Getsuyoubi)|วันจันทร์|รูปพระจันทร์เสี้ยว|Kanji
+火|ka / hi [คะ / ฮิ]|ไฟ|火曜日 (Kayoubi)|วันอังคาร|กองไฟสว่างไสว|Kanji
+水|sui / mizu [ซุย / มิซึ]|น้ำ|水 (Mizu)|น้ำ|สายน้ำไหล|Kanji
+木|moku / ki [โมะคุ / คิ]|ต้นไม้, ไม้|木曜日 (Mokuyoubi)|วันพฤหัสบดี|รูปต้นไม้กางกิ่ง|Kanji
+金|kin / okane [คิน / โอะคะเนะ]|ทองคำ, เงิน|お金 (Okane)|เงิน|รูปหลังคาคุมก้อนทอง|Kanji
+土|do / tsuchi [โดะ / สึจิ]|ดิน, พื้นดิน|土曜日 (Doyoubi)|วันเสาร์|ไม้ปักลงดิน|Kanji
+人|jin / hito [จิน / ฮิโตะ]|คน, มนุษย์|日本人 (Nihonjin)|คนญี่ปุ่น|คนยืนกางขา|Kanji
+山|san / yama [ซัน / ยะมะ]|ภูเขา|富士山 (Fujisan)|ภูเขาไฟฟูจิ|ยอดเขาสามยอด|Kanji
+川|sen / kawa [เซน / คาวะ]|แม่น้ำ|川 (Kawa)|แม่น้ำ|แม่น้ำสามสาย|Kanji
+上|jou / ue [โจ / อุเอะ]|ข้างบน, ขึ้น|上 (Ue)|ข้างบน|เส้นชี้ขึ้นบน|Kanji
+下|ka / shita [คะ / ชิตะ]|ข้างล่าง, ลง|下 (Shita)|ข้างล่าง|เส้นชี้ลงล่าง|Kanji
+中|chuu / naka [ชู / นาคะ]|ตรงกลาง, ข้างใน|中国 (Chuugoku)|ประเทศจีน|เส้นผ่ากลางสี่เหลี่ยม|Kanji
+`;
 
-      const ONE_DAY = 24 * 60 * 60 * 1000;
-      const WORDS_PER_CHAPTER = 20;
+      let appLang = localStorage.getItem("ox3k_app_lang") || "en";
+      let vocabData = [];
+      let srsData = {};
+      let userProgress = { currentChapter: 1, completedChapters: [] };
       let customBatches = [];
-      try {
-        customBatches =
-          JSON.parse(localStorage.getItem("ox3k_custom_batches")) || [];
-      } catch (e) {
-        customBatches = [];
-      }
       let chapterList = [];
 
-      // Chapters: built-in words split by 20, then each imported JSON file = 1 chapter
+      const ONE_DAY = 24 * 60 * 60 * 1000;
+      const WORDS_PER_CHAPTER = appLang === "en" ? 20 : 15; // 15 for JP characters per chapter
+
+      function getStorageKeys() {
+        if (appLang === "en") {
+          return {
+            srs: "ox3k_srs_data",
+            prog: "ox3k_user_progress",
+            batches: "ox3k_custom_batches"
+          };
+        } else {
+          return {
+            srs: "jp_master_srs_data",
+            prog: "jp_master_user_progress",
+            batches: "jp_master_custom_batches"
+          };
+        }
+      }
+
+      function toggleLanguage() {
+        appLang = appLang === "en" ? "jp" : "en";
+        localStorage.setItem("ox3k_app_lang", appLang);
+        init();
+      }
+
+      function applyTheme() {
+        if (appLang === "jp") {
+          document.body.classList.add("theme-jp");
+          
+          document.getElementById("lang-jp").classList.replace("text-slate-400", "text-slate-800");
+          document.getElementById("lang-jp").classList.add("bg-white", "shadow-sm");
+          
+          document.getElementById("lang-en").classList.replace("text-slate-800", "text-slate-400");
+          document.getElementById("lang-en").classList.remove("bg-white", "shadow-sm");
+          
+          document.getElementById("app-title").textContent = "Nihongo Master";
+          document.getElementById("app-subtitle").textContent = "Kana & Kanji Learning";
+          document.getElementById("app-logo-text").innerHTML = "<i class='fa-solid fa-torii-gate'></i>";
+          
+          document.getElementById("modal-chapter-desc").innerHTML = "แบ่งหมวดหมู่ตามอักษร ฮิรางานะ คาตากานะ และคันจิ";
+          document.getElementById("filter-cefr").innerHTML = `
+            <option value="all">ทุกหมวดหมู่</option>
+            <option value="Hiragana">ฮิรางานะ (Hiragana)</option>
+            <option value="Katakana">คาตากานะ (Katakana)</option>
+            <option value="Kanji">คันจิ (Kanji)</option>
+          `;
+        } else {
+          document.body.classList.remove("theme-jp");
+          
+          document.getElementById("lang-en").classList.replace("text-slate-400", "text-slate-800");
+          document.getElementById("lang-en").classList.add("bg-white", "shadow-sm");
+          
+          document.getElementById("lang-jp").classList.replace("text-slate-800", "text-slate-400");
+          document.getElementById("lang-jp").classList.remove("bg-white", "shadow-sm");
+          
+          document.getElementById("app-title").textContent = "Oxford 3000";
+          document.getElementById("app-subtitle").textContent = "Vocabulary Master & Quiz";
+          document.getElementById("app-logo-text").textContent = "O3k";
+          
+          document.getElementById("modal-chapter-desc").innerHTML = "แบ่งเป็นโซนตามระดับ CEFR เรียงจากง่ายไปยาก บทละไม่เกิน 20 คำ";
+          document.getElementById("filter-cefr").innerHTML = `
+            <option value="all">ทุกระดับ (CEFR)</option>
+            <option value="A1">ระดับ A1</option>
+            <option value="A2">ระดับ A2</option>
+            <option value="B1">ระดับ B1</option>
+            <option value="B2">ระดับ B2</option>
+          `;
+        }
+      }
+
+      // Chapters builder
       function buildChapters(baseCount, batchRanges) {
         chapterList = [];
         let runStart = 0;
+        let wordsPerChap = appLang === "en" ? 20 : 5;
+        
         for (let i = 1; i <= baseCount; i++) {
           if (
             i === baseCount ||
             vocabData[i].cefr !== vocabData[runStart].cefr
           ) {
             const lv = vocabData[runStart].cefr;
-            for (let st = runStart; st < i; st += WORDS_PER_CHAPTER) {
+            for (let st = runStart; st < i; st += wordsPerChap) {
               chapterList.push({
                 start: st,
-                end: Math.min(st + WORDS_PER_CHAPTER, i),
+                end: Math.min(st + wordsPerChap, i),
                 name: lv,
                 zone: lv,
               });
@@ -1610,6 +1916,7 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         if (chapterList.length === 0)
           chapterList.push({ start: 0, end: 0, name: "" });
       }
+      
       function getChapter(ch) {
         return chapterList[Math.min(Math.max(1, ch), chapterList.length) - 1];
       }
@@ -1621,7 +1928,7 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
       let activeSessionType = "daily";
       let currentActiveChapter = 1;
 
-      // Quiz game variables
+      // Quiz variables
       let quizScore = 0;
       let quizStreak = 0;
       let quizLives = 3;
@@ -1636,12 +1943,19 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
       function speakWord(e) {
         if (e) e.stopPropagation();
         if ("speechSynthesis" in window) {
-          const vocabIdx = sessionQueue[currentCardIndex];
-          const text = vocabData[vocabIdx] ? vocabData[vocabIdx].word : "";
-          if (!text) return;
+          const vocabIdx = sessionQueue[currentCardIndex] !== undefined ? sessionQueue[currentCardIndex] : currentQuizWordIdx;
+          const data = vocabData[vocabIdx];
+          if (!data) return;
+          
+          let text = data.word;
+          // if JP, try to speak the actual word from example, else speak the char
+          if (appLang === 'jp') {
+            text = data.exEn.split(' ')[0] || data.word; 
+          }
+          
           window.speechSynthesis.cancel();
           const utterance = new SpeechSynthesisUtterance(text);
-          utterance.lang = "en-US";
+          utterance.lang = appLang === "en" ? "en-US" : "ja-JP";
           utterance.rate = 0.9;
           window.speechSynthesis.speak(utterance);
         }
@@ -1669,25 +1983,34 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
 
       // Initialize App
       function init() {
-        const rawLines = RAW_VOCAB.trim().split("\n");
+        clearInterval(timerInterval);
+        quizActive = false;
+        applyTheme();
+        ensureReadUI();
+        const keys = getStorageKeys();
+        
+        const rawDataString = appLang === "en" ? RAW_VOCAB_EN : RAW_VOCAB_JP;
+        const rawLines = rawDataString.trim().split("\n");
+        
         vocabData = rawLines.map((line) => {
           const p = line.split("|");
           return {
-            id: p[0].trim().toLowerCase(),
+            id: p[0].trim().toLowerCase(), // char or word
             word: p[0].trim(),
             pron: p[1] ? p[1].trim() : "",
             mean: p[2] ? p[2].trim() : "",
             exEn: p[3] ? p[3].trim() : "",
             exTh: p[4] ? p[4].trim() : "",
             mem: p[5] ? p[5].trim() : "",
-            cefr: p[6] ? p[6].trim() : "B1",
+            cefr: p[6] ? p[6].trim() : (appLang === 'en' ? "B1" : "Hiragana"),
           };
         });
 
-        // Order built-in words by CEFR difficulty (A1 -> C2); inside each level, shuffle
-        // with a fixed seed so first letters are mixed but chapters stay the same on every reload.
-        const CEFR_RANK = { A1: 0, A2: 1, B1: 2, B2: 3, C1: 4, C2: 5 };
-        let seedState = 20240601;
+        const CEFR_RANK = appLang === "en" 
+          ? { A1: 0, A2: 1, B1: 2, B2: 3, C1: 4, C2: 5 } 
+          : { Hiragana: 0, Katakana: 1, Kanji: 2 };
+          
+        let seedState = appLang === 'en' ? 20240601 : 999999;
         const rand = () => {
           seedState = (seedState + 0x6d2b79f5) | 0;
           let t = Math.imul(seedState ^ (seedState >>> 15), 1 | seedState);
@@ -1698,23 +2021,36 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         vocabData.forEach((v) => {
           (byLevel[v.cefr] = byLevel[v.cefr] || []).push(v);
         });
-        // 1) shuffle only the built-in words (fixed seed -> stable chapters)
-        Object.values(byLevel).forEach((arr) => {
+        
+        // Shuffle inside level
+        if (appLang === "en") Object.values(byLevel).forEach((arr) => {
           for (let i = arr.length - 1; i > 0; i--) {
             const j = Math.floor(rand() * (i + 1));
             [arr[i], arr[j]] = [arr[j], arr[i]];
           }
         });
-        // 2) imported JSON words are appended to the END of their own CEFR level (file order),
-        //    so existing chapters in that level stay the same and new words fill the last/new chapters.
+        
+        try {
+          customBatches = JSON.parse(localStorage.getItem(keys.batches)) || [];
+        } catch (e) {
+          customBatches = [];
+        }
+
         const seen = new Set(vocabData.map((v) => v.id));
+        const customMap = new Map();
         customBatches.forEach((batch) => {
           (batch.words || []).forEach((w) => {
             const id = String(w.word).trim().toLowerCase();
-            if (!id || seen.has(id)) return;
+            if (!id) return;
+            if (seen.has(id)) {
+              // re-imported item: fill fields that were empty before
+              const ex = customMap.get(id);
+              if (ex) ["pron", "mem", "exEn", "exTh"].forEach((k) => { if (!ex[k] && w[k]) ex[k] = w[k]; });
+              return;
+            }
             seen.add(id);
-            const lv = w.cefr in CEFR_RANK ? w.cefr : "B1";
-            (byLevel[lv] = byLevel[lv] || []).push({
+            const lv = w.cefr in CEFR_RANK ? w.cefr : (appLang === 'en' ? "B1" : "Hiragana");
+            const obj = {
               id,
               word: String(w.word).trim(),
               pron: w.pron || "",
@@ -1724,16 +2060,23 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
               mem: w.mem || "",
               cefr: lv,
               custom: true,
-            });
+            };
+            customMap.set(id, obj);
+            (byLevel[lv] = byLevel[lv] || []).push(obj);
           });
         });
+        
         vocabData = [];
         Object.keys(byLevel)
           .sort((a, b) => (CEFR_RANK[a] ?? 9) - (CEFR_RANK[b] ?? 9))
           .forEach((lv) => vocabData.push(...byLevel[lv]));
+          
         buildChapters(vocabData.length, []);
 
-        // Initialize SRS Data
+        // Load specific SRS and Progress
+        srsData = JSON.parse(localStorage.getItem(keys.srs)) || {};
+        userProgress = JSON.parse(localStorage.getItem(keys.prog)) || { currentChapter: 1, completedChapters: [] };
+
         let isModified = false;
         vocabData.forEach((item) => {
           if (!srsData[item.id]) {
@@ -1754,15 +2097,14 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
       }
 
       function saveSRSData() {
-        localStorage.setItem("ox3k_srs_data", JSON.stringify(srsData));
+        const keys = getStorageKeys();
+        localStorage.setItem(keys.srs, JSON.stringify(srsData));
         updateDashboardStats();
       }
 
       function saveUserProgress() {
-        localStorage.setItem(
-          "ox3k_user_progress",
-          JSON.stringify(userProgress),
-        );
+        const keys = getStorageKeys();
+        localStorage.setItem(keys.prog, JSON.stringify(userProgress));
         updateDashboardStats();
       }
 
@@ -1834,20 +2176,20 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
 
         const percent =
           totalInCh > 0 ? Math.round((learnedInCh / totalInCh) * 100) : 0;
+          
+        const labelCh = appLang === 'en' ? 'บท' : 'หมวด';
 
         document.getElementById("total-chapters-badge").textContent =
-          `สำเร็จแล้ว ${completedChCount} / ${totalChapters} บท`;
+          `สำเร็จแล้ว ${completedChCount} / ${totalChapters} ${labelCh}`;
         document.getElementById("current-chapter-title").textContent =
-          `บทที่ ${currentCh}${getChapter(currentCh).name ? " · " + getChapter(currentCh).name : ""} (คำที่ ${startIdx + 1} - ${endIdx})`;
+          `${labelCh}ที่ ${currentCh}${getChapter(currentCh).name ? " · " + getChapter(currentCh).name : ""} (${startIdx + 1} - ${endIdx})`;
         document.getElementById("current-chapter-desc").textContent =
           `เรียนรู้แล้ว ${learnedInCh}/${totalInCh} คำ (${percent}%) • แม่นยำ ${masteredInCh} คำ`;
         document.getElementById("current-chapter-progress-bar").style.width =
           `${percent}%`;
       }
 
-      // ---------- JSON import ----------
-      // Accepts: [ {word,...}, ... ]  or  { "chapterName": "...", "words": [ ... ] }
-      // Field aliases: word | pron/pronunciation | mean/meaning | exEn/example | exTh/exampleTh | mem/mnemonic/trick | cefr/level
+      // JSON import
       function normalizeWord(w) {
         if (!w || typeof w !== "object") return null;
         const pick = (...keys) => {
@@ -1856,20 +2198,29 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
               return String(w[k]).trim();
           return "";
         };
-        const word = pick("word", "vocab", "en");
+        const word = pick("word", "vocab", "en", "char");
         const mean = pick("mean", "meaning", "th", "translation");
         if (!word || !mean) return null;
-        const cefr = pick("cefr", "level").toUpperCase();
+        const cefr = pick("cefr", "level", "type").toUpperCase();
+        
+        let validLevels = appLang === 'en' ? ["A1", "A2", "B1", "B2", "C1", "C2"] : ["HIRAGANA", "KATAKANA", "KANJI"];
+        let defaultLevel = appLang === 'en' ? "B1" : "Hiragana";
+        // Convert back to proper case if JP
+        let finalLevel = validLevels.includes(cefr) ? cefr : defaultLevel;
+        if(appLang === 'jp') {
+             if(cefr === 'HIRAGANA') finalLevel = 'Hiragana';
+             else if(cefr === 'KATAKANA') finalLevel = 'Katakana';
+             else if(cefr === 'KANJI') finalLevel = 'Kanji';
+        }
+
         return {
           word,
           mean,
-          pron: pick("pron", "pronunciation", "phonetic"),
-          exEn: pick("exEn", "example", "sentence", "exampleEn"),
-          exTh: pick("exTh", "exampleTh", "sentenceTh"),
+          pron: pick("pron", "pronunciation", "phonetic", "romaji"),
+          exEn: pick("exEn", "example", "sentence", "exampleEn", "ex_jp"),
+          exTh: pick("exTh", "exampleTh", "sentenceTh", "ex_th"),
           mem: pick("mem", "mnemonic", "trick", "memory"),
-          cefr: ["A1", "A2", "B1", "B2", "C1", "C2"].includes(cefr)
-            ? cefr
-            : "B1",
+          cefr: finalLevel
         };
       }
 
@@ -1891,28 +2242,28 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
             const words = arr.map(normalizeWord).filter(Boolean);
             if (words.length === 0) throw new Error("empty");
 
-            const existing = new Set(vocabData.map((v) => v.id));
-            const fresh = [],
-              seenNew = new Set();
+            const existing = new Map(vocabData.map((v) => [v.id, v]));
+            const fresh = [], updates = [], seenNew = new Set();
             words.forEach((w) => {
               const id = w.word.toLowerCase();
-              if (existing.has(id) || seenNew.has(id)) return;
+              if (seenNew.has(id)) return;
               seenNew.add(id);
-              fresh.push(w);
+              const ex = existing.get(id);
+              if (!ex) fresh.push(w);
+              else if (ex.custom && ((w.pron && !ex.pron) || (w.mem && !ex.mem))) updates.push(w);
             });
-            const skipped = words.length - fresh.length;
-            if (fresh.length === 0) {
+            const skipped = words.length - fresh.length - updates.length;
+            if (fresh.length === 0 && updates.length === 0) {
               showModal(
-                "ไม่มีคำใหม่",
-                "คำทั้งหมดในไฟล์นี้มีอยู่ในแอปแล้ว จึงไม่ได้เพิ่มบทใหม่",
+                "ไม่มีข้อมูลใหม่",
+                "ข้อมูลทั้งหมดในไฟล์นี้มีอยู่ในแอปแล้ว จึงไม่ได้เพิ่มใหม่",
               );
               return;
             }
-            customBatches.push({ name: String(name), words: fresh });
-            localStorage.setItem(
-              "ox3k_custom_batches",
-              JSON.stringify(customBatches),
-            );
+            
+            const keys = getStorageKeys();
+            customBatches.push({ name: String(name), words: [...fresh, ...updates] });
+            localStorage.setItem(keys.batches, JSON.stringify(customBatches));
             init();
             openChapterModal();
             const perLv = {};
@@ -1923,13 +2274,14 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
               .join(" • ");
             showModal(
               "นำเข้าสำเร็จ 🎉",
-              `เพิ่ม ${fresh.length} คำ เข้าโซนตามระดับ CEFR (${where})` +
+              `เพิ่ม ${fresh.length} รายการ เข้าโซน (${where})` +
+                (updates.length ? ` • เติมข้อมูลที่ว่างให้ ${updates.length} รายการ` : "") +
                 (skipped ? ` • ข้ามคำซ้ำ ${skipped} คำ` : ""),
             );
           } catch (e) {
             showModal(
               "อ่านไฟล์ไม่ได้",
-              "รูปแบบ JSON ไม่ถูกต้อง หรือไม่มีคำศัพท์ที่มี word และ mean กดดาวน์โหลดตัวอย่างเพื่อดูรูปแบบที่ใช้ได้",
+              "รูปแบบ JSON ไม่ถูกต้อง หรือไม่มีฟิลด์ที่จำเป็น",
             );
           }
         };
@@ -1937,32 +2289,22 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
       }
 
       function downloadSampleJSON() {
-        const sample = {
+        const sampleEn = {
           chapterName: "ตัวอย่างบทใหม่",
           words: [
-            {
-              word: "brave",
-              pron: "เบรฟว",
-              mean: "กล้าหาญ",
-              exEn: "The brave boy saved the cat.",
-              exTh: "เด็กชายผู้กล้าหาญช่วยแมวไว้",
-              mem: "เบรฟ = เบ่ง + ใจ → กล้า",
-              cefr: "B1",
-            },
-            {
-              word: "gentle",
-              pron: "เจน-เทิล",
-              mean: "อ่อนโยน",
-              exEn: "She has a gentle voice.",
-              exTh: "เธอมีเสียงอ่อนโยน",
-              mem: "gentle ~ gentleman สุภาพบุรุษ",
-              cefr: "B2",
-            },
+            { word: "brave", pron: "เบรฟว", mean: "กล้าหาญ", exEn: "The brave boy saved the cat.", exTh: "เด็กชายผู้กล้าหาญช่วยแมวไว้", mem: "เบรฟ = เบ่ง + ใจ → กล้า", cefr: "B1" }
           ],
         };
+        const sampleJp = {
+          chapterName: "คันจิเสริม",
+          words: [
+             { word: "空", pron: "sora [โซระ]", mean: "ท้องฟ้า", exEn: "青い空 (Aoi sora)", exTh: "ท้องฟ้าสีฟ้า", mem: "หลังคามีรูมองเห็นฟ้า", cefr: "Kanji" }
+          ]
+        };
+        
         const a = document.createElement("a");
         a.href = URL.createObjectURL(
-          new Blob([JSON.stringify(sample, null, 2)], {
+          new Blob([JSON.stringify(appLang === 'en' ? sampleEn : sampleJp, null, 2)], {
             type: "application/json",
           }),
         );
@@ -1985,15 +2327,21 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
 
         const totalChapters = chapterList.length;
 
-        const ZONE_INFO = {
+        const ZONE_INFO = appLang === "en" ? {
           A1: ["A1 · เริ่มต้น", "bg-emerald-100 text-emerald-700"],
           A2: ["A2 · พื้นฐาน", "bg-sky-100 text-sky-700"],
           B1: ["B1 · กลาง", "bg-amber-100 text-amber-700"],
           B2: ["B2 · กลางค่อนสูง", "bg-rose-100 text-rose-700"],
           C1: ["C1 · สูง", "bg-purple-100 text-purple-700"],
           C2: ["C2 · ชำนาญ", "bg-slate-200 text-slate-700"],
-          import: ["📥 บทที่นำเข้าจาก JSON", "bg-indigo-100 text-indigo-700"],
+          import: ["📥 นำเข้าจาก JSON", "bg-indigo-100 text-indigo-700"],
+        } : {
+          Hiragana: ["Hiragana (ฮิรางานะ)", "bg-emerald-100 text-emerald-700"],
+          Katakana: ["Katakana (คาตากานะ)", "bg-sky-100 text-sky-700"],
+          Kanji: ["Kanji (คันจิ)", "bg-rose-100 text-rose-700"],
+          import: ["📥 นำเข้าจาก JSON", "bg-indigo-100 text-indigo-700"],
         };
+        
         let lastZone = null;
         for (let ch = 1; ch <= totalChapters; ch++) {
           const zone = getChapter(ch).zone;
@@ -2011,8 +2359,8 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
             const h = document.createElement("div");
             h.className =
               "col-span-full flex items-center justify-between mt-3 first:mt-0 pt-1 border-t border-slate-100 first:border-0";
-            h.innerHTML = `<span class="text-xs font-extrabold px-3 py-1.5 rounded-full ${info[1]}">โซน ${info[0]}</span>
-                        <span class="text-[11px] text-slate-400 font-semibold">${chInZone.length} บท • ${wordsInZone} คำ</span>`;
+            h.innerHTML = `<span class="text-xs font-extrabold px-3 py-1.5 rounded-full ${info[1]}">${info[0]}</span>
+                        <span class="text-[11px] text-slate-400 font-semibold">${chInZone.length} บท • ${wordsInZone} รายการ</span>`;
             container.appendChild(h);
           }
           const startIdx = getChapter(ch).start;
@@ -2044,8 +2392,8 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
           const btn = document.createElement("button");
           btn.className = `p-4 rounded-2xl border text-left flex flex-col justify-between transition-all active:scale-95 ${
             isCurrent
-              ? "border-blue-500 bg-blue-50 shadow-sm ring-2 ring-blue-500/20"
-              : "border-slate-200 hover:border-blue-300 bg-white"
+              ? "border-primary-500 bg-primary-50 shadow-sm ring-2 ring-primary-500/20"
+              : "border-slate-200 hover:border-primary-300 bg-white"
           }`;
 
           btn.onclick = () => {
@@ -2053,10 +2401,12 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
             startChapterSession(ch);
           };
 
+          const labelCh = appLang === 'en' ? 'บท' : 'หมวด';
+
           btn.innerHTML = `
                     <div class="flex justify-between items-start mb-2">
-                        <span class="text-sm font-extrabold text-slate-800">บทที่ ${ch}</span>
-                        ${isCurrent ? '<span class="text-[9px] font-bold bg-blue-600 text-white px-1.5 py-0.5 rounded">ปัจจุบัน</span>' : ""}
+                        <span class="text-sm font-extrabold text-slate-800">${labelCh}ที่ ${ch}</span>
+                        ${isCurrent ? '<span class="text-[9px] font-bold bg-primary-600 text-white px-1.5 py-0.5 rounded">ปัจจุบัน</span>' : ""}
                     </div>
                     <p class="text-[11px] text-slate-500 font-medium mb-3">${getChapter(ch).zone === "import" ? getChapter(ch).name + " · " : ""}คำที่ ${startIdx + 1} - ${endIdx}</p>
                     <div class="text-[10px] font-bold px-2 py-1 rounded-md ${badgeColor} inline-block self-start">
@@ -2082,8 +2432,17 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
           sessionQueue.push(i);
         }
 
+        // Japanese: shuffle cards (no row-order cueing) and mix in a few already-learned characters from earlier chapters
+        if (appLang === "jp" && sessionQueue.length > 0) {
+          const review = [];
+          for (let i = 0; i < startIdx; i++) if (srsData[vocabData[i].id].level > 0) review.push(i);
+          review.sort(() => Math.random() - 0.5);
+          sessionQueue.push(...review.slice(0, 5));
+          sessionQueue.sort(() => Math.random() - 0.5);
+        }
+
         if (sessionQueue.length === 0) {
-          showModal("ไม่มีคำศัพท์", "ไม่พบคำศัพท์ในบทเรียนนี้");
+          showModal("ไม่มีเนื้อหา", "ไม่พบเนื้อหาในหมวดนี้");
           return;
         }
 
@@ -2120,7 +2479,7 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         if (sessionQueue.length === 0) {
           showModal(
             "เรียนครบแล้ว! 🎉",
-            "วันนี้คุณเรียนรู้และทบทวนคำศัพท์ที่ต้องทำครบหมดแล้ว!",
+            "วันนี้คุณเรียนรู้และทบทวนเนื้อหาที่ต้องทำครบหมดแล้ว!",
           );
           return;
         }
@@ -2128,6 +2487,187 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         currentCardIndex = 0;
         switchMode("flashcards");
         loadFlashcard();
+      }
+
+
+      // ===== Japanese reading practice (short words / long stories) =====
+      const READ_SHORT = `あか|อะ-คะ|สีแดง
+あお|อะ-โอะ|สีน้ำเงิน
+いえ|อิ-เอะ|บ้าน
+うえ|อุ-เอะ|ข้างบน
+いぬ|อิ-นุ|สุนัข
+ねこ|เนะ-โกะ|แมว
+さかな|ซะ-คะ-นะ|ปลา
+すし|สุ-ชิ|ซูชิ
+さくら|ซะ-คุ-ระ|ซากุระ
+うみ|อุ-มิ|ทะเล
+やま|ยะ-มะ|ภูเขา
+かわ|คะ-วะ|แม่น้ำ
+そら|โซ-ระ|ท้องฟ้า
+ひと|ฮิ-โตะ|คน
+みず|มิ-สึ|น้ำ
+あめ|อะ-เมะ|ฝน
+ゆき|ยุ-คิ|หิมะ
+はな|ฮะ-นะ|ดอกไม้
+かお|คะ-โอะ|ใบหน้า
+くち|คุ-จิ|ปาก
+くるま|คุ-รุ-มะ|รถยนต์
+ほん|ฮง|หนังสือ
+えき|เอะ-คิ|สถานี
+たまご|ตะ-มะ-โงะ|ไข่
+あさ|อะ-สะ|ตอนเช้า
+よる|โยะ-รุ|ตอนกลางคืน
+ともだち|โตะ-โมะ-ดะ-จิ|เพื่อน
+せんせい|เซ็น-เซ|ครู
+おはよう|โอะ-ฮะ-โยะ-อุ|อรุณสวัสดิ์
+ありがとう|อะ-ริ-งะ-โตะ-อุ|ขอบคุณ
+さようなら|ซะ-โยะ-นะ-ระ|ลาก่อน
+コーヒー|โค-ฮี|กาแฟ
+ケーキ|เค-คิ|เค้ก
+テレビ|เทะ-เระ-บิ|โทรทัศน์
+カメラ|คะ-เมะ-ระ|กล้องถ่ายรูป
+ホテル|โฮ-เทะ-รุ|โรงแรม
+バス|บะ-สึ|รถบัส
+タクシー|ตะ-คุ-ชี|แท็กซี่
+ピアノ|เปีย-โนะ|เปียโน
+パン|ปัง|ขนมปัง
+ゲーム|เกะ-มุ|เกม
+メニュー|เมะ-เนียว|เมนู
+サッカー|ซัก-คา|ฟุตบอล
+ラジオ|รา-จิ-โอะ|วิทยุ`.split("\n").map((l) => l.split("|"));
+      const READ_STORIES = [
+        { t: "ตอนเช้า", l: [["わたしは あさ はやく おきます。", "วะ-ตะ-ชิ วะ อะ-สะ ฮะ-ยะ-คุ โอะ-คิ-มัส", "ฉันตื่นเช้า"], ["みずを のみます。", "มิ-สึ โอะ โนะ-มิ-มัส", "ดื่มน้ำ"], ["パンを たべます。", "ปัง โอะ ตะ-เบะ-มัส", "กินขนมปัง"], ["そして がっこうへ いきます。", "โซะ-ชิ-เตะ กัก-โคะ-เอะ อิ-คิ-มัส", "แล้วไปโรงเรียน"]] },
+        { t: "แมวของฉัน", l: [["うちに ねこが います。", "อุ-จิ นิ เนะ-โกะ งะ อิ-มัส", "ที่บ้านมีแมว"], ["ねこの なまえは ミミです。", "เนะ-โกะ โนะ นะ-มะ-เอะ วะ มิ-มิ เดส", "แมวชื่อมิมิ"], ["ミミは さかなが すきです。", "มิ-มิ วะ ซะ-คะ-นะ งะ สุ-คิ เดส", "มิมิชอบปลา"], ["いつも ねています。", "อิ-สึ-โมะ เนะ-เตะ-อิ-มัส", "นอนอยู่ตลอดเลย"]] },
+        { t: "ที่สถานี", l: [["えきに いきます。", "เอะ-คิ นิ อิ-คิ-มัส", "ไปที่สถานี"], ["でんしゃに のります。", "เดน-ชะ นิ โนะ-ริ-มัส", "ขึ้นรถไฟ"], ["ともだちに あいます。", "โตะ-โมะ-ดะ-จิ นิ อะ-อิ-มัส", "พบเพื่อน"], ["いっしょに コーヒーを のみます。", "อิส-โชะ นิ โค-ฮี โอะ โนะ-มิ-มัส", "ดื่มกาแฟด้วยกัน"]] },
+      ];
+      let readMode = "char", readOnlyLearned = true, readQueue = [], readRev = false, readDone = 0, storyIdx = 0, shownLines = {};
+
+      function ensureReadUI() {
+        if (!document.getElementById("tab-read")) {
+          const base = document.getElementById("tab-list");
+          const t = base.cloneNode(true);
+          t.id = "tab-read";
+          t.setAttribute("onclick", "switchMode('read')");
+          t.innerHTML = '<i class="fa-solid fa-book-open mr-1"></i> ฝึกอ่าน';
+          base.after(t);
+          const sec = document.createElement("section");
+          sec.id = "mode-read";
+          sec.className = "mode-section hidden w-full pop-in";
+          document.getElementById("mode-list").after(sec);
+        }
+        document.getElementById("tab-read").classList.toggle("hidden", appLang !== "jp");
+      }
+
+      function readLearnedSet() {
+        const s = new Set();
+        vocabData.forEach((v) => { if ((srsData[v.id] || {}).level > 0) [...v.word].forEach((c) => s.add(c.normalize("NFD")[0])); });
+        return s;
+      }
+
+      function buildReadQueue() {
+        const s = readLearnedSet();
+        const ok = (w) => [...w].every((c) => "ーゃゅょっャュョッ".includes(c) || s.has(c.normalize("NFD")[0]));
+        let pool = readOnlyLearned ? READ_SHORT.filter((x) => ok(x[0])) : READ_SHORT;
+        if (pool.length < 4) pool = READ_SHORT;
+        readQueue = [...pool].sort(() => Math.random() - 0.5);
+        readRev = false;
+        readDone = 0;
+      }
+
+      let charQueue = [], charRev = false, charCat = "all", charOnlyLearned = true, charFallback = false, charStartT = 0, charDone = 0, charTimes = [];
+      function buildCharQueue() {
+        const pick = (learnedOnly) => vocabData.map((_, i) => i).filter((i) => (charCat === "all" || vocabData[i].cefr === charCat) && (!learnedOnly || srsData[vocabData[i].id].level > 0));
+        let idx = pick(charOnlyLearned);
+        charFallback = idx.length < 3;
+        if (charFallback) idx = pick(false);
+        charQueue = idx.sort(() => Math.random() - 0.5);
+        charRev = false;
+        charStartT = Date.now();
+      }
+      function setCharCat(c) { charCat = c; buildCharQueue(); renderRead(); }
+      function toggleCharLearned() { charOnlyLearned = !charOnlyLearned; buildCharQueue(); renderRead(); }
+      function revealChar() { charTimes.push(Date.now() - charStartT); charRev = true; renderRead(); }
+      function rateChar(ok) {
+        const i = charQueue.shift();
+        if (ok) charDone++;
+        else {
+          charQueue.splice(Math.min(3, charQueue.length), 0, i);
+          const s = srsData[vocabData[i].id];
+          if (s.level > 0) { s.nextReview = Date.now(); saveSRSData(); }
+        }
+        if (!charQueue.length) buildCharQueue();
+        charRev = false;
+        charStartT = Date.now();
+        renderRead();
+      }
+      function setReadMode(m) { readMode = m; if (m === "short") buildReadQueue(); if (m === "char") buildCharQueue(); renderRead(); }
+      function toggleReadLearned() { readOnlyLearned = !readOnlyLearned; buildReadQueue(); renderRead(); }
+      function revealRead() { readRev = true; renderRead(); }
+      function rateRead(ok) {
+        const cur = readQueue.shift();
+        if (ok) readDone++; else readQueue.splice(Math.min(3, readQueue.length), 0, cur);
+        if (!readQueue.length) buildReadQueue();
+        readRev = false;
+        renderRead();
+      }
+      function toggleLine(i) { shownLines[storyIdx + "_" + i] = !shownLines[storyIdx + "_" + i]; renderRead(); }
+      function setStory(i) { storyIdx = i; renderRead(); }
+      function speakJP(text) {
+        if (!window.speechSynthesis) return;
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = "ja-JP";
+        speechSynthesis.speak(u);
+      }
+
+      function renderRead() {
+        const sec = document.getElementById("mode-read");
+        if (!sec || appLang !== "jp") return;
+        if (!readQueue.length) buildReadQueue();
+        if (readMode === "char" && !charQueue.length) buildCharQueue();
+        const btn = (m, label) => `<button onclick="setReadMode('${m}')" class="flex-1 py-2.5 rounded-xl font-bold text-sm ${readMode === m ? "bg-primary-600 text-white shadow" : "bg-white text-slate-600 border border-slate-200"}">${label}</button>`;
+        let body = "";
+        if (readMode === "char") {
+          const cur = vocabData[charQueue[0]];
+          const last = charTimes.slice(-10);
+          const avg = last.length ? (last.reduce((a, b) => a + b, 0) / last.length / 1000).toFixed(1) : "-";
+          const opt = (v, l) => `<option value="${v}" ${charCat === v ? "selected" : ""}>${l}</option>`;
+          body = `<p class="text-xs text-slate-500 mb-3">โหมดสุ่มตัวอักษร: เห็นตัวแล้ว <b>ต้องอ่านออกทันที</b> ไม่มีลำดับให้เดา ถ้าต้องคิดนานให้กด "ช้า" ตัวนั้นจะวนกลับมาและเข้าคิวทบทวน</p>
+          <div class="flex flex-wrap items-center gap-3 mb-4 text-xs text-slate-600">
+            <select onchange="setCharCat(this.value)" class="border border-slate-200 rounded-lg px-2 py-1 bg-white">${opt("all", "ทุกหมวด")}${opt("Hiragana", "ฮิรางานะ")}${opt("Katakana", "คาตาคานะ")}${opt("Kanji", "คันจิ")}</select>
+            <label class="flex items-center gap-1.5"><input type="checkbox" ${charOnlyLearned ? "checked" : ""} onchange="toggleCharLearned()"> เฉพาะตัวที่เรียนแล้ว</label>
+          </div>
+          ${charFallback ? '<p class="text-xs text-amber-600 mb-3">ยังเรียนตัวอักษรในหมวดนี้ไม่ถึง 3 ตัว จึงสุ่มจากทั้งหมวดแทน</p>' : ""}
+          <div class="bg-white rounded-3xl shadow-lg border border-slate-100 p-8 text-center">
+            <p class="text-xs text-slate-400 mb-4">รู้เลย ${charDone} ตัว • เวลาคิดเฉลี่ย ${avg} วินาที</p>
+            <p class="text-8xl sm:text-9xl font-black jp-font mb-6">${cur.word}</p>
+            ${charRev ? `<p class="text-lg font-bold text-primary-600">${cur.pron}</p><p class="text-slate-600 mb-5">${cur.mean}</p>
+              <div class="flex gap-3"><button onclick="rateChar(false)" class="flex-1 py-3 rounded-xl bg-amber-100 text-amber-800 font-bold">ช้า / ไม่แน่ใจ</button><button onclick="rateChar(true)" class="flex-1 py-3 rounded-xl bg-green-100 text-green-800 font-bold">รู้เลย</button></div>`
+              : `<button onclick="revealChar()" class="w-full py-3 rounded-xl bg-primary-600 text-white font-bold">ดูคำอ่าน</button>`}
+            <button onclick="speakJP('${cur.word}')" class="mt-4 text-xs text-slate-400"><i class="fa-solid fa-volume-high"></i> ฟังเสียง</button>
+          </div>`;
+        } else if (readMode === "short") {
+          const cur = readQueue[0];
+          body = `<p class="text-xs text-slate-500 mb-3">โหมดคำสั้น: เน้น <b>แปลงตัวอักษรเป็นเสียงให้ไว</b> อ่านในใจก่อน แล้วกดดูคำอ่าน คำที่ยังไม่แน่ใจจะวนกลับมาให้อ่านอีก</p>
+          <label class="flex items-center gap-2 text-xs text-slate-600 mb-4"><input type="checkbox" ${readOnlyLearned ? "checked" : ""} onchange="toggleReadLearned()"> ใช้เฉพาะตัวอักษรที่เรียนแล้ว</label>
+          <div class="bg-white rounded-3xl shadow-lg border border-slate-100 p-8 text-center">
+            <p class="text-xs text-slate-400 mb-4">อ่านถูกแล้ว ${readDone} คำ</p>
+            <p class="text-6xl sm:text-7xl font-black jp-font mb-6">${cur[0]}</p>
+            ${readRev ? `<p class="text-lg font-bold text-primary-600">${cur[1]}</p><p class="text-slate-600 mb-5">${cur[2]}</p>
+              <div class="flex gap-3"><button onclick="rateRead(false)" class="flex-1 py-3 rounded-xl bg-amber-100 text-amber-800 font-bold">ยังไม่แน่ใจ</button><button onclick="rateRead(true)" class="flex-1 py-3 rounded-xl bg-green-100 text-green-800 font-bold">อ่านถูก</button></div>`
+              : `<button onclick="revealRead()" class="w-full py-3 rounded-xl bg-primary-600 text-white font-bold">ดูคำอ่านและความหมาย</button>`}
+            <button onclick="speakJP('${cur[0]}')" class="mt-4 text-xs text-slate-400"><i class="fa-solid fa-volume-high"></i> ฟังเสียง</button>
+          </div>`;
+        } else {
+          const st = READ_STORIES[storyIdx];
+          body = `<p class="text-xs text-slate-500 mb-3">โหมดเรื่องยาว: เน้น <b>อ่านต่อเนื่องให้ลื่นและเข้าใจความ</b> อ่านทั้งเรื่องก่อน แล้วแตะแต่ละบรรทัดเพื่อเช็กคำอ่านและคำแปล</p>
+          <div class="flex gap-2 mb-4 overflow-x-auto">${READ_STORIES.map((s, i) => `<button onclick="setStory(${i})" class="px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap ${i === storyIdx ? "bg-primary-600 text-white" : "bg-white border border-slate-200 text-slate-600"}">${s.t}</button>`).join("")}</div>
+          <div class="bg-white rounded-3xl shadow-lg border border-slate-100 p-5 space-y-3">
+            ${st.l.map((ln, i) => `<div onclick="toggleLine(${i})" class="cursor-pointer rounded-2xl border border-slate-100 p-4 hover:bg-slate-50"><p class="text-2xl font-bold jp-font">${ln[0]}</p>${shownLines[storyIdx + "_" + i] ? `<p class="text-sm text-primary-600 mt-2">${ln[1]}</p><p class="text-sm text-slate-600">${ln[2]}</p>` : `<p class="text-[11px] text-slate-300 mt-2">แตะเพื่อดูคำอ่านและคำแปล</p>`}</div>`).join("")}
+            <button onclick="speakJP('${st.l.map((x) => x[0]).join("")}')" class="text-xs text-slate-500"><i class="fa-solid fa-volume-high"></i> ฟังทั้งเรื่อง</button>
+          </div>`;
+        }
+        sec.innerHTML = `<div class="max-w-xl mx-auto"><div class="flex gap-2 mb-4">${btn("char", "สุ่มตัวอักษร")}${btn("short", "คำสั้น")}${btn("long", "เรื่องยาว")}</div>${body}</div>`;
       }
 
       function switchMode(mode) {
@@ -2139,15 +2679,16 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
           .querySelectorAll(".mode-section")
           .forEach((el) => el.classList.add("hidden"));
         document.querySelectorAll(".tab-btn").forEach((el) => {
-          el.classList.remove("bg-white", "text-blue-600", "shadow-sm");
+          el.classList.remove("bg-white", "text-primary-600", "shadow-sm");
           el.classList.add("text-slate-500");
         });
 
         document.getElementById(`mode-${mode}`).classList.remove("hidden");
         let activeTab = document.getElementById(`tab-${mode}`);
         activeTab.classList.remove("text-slate-500");
-        activeTab.classList.add("bg-white", "text-blue-600", "shadow-sm");
+        activeTab.classList.add("bg-white", "text-primary-600", "shadow-sm");
 
+        if (mode === "read") renderRead();
         if (mode === "quiz") {
           startNewQuiz();
         } else if (mode === "list") {
@@ -2178,7 +2719,7 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         document.getElementById("session-progress-bar").style.width =
           `${(currentCardIndex / sessionQueue.length) * 100}%`;
 
-        let badgeHtml = "⚪️ คำศัพท์ใหม่";
+        let badgeHtml = "⚪️ เพิ่งเริ่ม";
         let badgeClass = "bg-slate-100 text-slate-700";
         if (srs.level === 1) {
           badgeHtml = "🔴 ต้องทวนซ้ำ";
@@ -2195,17 +2736,37 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         badge.innerHTML = badgeHtml;
         badge.className = `text-[10px] px-2 py-1 rounded-md font-bold ${badgeClass}`;
 
-        document.getElementById("fc-word").textContent = data.word;
-        document.getElementById("fc-pronunciation-front").textContent =
-          `[ ${data.pron} ]`;
-        document.getElementById("fc-pronunciation-back").textContent =
-          `[ ${data.pron} ]`;
-        document.getElementById("fc-cefr-front").textContent =
-          `CEFR ${data.cefr}`;
+        const wordEl = document.getElementById("fc-word");
+        wordEl.textContent = data.word;
+        if(appLang === 'jp') {
+            wordEl.className = "text-8xl sm:text-9xl font-black tracking-tight text-center jp-font drop-shadow-md";
+            document.getElementById("fc-audio-front").classList.add("hidden");
+            document.getElementById("fc-pronunciation-front").classList.add("hidden");
+            document.getElementById("fc-cefr-front").classList.add("hidden");
+        } else {
+            wordEl.className = "text-5xl sm:text-6xl font-extrabold tracking-tight text-center break-words";
+            document.getElementById("fc-audio-front").classList.remove("hidden");
+            document.getElementById("fc-pronunciation-front").classList.remove("hidden");
+            document.getElementById("fc-cefr-front").classList.remove("hidden");
+        }
+
+        document.getElementById("fc-pronunciation-front").textContent = data.pron ? `[ ${data.pron} ]` : "";
+        document.getElementById("fc-pronunciation-back").textContent = data.pron ? `[ ${data.pron} ]` : "";
+        document.getElementById("fc-cefr-front").textContent = `${appLang==='en'?'CEFR ':''}${data.cefr}`;
 
         document.getElementById("fc-meaning").textContent = data.mean;
-        document.getElementById("fc-mnemonic").textContent = data.mem;
-        document.getElementById("fc-example-en").textContent = `"${data.exEn}"`;
+        document.getElementById("fc-mnemonic").textContent = data.mem || "ยังไม่มีทริคช่วยจำสำหรับรายการนี้ — ลองคิดทริคของตัวเองดูนะ ✨";
+        
+        // Ex split logic for JP formatting on back of card
+        let exMain = `"${data.exEn}"`;
+        if (appLang === 'jp') {
+             const jpParts = data.exEn.match(/(.+)\s*\((.+)\)/);
+             if(jpParts && jpParts.length > 2) {
+                exMain = `"${jpParts[1]}" (${jpParts[2]})`;
+             }
+        }
+        
+        document.getElementById("fc-example-en").textContent = exMain;
         document.getElementById("fc-example-th").textContent = `"${data.exTh}"`;
 
         let daysIfGood =
@@ -2297,12 +2858,11 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         }, 50);
       }
 
-      // Quiz pools: questions and wrong options come from words the user knows well (level >= 3),
-      // so newly imported / unlearned words never show up as confusing choices.
       function getQuizPools() {
         const lvl = (i) => (srsData[vocabData[i].id] || {}).level || 0;
         const all = vocabData.map((_, i) => i);
-        const mastered = all.filter((i) => lvl(i) >= 3);
+        // Requirement for JP might be lower to easily see quiz in demo, let's allow level >= 1 for base pool fallback
+        const mastered = all.filter((i) => lvl(i) >= 2); 
         const learned = all.filter((i) => lvl(i) > 0);
         let base = null,
           fallback = false;
@@ -2319,7 +2879,7 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
           quizActive = false;
           showModal(
             "ยังทำควิซไม่ได้",
-            "ควิซนี้ใช้คำที่คุณจำแม่นแล้ว ต้องมีอย่างน้อย 4 คำ ลองท่องศัพท์ก่อนแล้วกลับมาใหม่",
+            "โหมดสุ่มนี้ใช้คำที่คุณผ่านตาแล้ว ต้องมีอย่างน้อย 4 คำ ลองเรียนรู้ก่อนแล้วกลับมาใหม่",
             "ตกลง",
             () => switchMode("dashboard"),
           );
@@ -2337,10 +2897,10 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
             "text-[10px] font-bold bg-orange-100 text-orange-700 px-2 py-1 rounded-md";
         } else {
           badge.textContent = getQuizPools().fallback
-            ? "โหมด: ทายศัพท์ที่เรียนแล้ว (ยังจำแม่น < 4 คำ)"
-            : "โหมด: ทายศัพท์ที่จำแม่น (สุ่ม)";
+            ? "โหมด: ทายคำที่เคยเรียน (สุ่ม)"
+            : "โหมด: ทายคำที่จำแม่น (สุ่ม)";
           badge.className =
-            "text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-md";
+            "text-[10px] font-bold bg-primary-100 text-primary-700 px-2 py-1 rounded-md";
         }
 
         document.getElementById("quiz-play-area").classList.remove("hidden");
@@ -2366,6 +2926,22 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         }
       }
 
+      // Fill-in-the-blank helpers: automatic for every English word whose example contains it (also inflected forms)
+      function baseWord(w) { return String(w).replace(/\s*\([^)]*\)/g, '').trim(); }
+      function blankPattern(word) {
+        const esc = x => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const forms = [];
+        baseWord(word).split(/\s*,\s*/).filter(Boolean).forEach(alt => {
+          const a = esc(alt);
+          forms.push(a + '(?:s|es|ed|d|ing|ly|er|est)?');
+          if (/e$/i.test(alt)) forms.push(esc(alt.slice(0, -1)) + '(?:ing|ed|er|est)');
+          if (/y$/i.test(alt)) forms.push(esc(alt.slice(0, -1)) + '(?:ies|ied|ier|iest|ily)');
+          if (/[^aeiou][aeiou][^aeiouwxy]$/i.test(alt)) forms.push(a + esc(alt.slice(-1)) + '(?:ed|ing|er|est|y)');
+        });
+        if (!forms.length) return null;
+        return new RegExp('(?<![A-Za-z’\'])(?:' + forms.join('|') + ')(?![A-Za-z])', 'gi');
+      }
+
       function nextQuizQuestion() {
         if (!quizActive || currentMode !== "quiz") return;
         document
@@ -2389,42 +2965,49 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
           candidates[Math.floor(Math.random() * candidates.length)];
         const correctData = vocabData[currentQuizWordIdx];
 
-        // Randomize between word-to-meaning OR sentence completion quiz
-        const isSentenceQuiz =
-          correctData.exEn.includes(correctData.word) && Math.random() > 0.5;
+        // Randomize between word-to-meaning OR sentence completion quiz (Sentence mostly for EN)
+        const blankRe = appLang === 'en' && correctData.exEn ? blankPattern(correctData.word) : null;
+        const canBlank = !!(blankRe && correctData.exEn.search(blankRe) >= 0);
+        if (blankRe) blankRe.lastIndex = 0;
+        const isSentenceQuiz = canBlank && Math.random() > 0.5;
 
+        const wordEl = document.getElementById("quiz-word");
+        
         if (isSentenceQuiz) {
           document.getElementById("quiz-question-type").textContent =
             "เติมคำศัพท์ในประโยคให้ถูกต้อง";
-          const maskedSentence = correctData.exEn.replace(
-            new RegExp(correctData.word, "gi"),
-            "________",
-          );
-          document.getElementById("quiz-word").textContent =
-            `"${maskedSentence}"`;
+          const maskedSentence = correctData.exEn.replace(blankRe, "________");
+          wordEl.textContent = `"${maskedSentence}"`;
+          wordEl.className = "text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight mb-2 break-words";
           document.getElementById("quiz-subtext").textContent = correctData.exTh
             ? `(${correctData.exTh})`
             : "";
         } else {
-          document.getElementById("quiz-question-type").textContent =
-            "คำนี้แปลว่าอะไร?";
-          document.getElementById("quiz-word").textContent = correctData.word;
-          document.getElementById("quiz-subtext").textContent =
-            `[ ${correctData.pron} ] • CEFR ${correctData.cefr}`;
+          document.getElementById("quiz-question-type").textContent = appLang === 'en' ? "คำนี้แปลว่าอะไร?" : "อ่าน/แปล ว่าอะไร?";
+          wordEl.textContent = correctData.word;
+          
+          if(appLang === 'jp') {
+             wordEl.className = "text-6xl sm:text-7xl font-black text-slate-800 tracking-tight mb-4 break-words jp-font";
+             document.getElementById("quiz-subtext").textContent = correctData.cefr;
+          } else {
+             wordEl.className = "text-3xl sm:text-5xl font-extrabold text-slate-800 tracking-tight mb-2 break-words";
+             document.getElementById("quiz-subtext").textContent = `${correctData.pron ? "[ " + correctData.pron + " ] • " : ""}CEFR ${correctData.cefr}`;
+          }
         }
 
-        // Wrong options: random words from the well-known pool (fallback: all words if the pool is too small)
         const pools = getQuizPools();
-        const correctText = isSentenceQuiz
-          ? correctData.word
-          : correctData.mean;
+        
+        // Answer formats
+        const formatAns = (d) =>
+          appLang === 'jp' && d.cefr !== 'Kanji' ? `${d.pron} : ${d.mean}` : d.mean;
+        
+        const correctText = isSentenceQuiz ? baseWord(correctData.word) : formatAns(correctData);
+        
         const pick = (arr) => {
           const shuffled = [...arr].sort(() => Math.random() - 0.5);
           const out = [];
           for (const idx of shuffled) {
-            const t = isSentenceQuiz
-              ? vocabData[idx].word
-              : vocabData[idx].mean;
+            const t = isSentenceQuiz ? baseWord(vocabData[idx].word) : formatAns(vocabData[idx]);
             if (
               idx !== currentQuizWordIdx &&
               t !== correctText &&
@@ -2438,15 +3021,20 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
           }
           return out;
         };
+        
         const wrongOptionsSet = new Set();
         let wrongOptions = [];
-        wrongOptions.push(...pick(pools.base || pools.all));
+        // Prioritize same category if JP (Hiragana vs Hiragana)
+        if(appLang === 'jp') {
+             let sameCat = pools.all.filter(i => vocabData[i].cefr === correctData.cefr);
+             wrongOptions.push(...pick(sameCat));
+        }
+        
+        if (wrongOptions.length < 3) wrongOptions.push(...pick(pools.base || pools.all));
         if (wrongOptions.length < 3) wrongOptions.push(...pick(pools.all));
         wrongOptions = wrongOptions.slice(0, 3);
 
-        const correctAnswerText = isSentenceQuiz
-          ? correctData.word
-          : correctData.mean;
+        const correctAnswerText = correctText;
         let options = [...wrongOptions, correctAnswerText].sort(
           () => Math.random() - 0.5,
         );
@@ -2459,7 +3047,7 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         options.forEach((opt) => {
           const btn = document.createElement("button");
           btn.className =
-            "quiz-btn w-full text-left bg-white border-2 border-slate-200 hover:border-blue-400 hover:bg-blue-50 text-slate-700 font-bold py-4 px-5 rounded-2xl shadow-sm transition-all focus:outline-none flex justify-between items-center active:scale-[0.98] text-sm";
+            "quiz-btn w-full text-left bg-white border-2 border-slate-200 hover:border-primary-400 hover:bg-primary-50 text-slate-700 font-bold py-4 px-5 rounded-2xl shadow-sm transition-all focus:outline-none flex justify-between items-center active:scale-[0.98] text-sm";
           btn.innerHTML = `<span>${opt}</span><i class="fa-solid fa-circle text-slate-200 text-xs option-icon"></i>`;
           btn.onclick = () => handleQuizAnswer(opt, btn, correctAnswerText);
           optionsContainer.appendChild(btn);
@@ -2486,12 +3074,16 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
               "h-full bg-orange-500 w-full transition-all ease-linear";
           else
             bar.className =
-              "h-full bg-blue-500 w-full transition-all ease-linear";
+              "h-full bg-primary-500 w-full transition-all ease-linear";
 
           if (timeLeft <= 0) {
             clearInterval(timerInterval);
             const correctData = vocabData[currentQuizWordIdx];
-            handleQuizAnswer(null, null, correctData.mean);
+            let ansStr = correctData.mean;
+            if(appLang === 'jp' && correctData.cefr !== 'Kanji') ansStr = `${correctData.pron} : ${correctData.mean}`;
+            if(document.getElementById("quiz-question-type").textContent.includes("ประโยค")) ansStr = correctData.word;
+            
+            handleQuizAnswer(null, null, ansStr);
           }
         }, 50);
       }
@@ -2573,6 +3165,8 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
             srsBadgeHTML = `<span class="text-[10px] font-bold px-2 py-1 rounded-md bg-red-100 text-red-700 border border-red-200">🔴 ต้องทวน</span>`;
             dataStatus = "review";
           }
+          
+          let displayWordClass = appLang === "jp" ? "text-3xl font-black jp-font pt-1" : "text-xl font-extrabold";
 
           const card = document.createElement("div");
           card.className =
@@ -2582,30 +3176,30 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
                     <div>
                         <div class="flex justify-between items-start mb-2">
                             <div>
-                                <h3 class="text-xl font-extrabold text-slate-800 break-words">${item.word}</h3>
-                                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">CEFR ${item.cefr}</span>
+                                <h3 class="${displayWordClass} text-slate-800 break-words">${item.word}</h3>
+                                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary-100 text-primary-700">${appLang==='en'?'CEFR ':''}${item.cefr}</span>
                             </div>
                             <div>${srsBadgeHTML}</div>
                         </div>
-                        <p class="text-xs font-semibold text-blue-500 mb-2">[ ${item.pron} ]</p>
+                        <p class="text-xs font-semibold text-primary-500 mb-2">${item.pron ? "[ " + item.pron + " ]" : ""}</p>
                         <p class="text-sm font-bold text-slate-700 mb-3">${item.mean}</p>
                         
                         <div class="bg-amber-50 p-2.5 rounded-2xl border border-amber-100 mb-3">
                             <p class="text-[10px] font-bold text-amber-800 mb-0.5"><i class="fa-solid fa-lightbulb mr-1"></i>เทคนิคจำ:</p>
-                            <p class="text-xs text-amber-900 leading-snug">${item.mem}</p>
+                            <p class="text-xs text-amber-900 leading-snug">${item.mem || "ยังไม่มีทริคช่วยจำ"}</p>
                         </div>
                     </div>
 
                     <div class="pt-2 border-t border-slate-100 mt-auto">
                         <p class="text-[10px] text-slate-400 uppercase font-bold mb-0.5">ตัวอย่าง</p>
-                        <p class="text-xs font-semibold text-slate-600 italic">"${item.exEn}"</p>
+                        <p class="text-xs font-semibold text-slate-600 italic jp-font">"${item.exEn}"</p>
                         <p class="text-[10px] text-slate-400 mt-0.5">"${item.exTh}"</p>
                     </div>
                 `;
 
           card.setAttribute(
             "data-search",
-            `${item.word} ${item.mean} ${item.exEn} ${item.mem}`.toLowerCase(),
+            `${item.word} ${item.mean} ${item.exEn} ${item.mem} ${item.pron}`.toLowerCase(),
           );
           card.setAttribute("data-status", dataStatus);
           card.setAttribute("data-cefr", item.cefr);
