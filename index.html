@@ -94,6 +94,11 @@
         transition: background-color 0.5s ease;
       }
       
+      #main-nav { scrollbar-width: none; }
+      #main-nav::-webkit-scrollbar { display: none; }
+      #main-nav.fade-r { -webkit-mask-image: linear-gradient(to right, #000 82%, transparent); mask-image: linear-gradient(to right, #000 82%, transparent); }
+      #main-nav.fade-l { -webkit-mask-image: linear-gradient(to left, #000 82%, transparent); mask-image: linear-gradient(to left, #000 82%, transparent); }
+      #main-nav.fade-l.fade-r { -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 82%, transparent); mask-image: linear-gradient(to right, transparent, #000 12%, #000 82%, transparent); }
       .jp-font {
         font-family: "Noto Sans JP", sans-serif;
       }
@@ -198,9 +203,24 @@
         background: #cbd5e1;
         border-radius: 10px;
       }
+    .shake-animation { animation-duration: 0.25s !important; }
+      #mode-quiz .pop-in { animation-duration: 0.12s !important; }
+      @keyframes floatUpFade {
+        0% { opacity: 0; transform: translate(-50%, 8px) scale(0.9); }
+        20% { opacity: 1; transform: translate(-50%, 0px) scale(1); }
+        80% { opacity: 1; transform: translate(-50%, -6px) scale(1); }
+        100% { opacity: 0; transform: translate(-50%, -14px) scale(0.95); }
+      }
+      .pts-toast {
+        animation: floatUpFade 1.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        pointer-events: none;
+      }
     </style>
   </head>
   <body class="antialiased min-h-screen flex flex-col text-slate-800 transition-colors duration-300">
+    <!-- Floating Point Feedback Toast (Visibility of System Status) -->
+    <div id="pts-toast-container" class="fixed top-20 left-1/2 -translate-x-1/2 z-[120] pointer-events-none"></div>
+
     <!-- Custom Notification Modal -->
     <div
       id="custom-modal"
@@ -326,42 +346,47 @@
               </div>
             </div>
 
+            <div class="flex items-center gap-2">
+            <button onclick="openTutorial()" title="สอนใช้งาน" class="w-9 h-9 rounded-full bg-slate-100 text-slate-500 hover:text-primary-600 flex items-center justify-center shadow-inner"><i class="fa-solid fa-circle-question"></i></button>
+            <button onclick="openSettings()" title="ตั้งค่า" class="w-9 h-9 rounded-full bg-slate-100 text-slate-500 hover:text-primary-600 flex items-center justify-center shadow-inner"><i class="fa-solid fa-gear"></i></button>
             <!-- Language Toggle Switch (Mobile view inline) -->
             <div class="flex items-center bg-slate-100 rounded-full p-1 shadow-inner cursor-pointer" onclick="toggleLanguage()">
               <div id="lang-en" class="px-2.5 py-1 rounded-full text-[10px] font-bold transition-all bg-white text-slate-800 shadow-sm">ENG</div>
               <div id="lang-jp" class="px-2.5 py-1 rounded-full text-[10px] font-bold transition-all text-slate-400">JPN</div>
             </div>
+            </div>
           </div>
 
           <!-- Main Nav Tabs -->
           <nav
-            class="flex space-x-1 bg-slate-100 p-1.5 rounded-2xl w-full md:w-auto overflow-x-auto justify-center"
+            id="main-nav"
+            class="flex space-x-1 bg-slate-100 p-1.5 rounded-2xl w-full md:w-auto overflow-x-auto justify-start md:justify-center"
           >
             <button
               onclick="switchMode('dashboard')"
               id="tab-dashboard"
-              class="tab-btn flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap bg-white text-primary-600 shadow-sm"
+              class="tab-btn flex-none px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap bg-white text-primary-600 shadow-sm"
             >
               <i class="fa-solid fa-house mr-1.5"></i>หน้าแรก
             </button>
             <button
               onclick="switchMode('flashcards')"
               id="tab-flashcards"
-              class="tab-btn flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-500 hover:text-primary-600 transition-all whitespace-nowrap"
+              class="tab-btn flex-none px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-500 hover:text-primary-600 transition-all whitespace-nowrap"
             >
-              <i class="fa-solid fa-layer-group mr-1.5"></i>เรียนรู้ (Cards)
+              <i class="fa-solid fa-layer-group mr-1.5"></i>เรียนรู้<span class="hidden sm:inline"> (Cards)</span>
             </button>
             <button
               onclick="switchMode('quiz')"
               id="tab-quiz"
-              class="tab-btn flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-500 hover:text-primary-600 transition-all whitespace-nowrap"
+              class="tab-btn flex-none px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-500 hover:text-primary-600 transition-all whitespace-nowrap"
             >
-              <i class="fa-solid fa-gamepad mr-1.5"></i>ทำควิซ (Quiz)
+              <i class="fa-solid fa-gamepad mr-1.5"></i>ควิซ<span class="hidden sm:inline"> (Quiz)</span>
             </button>
             <button
               onclick="switchMode('list')"
               id="tab-list"
-              class="tab-btn flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-500 hover:text-primary-600 transition-all whitespace-nowrap"
+              class="tab-btn flex-none px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-500 hover:text-primary-600 transition-all whitespace-nowrap"
             >
               <i class="fa-solid fa-book mr-1.5"></i>คลังศัพท์
             </button>
@@ -447,7 +472,7 @@
           </div>
         </div>
 
-        <!-- Daily SRS Target Banner -->
+        <!-- Practice banner -->
         <div
           class="w-full bg-gradient-to-br from-primary-600 to-secondary-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-primary-200 mb-6 relative overflow-hidden"
         >
@@ -461,12 +486,12 @@
           <div class="relative z-10">
             <div class="flex justify-between items-start mb-2">
               <h2 class="text-2xl sm:text-3xl font-bold">
-                เป้าหมายทบทวนประจำวัน 🚀
+                ฝึกต่อจากที่ค้างไว้ 🚀
               </h2>
             </div>
             <p class="text-primary-100 text-sm mb-6 leading-relaxed">
-              ระบบผสมเนื้อหาใหม่และเก่าที่ถึงเวลาต้องทวนตามหลัก Spaced
-              Repetition (SRS) เพื่อย้ายความจำเข้าสู่ Long-term Memory
+              ระบบผสมคำใหม่กับคำที่ยังไม่ครบ 10 แต้ม แต้มจะค่อยๆ ลดลงถ้าไม่ได้ทวน
+              ตามช่วงเวลา จึงควรกลับมาฝึกสม่ำเสมอ
             </p>
 
             <div class="grid grid-cols-2 gap-4 mb-6">
@@ -477,7 +502,7 @@
                   class="text-[11px] uppercase tracking-wider text-primary-100 font-bold mb-1 flex items-center"
                 >
                   <i class="fa-solid fa-sparkles mr-1.5 text-yellow-300"></i
-                  >เนื้อหาใหม่วันนี้
+                  >คำใหม่รอบนี้
                 </p>
                 <p class="text-3xl font-extrabold" id="dash-new-count">0</p>
               </div>
@@ -488,7 +513,7 @@
                   class="text-[11px] uppercase tracking-wider text-primary-100 font-bold mb-1 flex items-center"
                 >
                   <i class="fa-solid fa-rotate-left mr-1.5 text-red-300"></i
-                  >ที่ต้องทบทวน
+                  >กำลังจำ (ยังไม่ครบ 10 แต้ม)
                 </p>
                 <p
                   class="text-3xl font-extrabold text-amber-300"
@@ -503,7 +528,7 @@
               onclick="startDailySession()"
               class="w-full bg-white text-primary-700 hover:bg-primary-50 font-extrabold py-4 px-6 rounded-2xl transition-all active:scale-95 shadow-lg text-base flex justify-center items-center"
             >
-              <i class="fa-solid fa-play mr-2"></i> เริ่มฝึกวันนี้
+              <i class="fa-solid fa-play mr-2"></i> เรียนต่อ
             </button>
           </div>
         </div>
@@ -534,11 +559,11 @@
               <p
                 class="text-[10px] sm:text-xs text-slate-500 font-bold uppercase mt-1"
               >
-                จำได้แม่นยำ
+                ครบ 10 แต้ม
               </p>
             </div>
             <div
-              onclick="goToFilteredList('learning')"
+              onclick="openLearningPicker()"
               class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm text-center cursor-pointer hover:bg-yellow-50 hover:border-yellow-300 transition-all active:scale-95"
             >
               <div
@@ -591,7 +616,7 @@
         <!-- Empty State when session finishes -->
         <div
           id="fc-empty-state"
-          class="hidden w-full text-center py-16 bg-white rounded-3xl border border-slate-200 shadow-sm p-6"
+          class="hidden w-full text-center py-12 bg-white rounded-3xl border border-slate-200 shadow-sm p-6"
         >
           <div
             class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4"
@@ -602,14 +627,36 @@
             ยอดเยี่ยมมาก! คุณเรียนจบเซ็ตนี้แล้ว
           </h3>
           <p class="text-sm text-slate-500 mb-6">
-            กลับไปหน้าแรกเพื่อดูพัฒนาการ หรือเริ่มบททดสอบประเมินผล
+            ทบทวนบัตรคำต่อ ฝึกพิมพ์สะกดคำ หรือเปิดดูคลังคำศัพท์
           </p>
-          <button
-            onclick="switchMode('dashboard')"
-            class="bg-primary-600 text-white px-6 py-3.5 rounded-2xl font-bold hover:bg-primary-700 active:scale-95 transition-all shadow-md"
-          >
-            กลับหน้าหลัก
-          </button>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-2.5">
+            <button
+              onclick="startDailySession()"
+              class="bg-primary-600 hover:bg-primary-700 text-white px-5 py-3.5 rounded-2xl font-bold active:scale-95 transition-all shadow-md text-sm flex items-center justify-center gap-2"
+            >
+              <i class="fa-solid fa-layer-group"></i> เรียนบัตรคำเซ็ตต่อไป
+            </button>
+            <button
+              onclick="switchMode('type')"
+              class="bg-primary-50 hover:bg-primary-100 text-primary-700 px-5 py-3.5 rounded-2xl font-bold active:scale-95 transition-all text-sm flex items-center justify-center gap-2"
+            >
+              <i class="fa-solid fa-keyboard"></i> ไปฝึกพิมพ์
+            </button>
+          </div>
+          <div class="flex gap-2">
+            <button
+              onclick="switchMode('list')"
+              class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-3 rounded-2xl font-bold active:scale-95 transition-all text-xs"
+            >
+              <i class="fa-solid fa-book mr-1"></i> ดูคลังคำศัพท์
+            </button>
+            <button
+              onclick="switchMode('dashboard')"
+              class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-3 rounded-2xl font-bold active:scale-95 transition-all text-xs"
+            >
+              กลับหน้าหลัก
+            </button>
+          </div>
         </div>
 
         <!-- Active Flashcard Area -->
@@ -703,15 +750,25 @@
                     </button>
                   </div>
 
-                  <!-- Middle: Mnemonic Box -->
+                  <!-- Middle: Mnemonic Box (Editable by User - Generation Effect) -->
                   <div
-                    class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 p-3 rounded-xl mb-3 shadow-sm"
+                    class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 p-3 rounded-xl mb-3 shadow-sm flex-grow flex flex-col justify-center relative"
                     id="fc-mnemonic-box"
+                    onclick="event.stopPropagation()"
                   >
-                    <p class="text-xs font-bold text-amber-800 mb-1">
-                      <i class="fa-solid fa-lightbulb mr-1.5 text-amber-500"></i
-                      >เทคนิคช่วยจำ (Mnemonic)
-                    </p>
+                    <div class="flex justify-between items-center mb-1">
+                      <p class="text-xs font-bold text-amber-800">
+                        <i class="fa-solid fa-lightbulb mr-1.5 text-amber-500"></i
+                        >เทคนิคช่วยจำ (Mnemonic)
+                      </p>
+                      <button
+                        type="button"
+                        onclick="openMnemonicEditor(event)"
+                        class="text-[10px] font-bold text-amber-700 hover:text-amber-900 bg-amber-100/80 hover:bg-amber-200 px-2 py-0.5 rounded-md transition-colors"
+                      >
+                        <i class="fa-solid fa-pen mr-1"></i>แก้ไขทริคของฉัน
+                      </button>
+                    </div>
                     <p
                       class="text-xs sm:text-sm text-amber-900 font-medium"
                       id="fc-mnemonic"
@@ -756,8 +813,8 @@
             >
               <i class="fa-solid fa-face-frown text-xl sm:text-2xl mb-1"></i>
               <span>จำไม่ได้ (ลืม)</span>
-              <span class="text-[9px] font-normal text-red-400 mt-0.5"
-                >ทวนซ้ำวันนี้</span
+              <span class="text-[9px] font-normal text-red-400 mt-0.5" id="lbl-rate-1"
+                >จะวนกลับมาในรอบนี้</span
               >
             </button>
             <button
@@ -779,7 +836,7 @@
               <i
                 class="fa-solid fa-face-smile-beam text-xl sm:text-2xl mb-1"
               ></i>
-              <span>จำได้แม่น</span>
+              <span>นึกออกทันที</span>
               <span
                 class="text-[9px] font-normal text-green-500 mt-0.5"
                 id="lbl-rate-3"
@@ -791,7 +848,7 @@
             id="fc-instruction"
             class="text-center text-xs text-slate-400 mt-4 font-medium animate-pulse"
           >
-            แตะที่การ์ดเพื่อดูคำแปลและเฉลย
+            แตะที่การ์ดเพื่อดูคำแปล <span class="hidden sm:inline">• กด Spacebar เพื่อพลิกการ์ด / กด 1, 2, 3 ให้คะแนน</span>
           </p>
         </div>
       </section>
@@ -852,6 +909,15 @@
         </div>
 
         <!-- Quiz Play Area -->
+        <div id="quiz-filter-bar" class="flex flex-wrap gap-2 mb-4 text-xs">
+          <select id="quiz-filter-status" onchange="applyQuizFilter()" class="border border-slate-200 rounded-lg px-2 py-1.5 bg-white">
+            <option value="learned">📚 ทุกคำที่เคยเรียนแล้ว</option>
+            <option value="learning">🟡🔴 กำลังเรียนรู้ (รวมต้องทวนซ้ำ)</option>
+            <option value="mastered">🟢 คำที่ครบ 10 แต้ม</option>
+            <option value="off">🔒 คำที่ล็อกว่าจำได้แล้ว</option>
+          </select>
+          <select id="quiz-filter-cefr" onchange="applyQuizFilter()" class="border border-slate-200 rounded-lg px-2 py-1.5 bg-white"><option value="all">ทุกระดับ</option></select>
+        </div>
         <div id="quiz-play-area" class="w-full">
           <!-- Question Card -->
           <div
@@ -959,8 +1025,9 @@
               <option value="all">ทุกสถานะความจำ</option>
               <option value="new">⚪️ เพิ่งเริ่ม</option>
               <option value="review">🔴 ต้องทวนซ้ำ</option>
-              <option value="learning">🟡 กำลังจำ</option>
-              <option value="mastered">🟢 จำได้แม่น</option>
+              <option value="learning">🟡🔴 กำลังเรียนรู้ (รวมต้องทวนซ้ำ)</option>
+              <option value="mastered">🟢 ครบ 10 แต้ม</option>
+                  <option value="off">🔒 ล็อกว่าจำได้แล้ว</option>
             </select>
           </div>
         </div>
@@ -1930,7 +1997,7 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
 
       // Quiz variables
       let quizScore = 0;
-      let quizStreak = 0;
+      let quizStreak = 0, quizMaxStreak = 0;
       let quizLives = 3;
       let currentQuizWordIdx = 0;
       let timerInterval;
@@ -1962,7 +2029,8 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
       }
 
       // Modal Utility
-      function showModal(title, message, buttonText = "ตกลง", callback = null) {
+      function showModal(title, message, buttonText = "ตกลง", callback = null, secondText = null, secondCb = null) {
+        const oldSecond = document.getElementById("modal-btn2"); if (oldSecond) oldSecond.remove();
         const modal = document.getElementById("custom-modal");
         document.getElementById("modal-title").textContent = title;
         document.getElementById("modal-message").textContent = message;
@@ -1977,6 +2045,14 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
           modal.classList.add("hidden");
           if (callback) callback();
         });
+        if (secondText) {
+          const b2 = document.createElement("button");
+          b2.id = "modal-btn2";
+          b2.className = "w-full mt-2 py-3 rounded-xl text-slate-500 text-sm font-bold hover:bg-slate-50";
+          b2.textContent = secondText;
+          b2.onclick = () => { modal.classList.add("hidden"); if (secondCb) secondCb(); };
+          newBtn.after(b2);
+        }
 
         modal.classList.remove("hidden");
       }
@@ -2109,6 +2185,7 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
       }
 
       function updateDashboardStats() {
+        applyDecay();
         const now = Date.now();
         let newCount = 0,
           reviewCount = 0;
@@ -2119,21 +2196,21 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         vocabData.forEach((item) => {
           const srs = srsData[item.id];
           if (!srs) return;
+          if (srs.pts === undefined) srs.pts = srs.level >= 3 ? MASTER_PTS : srs.level === 2 ? 5 : srs.level === 1 ? 2 : 0; // migrate old progress
 
           if (srs.level === 0) remaining++;
           else if (srs.level === 1 || srs.level === 2) learning++;
           else if (srs.level >= 3) mastered++;
 
-          if (srs.level === 0 && newCount < 10) newCount++;
-          if (srs.level > 0 && srs.nextReview <= now && reviewCount < 15)
-            reviewCount++;
         });
+        reviewCount = learning;
+        newCount = Math.min(5, remaining);
 
         document.getElementById("stat-mastered").textContent = mastered;
         document.getElementById("stat-learning").textContent = learning;
         document.getElementById("stat-remaining").textContent = remaining;
 
-        document.getElementById("dash-new-count").textContent = newCount;
+        document.getElementById("dash-new-count").textContent = newCount === 0 && remaining > 0 ? "🔒" : newCount;
         document.getElementById("dash-review-count").textContent = reviewCount;
 
         updateChapterBannerInfo();
@@ -2155,7 +2232,7 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         let masteredInCh = 0;
         for (let i = startIdx; i < endIdx; i++) {
           const srs = srsData[vocabData[i].id];
-          if (srs && srs.level > 0) learnedInCh++;
+          if (srs && srs.level >= 2) learnedInCh++;
           if (srs && srs.level >= 3) masteredInCh++;
         }
 
@@ -2184,7 +2261,7 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         document.getElementById("current-chapter-title").textContent =
           `${labelCh}ที่ ${currentCh}${getChapter(currentCh).name ? " · " + getChapter(currentCh).name : ""} (${startIdx + 1} - ${endIdx})`;
         document.getElementById("current-chapter-desc").textContent =
-          `เรียนรู้แล้ว ${learnedInCh}/${totalInCh} คำ (${percent}%) • แม่นยำ ${masteredInCh} คำ`;
+          `เริ่มจำได้ ${learnedInCh}/${totalInCh} คำ (${percent}%) • ครบ 10 แต้ม ${masteredInCh} คำ`;
         document.getElementById("current-chapter-progress-bar").style.width =
           `${percent}%`;
       }
@@ -2420,6 +2497,7 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
 
       function startChapterSession(chapterNum) {
         activeSessionType = "chapter";
+        relearnIds.clear();
         currentActiveChapter = chapterNum;
         userProgress.currentChapter = chapterNum;
         saveUserProgress();
@@ -2435,7 +2513,7 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         // Japanese: shuffle cards (no row-order cueing) and mix in a few already-learned characters from earlier chapters
         if (appLang === "jp" && sessionQueue.length > 0) {
           const review = [];
-          for (let i = 0; i < startIdx; i++) if (srsData[vocabData[i].id].level > 0) review.push(i);
+          for (let i = 0; i < startIdx; i++) if (srsData[vocabData[i].id].level > 0 && (srsData[vocabData[i].id].pts || 0) < MASTER_PTS && !srsData[vocabData[i].id].off) review.push(i);
           review.sort(() => Math.random() - 0.5);
           sessionQueue.push(...review.slice(0, 5));
           sessionQueue.sort(() => Math.random() - 0.5);
@@ -2453,92 +2531,290 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
 
       function startDailySession() {
         activeSessionType = "daily";
-        const now = Date.now();
+        relearnIds.clear();
+        const weak = weakIndexes().sort((x, y) => (srsData[vocabData[x].id].pts || 0) - (srsData[vocabData[y].id].pts || 0));
         sessionQueue = [];
-
-        let dueReviews = [];
-        vocabData.forEach((item, index) => {
-          const srs = srsData[item.id];
-          if (srs.level > 0 && srs.nextReview <= now) {
-            dueReviews.push(index);
-          }
-        });
-
-        sessionQueue = dueReviews.slice(0, 15);
-
-        let neededNew = 10;
+        const lvl = (i) => srsData[vocabData[i].id].level;
+        const red = weak.filter((i) => lvl(i) === 1).slice(0, 20); // red words (0-3 pts), weakest first
+        const mid = weak.filter((i) => lvl(i) >= 2).slice(0, 5); // 5 lowest-point "กำลังจำ" words
+        sessionQueue = [...red, ...mid];
+        let neededNew = 5;
         for (let i = 0; i < vocabData.length && neededNew > 0; i++) {
-          if (srsData[vocabData[i].id].level === 0) {
-            sessionQueue.push(i);
-            neededNew--;
-          }
+          if (srsData[vocabData[i].id].level === 0) { sessionQueue.push(i); neededNew--; }
         }
-
         sessionQueue = sessionQueue.sort(() => Math.random() - 0.5);
-
         if (sessionQueue.length === 0) {
-          showModal(
-            "เรียนครบแล้ว! 🎉",
-            "วันนี้คุณเรียนรู้และทบทวนเนื้อหาที่ต้องทำครบหมดแล้ว!",
-          );
+          showModal("เรียนครบแล้ว! 🎉", "ทุกคำถึงเกณฑ์จำได้แล้ว ลองฝึกพิมพ์หรือเล่นควิซเพื่อทบทวนเพิ่ม");
           return;
         }
-
         currentCardIndex = 0;
         switchMode("flashcards");
         loadFlashcard();
       }
 
-
       // ===== Japanese reading practice (short words / long stories) =====
       const READ_SHORT = `あか|อะ-คะ|สีแดง
 あお|อะ-โอะ|สีน้ำเงิน
+しろ|ชิ-โระ|สีขาว
+くろ|คุ-โระ|สีดำ
+きいろ|คิ-อิ-โระ|สีเหลือง
+みどり|มิ-โดะ-ริ|สีเขียว
+むらさき|มุ-ระ-ซะ-คิ|สีม่วง
 いえ|อิ-เอะ|บ้าน
+へや|เฮะ-ยะ|ห้อง
+にわ|นิ-วะ|สวน
+まど|มะ-โดะ|หน้าต่าง
+いす|อิ-สึ|เก้าอี้
+つくえ|ทสึ-คุ-เอะ|โต๊ะเรียน
+とけい|โทะ-เค|นาฬิกา
+でんわ|เดน-วะ|โทรศัพท์
+かばん|คะ-บัง|กระเป๋า
+かさ|คะ-สะ|ร่ม
+くつ|คุ-ทสึ|รองเท้า
+めがね|เมะ-งะ-เนะ|แว่นตา
+さいふ|ซะ-อิ-ฟุ|กระเป๋าสตางค์
+かぎ|คะ-งิ|กุญแจ
+かみ|คะ-มิ|กระดาษ / ผม
+てがみ|เทะ-งะ-มิ|จดหมาย
+しんぶん|ชิน-บุน|หนังสือพิมพ์
+ざっし|ซัส-ชิ|นิตยสาร
+えいが|เอ-งะ|ภาพยนตร์
+おんがく|อง-งะ-คุ|ดนตรี
+しゃしん|ชะ-ชิน|รูปถ่าย
 うえ|อุ-เอะ|ข้างบน
+した|ชิ-ตะ|ข้างล่าง
+なか|นะ-คะ|ข้างใน
+そと|โซะ-โทะ|ข้างนอก
+まえ|มะ-เอะ|ข้างหน้า
+うしろ|อุ-ชิ-โระ|ข้างหลัง
+みぎ|มิ-งิ|ด้านขวา
+ひだり|ฮิ-ดะ-ริ|ด้านซ้าย
+ちかく|จิ-คะ-คุ|ใกล้
+とおく|โท-คุ|ไกล
 いぬ|อิ-นุ|สุนัข
 ねこ|เนะ-โกะ|แมว
+とり|โทะ-ริ|นก
 さかな|ซะ-คะ-นะ|ปลา
+うさぎ|อุ-ซะ-งิ|กระต่าย
+くま|คุ-มะ|หมี
+うま|อุ-มะ|ม้า
+ぶた|บุ-ตะ|หมู
+うし|อุ-ชิ|วัว
+さる|ซะ-รุ|ลิง
+ぞう|โซ|ช้าง
+きつね|คิ-ทสึ-เนะ|สุนัขจิ้งจอก
 すし|สุ-ชิ|ซูชิ
+ごはん|โกะ-ฮัง|ข้าว / มื้ออาหาร
+みそしる|มิ-โซะ-ชิ-รุ|ซุปมิโซะ
+たまご|ตะ-มะ-โงะ|ไข่
+にく|นิ-คุ|เนื้อสัตว์
+やさい|ยะ-ซะ-อิ|ผัก
+くだもの|คุ-ดะ-โมะ-โนะ|ผลไม้
+りんご|ริง-โกะ|แอปเปิล
+みかん|มิ-คัง|ส้ม
+いちご|อิ-จิ-โกะ|สตรอว์เบอร์รี
+すいか|ซุ-อิ-คะ|แตงโม
+おちゃ|โอะ-ชะ|ชา
+みず|มิ-สึ|น้ำ
+ぎゅうにゅう|กิว-นิว|นมวัว
+さとう|ซะ-โท|น้ำตาล
+しお|ชิ-โอะ|เกลือ
 さくら|ซะ-คุ-ระ|ซากุระ
+はな|ฮะ-นะ|ดอกไม้
+き|คิ|ต้นไม้
+もり|โมะ-ริ|ป่าทึบ
 うみ|อุ-มิ|ทะเล
 やま|ยะ-มะ|ภูเขา
 かわ|คะ-วะ|แม่น้ำ
+いけ|อิ-เคะ|บ่อน้ำ
 そら|โซ-ระ|ท้องฟ้า
-ひと|ฮิ-โตะ|คน
-みず|มิ-สึ|น้ำ
+くも|คุ-โมะ|เมฆ
+ほし|โฮะ-ชิ|ดวงดาว
+つき|ทสึ-คิ|พระจันทร์
+たいよう|ไท-โย|ดวงอาทิตย์
 あめ|อะ-เมะ|ฝน
 ゆき|ยุ-คิ|หิมะ
-はな|ฮะ-นะ|ดอกไม้
-かお|คะ-โอะ|ใบหน้า
-くち|คุ-จิ|ปาก
-くるま|คุ-รุ-มะ|รถยนต์
-ほん|ฮง|หนังสือ
-えき|เอะ-คิ|สถานี
-たまご|ตะ-มะ-โงะ|ไข่
-あさ|อะ-สะ|ตอนเช้า
-よる|โยะ-รุ|ตอนกลางคืน
+かぜ|คะ-เซะ|ลม
+はる|ฮะ-รุ|ฤดูใบไม้ผลิ
+なつ|นะ-ทสึ|ฤดูร้อน
+あき|อะ-คิ|ฤดูใบไม้ร่วง
+ふゆ|ฟุ-ยุ|ฤดูหนาว
+ひと|ฮิ-โตะ|คน
+かぞく|คะ-โซะ-คุ|ครอบครัว
+ちち|จิ-จิ|พ่อ (ของเรา)
+はは|ฮะ-ฮะ|แม่ (ของเรา)
+あに|อะ-นิ|พี่ชาย
+あね|อะ-เนะ|พี่สาว
+おとうと|โอะ-โท-โทะ|น้องชาย
+いもうと|อิ-โม-โทะ|น้องสาว
+こども|โคะ-โดะ-โมะ|เด็ก
 ともだち|โตะ-โมะ-ดะ-จิ|เพื่อน
-せんせい|เซ็น-เซ|ครู
-おはよう|โอะ-ฮะ-โยะ-อุ|อรุณสวัสดิ์
-ありがとう|อะ-ริ-งะ-โตะ-อุ|ขอบคุณ
-さようなら|ซะ-โยะ-นะ-ระ|ลาก่อน
+せんせい|เซ็น-เซ|คุณครู
+がくせい|กัก-เซ|นักเรียน
+いしゃ|อิ-ชะ|หมอ
+あたま|อะ-ตะ-มะ|ศีรษะ
+かお|คะ-โอะ|ใบหน้า
+め|เมะ|ตา
+みみ|มิ-มิ|หู
+はな|ฮะ-นะ|จมูก
+くち|คุ-จิ|ปาก
+て|เทะ|มือ
+あし|อะ-ชิ|ขา / เท้า
+おなか|โอะ-นะ-คะ|ท้อง
+くるま|คุ-รุ-มะ|รถยนต์
+じてんしゃ|จิ-เทน-ชะ|จักรยาน
+でんしゃ|เดน-ชะ|รถไฟ
+ひこうき|ฮิ-โค-คิ|เครื่องบิน
+ふね|ฟุ-เนะ|เรือ
+えき|เอะ-คิ|สถานีรถไฟ
+がっこう|กัก-โค|โรงเรียน
+びょういん|เบียว-อิน|โรงพยาบาล
+ぎんこう|กิง-โค|ธนาคาร
+こうえん|โค-เอ็น|สวนสาธารณะ
+としょかん|โทะ-โฉะ-คัง|ห้องสมุด
+ほん|ฮง|หนังสือ
+あさ|อะ-สะ|ตอนเช้า
+ひる|ฮิ-รุ|ตอนกลางวัน
+ばん|บัง|ตอนเย็น
+よる|โยะ-รุ|ตอนกลางคืน
+きょう|เคียว|วันนี้
+あした|อะ-ชิ-ตะ|พรุ่งนี้
+きのう|คิ-โน|เมื่อวาน
+いま|อิ-มะ|ตอนนี้
+まいにち|ไม-นิ-จิ|ทุกวัน
+おはよう|โอะ-ฮะ-โย|อรุณสวัสดิ์
+こんにちは|คน-นิ-จิ-วะ|สวัสดี (กลางวัน)
+こんばんは|คม-บัง-วะ|สวัสดี (ตอนเย็น)
+おやすみ|โอะ-ยะ-สึ-มิ|ราตรีสวัสดิ์
+ありがとう|อะ-ริ-งะ-โท|ขอบคุณ
+すみません|สึ-มิ-มะ-เซน|ขอโทษ / ขอรบกวน
+さようなら|ซะ-โย-นะ-ระ|ลาก่อน
 コーヒー|โค-ฮี|กาแฟ
-ケーキ|เค-คิ|เค้ก
-テレビ|เทะ-เระ-บิ|โทรทัศน์
-カメラ|คะ-เมะ-ระ|กล้องถ่ายรูป
-ホテル|โฮ-เทะ-รุ|โรงแรม
-バス|บะ-สึ|รถบัส
-タクシー|ตะ-คุ-ชี|แท็กซี่
-ピアノ|เปีย-โนะ|เปียโน
+ミルク|มิ-รุ-คุ|นม
+ジュース|จู-สึ|น้ำผลไม้
+ビール|บี-รุ|เบียร์
+ワイン|วะ-อิน|ไวน์
 パン|ปัง|ขนมปัง
-ゲーム|เกะ-มุ|เกม
-メニュー|เมะ-เนียว|เมนู
+ケーキ|เค-คิ|เค้ก
+アイス|อะ-อิ-สึ|ไอศกรีม
+チョコレート|โชะ-โคะ-เร-โทะ|ช็อกโกแลต
+ラーメン|รา-เม็ง|ราเม็ง
+カレー|คะ-เร|แกงกะหรี่
+サラダ|ซะ-ระ-ดะ|สลัด
+サンドイッチ|ซัน-โดะ-อิต-จิ|แซนด์วิช
+ハンバーグ|ฮัม-บา-กึ|แฮมเบิร์ก
+フルーツ|ฟุ-รู-ทสึ|ผลไม้
+スプーン|สึ-ปูน|ช้อน
+フォーク|โฟ-คุ|ส้อม
+ナイフ|ไน-ฟุ|มีด
+コップ|คป-ปุ|แก้วน้ำ
+テレビ|เทะ-เระ-บิ|โทรทัศน์
+ラジオ|รา-จิ-โอะ|วิทยุ
+カメラ|คะ-เมะ-ระ|กล้องถ่ายรูป
+パソコン|พะ-โซะ-คน|คอมพิวเตอร์
+スマホ|สึ-มะ-โฮะ|สมาร์ตโฟน
+インターネット|อิน-ตา-เนต-โทะ|อินเทอร์เน็ต
+ゲーム|เก-มุ|เกม
+ニュース|นิว-สึ|ข่าว
+アニメ|อะ-นิ-เมะ|อนิเมะ
+ピアノ|พิ-อะ-โนะ|เปียโน
+ギター|กิ-ตา|กีตาร์
+スポーツ|สึ-โป-ทสึ|กีฬา
 サッカー|ซัก-คา|ฟุตบอล
-ラジオ|รา-จิ-โอะ|วิทยุ`.split("\n").map((l) => l.split("|"));
+テニス|เทะ-นิ-สึ|เทนนิส
+バスケット|บะ-สึ-เกต-โทะ|บาสเกตบอล
+プール|พู-รุ|สระว่ายน้ำ
+ホテル|โฮะ-เทะ-รุ|โรงแรม
+レストラン|เระ-สึ-โทะ-รัง|ร้านอาหาร
+コンビニ|คม-บิ-นิ|ร้านสะดวกซื้อ
+スーパー|ซู-ปา|ซูเปอร์มาร์เก็ต
+デパート|เดะ-ปา-โทะ|ห้างสรรพสินค้า
+トイレ|โทะ-อิ-เระ|ห้องน้ำ
+エレベーター|เอะ-เระ-เบ-ตา|ลิฟต์
+ドア|โดะ-อะ|ประตู
+ベッド|เบด-โดะ|เตียงนอน
+テーブル|เท-บุ-รุ|โต๊ะอาหาร
+エアコン|เอะ-อะ-คน|แอร์
+シャワー|ชะ-วา|ฝักบัวอาบน้ำ
+タオル|ทะ-โอะ-รุ|ผ้าเช็ดตัว
+シャツ|ชะ-ทสึ|เสื้อเชิ้ต
+スカート|สึ-คา-โทะ|กระโปรง
+ズボン|ซุ-บง|กางเกงขายาว
+コート|โค-โทะ|เสื้อโค้ท
+ネクタイ|เนะ-คุ-ไท|เนกไท
+バッグ|บัก-กึ|กระเป๋าถือ
+ノート|โน-โทะ|สมุดโน้ต
+ペン|เพน|ปากกา
+カレンダー|คะ-เรน-ดา|ปฏิทิน
+バス|บะ-สึ|รถบัส
+タクシー|ทะ-คุ-ชี|รถแท็กซี่
+クラス|คุ-ระ-สึ|ชั้นเรียน
+テスト|เทะ-สึ-โทะ|การสอบ
+メニュー|เมะ-นิว|เมนู
+プレゼント|พึ-เระ-เซน-โทะ|ของขวัญ
+パーティー|พา-ที|งานปาร์ตี้`.split("\n").map((l) => l.split("|"));
+
       const READ_STORIES = [
-        { t: "ตอนเช้า", l: [["わたしは あさ はやく おきます。", "วะ-ตะ-ชิ วะ อะ-สะ ฮะ-ยะ-คุ โอะ-คิ-มัส", "ฉันตื่นเช้า"], ["みずを のみます。", "มิ-สึ โอะ โนะ-มิ-มัส", "ดื่มน้ำ"], ["パンを たべます。", "ปัง โอะ ตะ-เบะ-มัส", "กินขนมปัง"], ["そして がっこうへ いきます。", "โซะ-ชิ-เตะ กัก-โคะ-เอะ อิ-คิ-มัส", "แล้วไปโรงเรียน"]] },
-        { t: "แมวของฉัน", l: [["うちに ねこが います。", "อุ-จิ นิ เนะ-โกะ งะ อิ-มัส", "ที่บ้านมีแมว"], ["ねこの なまえは ミミです。", "เนะ-โกะ โนะ นะ-มะ-เอะ วะ มิ-มิ เดส", "แมวชื่อมิมิ"], ["ミミは さかなが すきです。", "มิ-มิ วะ ซะ-คะ-นะ งะ สุ-คิ เดส", "มิมิชอบปลา"], ["いつも ねています。", "อิ-สึ-โมะ เนะ-เตะ-อิ-มัส", "นอนอยู่ตลอดเลย"]] },
-        { t: "ที่สถานี", l: [["えきに いきます。", "เอะ-คิ นิ อิ-คิ-มัส", "ไปที่สถานี"], ["でんしゃに のります。", "เดน-ชะ นิ โนะ-ริ-มัส", "ขึ้นรถไฟ"], ["ともだちに あいます。", "โตะ-โมะ-ดะ-จิ นิ อะ-อิ-มัส", "พบเพื่อน"], ["いっしょに コーヒーを のみます。", "อิส-โชะ นิ โค-ฮี โอะ โนะ-มิ-มัส", "ดื่มกาแฟด้วยกัน"]] },
+        { t: "1. ตอนเช้าของฉัน", l: [
+          ["わたしは まいあさ ろくじに おきます。", "วะ-ตะ-ชิ วะ ไม-อะ-สะ โระ-คุ-จิ นิ โอะ-คิ-มัส", "ฉันตื่นนอนตอนหกโมงเช้าทุกวัน"],
+          ["かおを あらって、みずを のみます。", "คะ-โอะ โอะ อะ-รัต-เตะ, มิ-สึ โอะ โนะ-มิ-มัส", "ล้างหน้าแล้วดื่มน้ำ"],
+          ["あたたかい パンと たまごを たべます。", "อะ-ตะ-ตะ-ไค ปัง โทะ ตะ-มะ-โงะ โอะ ตะ-เบะ-มัส", "กินขนมปังอุ่นๆ กับไข่"],
+          ["そして げんきに がっこうへ いきます。", "โซะ-ชิ-เตะ เกน-คิ นิ กัก-โค เอะ อิ-คิ-มัส", "จากนั้นก็ไปโรงเรียนอย่างสดใส"]
+        ]},
+        { t: "2. แมวเหมียวมิมิ", l: [
+          ["わたしの うちに しろい ねこが います。", "วะ-ตะ-ชิ โนะ อุ-จิ นิ ชิ-โร-อิ เนะ-โกะ งะ อิ-มัส", "ที่บ้านของฉันมีแมวสีขาวอยู่ตัวหนึ่ง"],
+          ["ねこの なまえは ミミです。", "เนะ-โกะ โนะ นะ-มะ-เอะ วะ มิ-มิ เดส", "แมวตัวนี้ชื่อว่ามิมิ"],
+          ["ミミは やきざかなと ミルクが だいすきです。", "มิ-มิ วะ ยะ-คิ-ซะ-คะ-นะ โทะ มิ-รุ-คุ งะ ได-สุ-คิ เดส", "มิมิชอบกินปลาย่างและนมมากที่สุด"],
+          ["ひるは まどの ちかくで いつも ねています。", "ฮิ-รุ วะ มะ-โดะ โนะ จิ-คะ-คุ เดะ อิ-ทสึ-โมะ เนะ-เตะ-อิ-มัส", "ตอนกลางวันจะนอนหลับอยู่ใกล้หน้าต่างเสมอ"]
+        ]},
+        { t: "3. นัดพบที่สถานี", l: [
+          ["きょうは ともだちと えきで あいます。", "เคียว วะ โทะ-โมะ-ดะ-จิ โทะ เอะ-คิ เดะ อะ-อิ-มัส", "วันนี้ฉันนัดพบเพื่อนที่สถานีรถไฟ"],
+          ["いっしょに あたらしい でんしゃに のります。", "อิส-โฉะ นิ อะ-ตะ-ระ-ชี เดน-ชะ นิ โนะ-ริ-มัส", "พวกเราขึ้นรถไฟขบวนใหม่ด้วยกัน"],
+          ["まちの カフェで コーヒーと ケーキを たのみます。", "มะ-จิ โนะ คา-เฟะ เดะ โค-ฮี โทะ เค-คิ โอะ ทะ-โนะ-มิ-มัส", "สั่งกาแฟและเค้กที่คาเฟ่ในเมือง"],
+          ["たくさん はなして、とても たのしかったです。", "ทัก-ซัง ฮะ-นะ-ชิ-เตะ, โทะ-เตะ-โมะ ทะ-โนะ-ชิ-คัต-ตะ เดส", "ได้คุยกันเยอะแยะ สนุกมากเลย"]
+        ]},
+        { t: "4. ซื้อของที่ร้านสะดวกซื้อ", l: [
+          ["よる、いえの ちかくの コンビニへ いきました。", "โยะ-รุ, อิ-เอะ โนะ จิ-คะ-คุ โนะ คม-บิ-นิ เอะ อิ-คิ-มะ-ชิ-ตะ", "ตอนกลางคืน ฉันเดินไปร้านสะดวกซื้อใกล้บ้าน"],
+          ["おべんとうと つめたい おちゃを かいました。", "โอะ-เบน-โท โทะ ทสึ-เมะ-ไต โอะ-ชะ โอะ คะ-อิ-มะ-ชิ-ตะ", "ซื้อข้าวกล่องและชาเย็นมา"],
+          ["あまい アイスも ひとつ えらびました。", "อะ-ไม อะ-อิ-สึ โมะ ฮิ-โทะ-ทสึ เอะ-ระ-บิ-มะ-ชิ-ตะ", "แถมยังเลือกไอศกรีมหวานๆ มาอีกหนึ่งอัน"],
+          ["へやで テレビを みながら たべます。", "เฮะ-ยะ เดะ เทะ-เระ-บิ โอะ มิ-นะ-งะ-ระ ตะ-เบะ-มัส", "กินไปพร้อมกับดูโทรทัศน์ในห้อง"]
+        ]},
+        { t: "5. วันหยุดที่สวนสาธารณะ", l: [
+          ["にちようびは てんきが とても いいです。", "นิ-จิ-โย-บิ วะ เทน-คิ งะ โทะ-เตะ-โมะ อี เดส", "วันอาทิตย์อากาศแจ่มใสมาก"],
+          ["わたしは じてんしゃで おおきい こうえんへ いきます。", "วะ-ตะ-ชิ วะ จิ-เทน-ชะ เดะ โอ-คี โค-เอ็น เอะ อิ-คิ-มัส", "ฉันปั่นจักรยานไปสวนสาธารณะแห่งใหญ่"],
+          ["きれいな さくらの しゃしんを とりました。", "คิ-เร-นะ ซะ-คุ-ระ โนะ ชะ-ชิน โอะ โทะ-ริ-มะ-ชิ-ตะ", "ถ่ายรูปดอกซากุระสวยๆ เอาไว้"],
+          ["きの したで しずかに ほんを よみます。", "คิ โนะ ชิ-ตะ เดะ ชิ-ซึ-คะ นิ ฮง โอะ โยะ-มิ-มัส", "นั่งอ่านหนังสืออย่างเงียบสงบใต้ต้นไม้"]
+        ]},
+        { t: "6. มื้อค่ำที่ร้านอาหาร", l: [
+          ["かぞくと えきの まえの レストランに きました。", "คะ-โซะ-คุ โทะ เอะ-คิ โนะ มะ-เอะ โนะ เระ-สึ-โทะ-รัง นิ คิ-มะ-ชิ-ตะ", "ฉันมากินข้าวที่ร้านอาหารหน้าสถานีกับครอบครัว"],
+          ["メニューを みて、カレーと サラダを たのみます。", "เมะ-นิว โอะ มิ-เตะ, คะ-เร โทะ ซะ-ระ-ดะ โอะ ทะ-โนะ-มิ-มัส", "ดูเมนูแล้วสั่งแกงกะหรี่กับสลัด"],
+          ["あつい ラーメンも とても おいしいです。", "อะ-ทสึ-อิ รา-เม็ง โมะ โทะ-เตะ-โมะ โอะ-อิ-ชี เดส", "ราเม็งร้อนๆ ก็อร่อยมากเหมือนกัน"],
+          ["みんなで たべる ごはんは いちばん すきです。", "มิน-นะ เดะ ตะ-เบะ-รุ โกะ-ฮัง วะ อิ-จิ-บัง สุ-คิ เดส", "มื้ออาหารที่ได้กินพร้อมหน้ากันคือสิ่งที่ฉันชอบที่สุด"]
+        ]},
+        { t: "7. วันที่ฝนตก", l: [
+          ["けさから ずっと つよい あめが ふっています。", "เคะ-สะ คะ-ระ ซุต-โทะ ทสึ-โยะ-อิ อะ-เมะ งะ ฟุต-เตะ อิ-มัส", "มีฝนตกหนักต่อเนื่องตั้งแต่เมื่อเช้านี้"],
+          ["あかい かさを さして バスに のります。", "อะ-ไค คะ-สะ โอะ ซะ-ชิ-เตะ บะ-สึ นิ โนะ-ริ-มัส", "ฉันกางร่มสีแดงแล้วขึ้นรถบัส"],
+          ["みちが こんでいて、すこし おくれました。", "มิ-จิ งะ คน-เดะ อิ-เตะ, สึ-โคะ-ชิ โอะ-คุ-เระ-มะ-ชิ-ตะ", "ถนนรถติดมาก เลยไปสายนิดหน่อย"],
+          ["はやく たいようが でて ほしいです。", "ฮะ-ยะ-คุ ไท-โย งะ เดะ-เตะ โฮะ-ชี เดส", "อยากให้พระอาทิตย์ออกเร็วๆ จัง"]
+        ]},
+        { t: "8. ทริปทะเลหน้าร้อน", l: [
+          ["なつやすみに ともだちと あおい うみへ いきました。", "นะ-ทสึ-ยะ-สึ-มิ นิ โทะ-โมะ-ดะ-จิ โทะ อะ-โอะ-อิ อุ-มิ เอะ อิ-คิ-มะ-ชิ-ตะ", "ช่วงปิดเทอมหน้าร้อน ฉันไปเที่ยวทะเลสีครามกับเพื่อน"],
+          ["つめたい みずの なかで たくさん およぎました。", "ทสึ-เมะ-ไต มิ-สึ โนะ นะ-คะ เดะ ทัก-ซัง โอะ-โยะ-งิ-มะ-ชิ-ตะ", "ว่ายน้ำเล่นในน้ำเย็นๆ กันอย่างจุใจ"],
+          ["ひるごはんに あまい すいかを たべました。", "ฮิ-รุ-โกะ-ฮัง นิ อะ-ไม ซุ-อิ-คะ โอะ ตะ-เบะ-มะ-ชิ-ตะ", "ตอนมื้อเที่ยงได้กินแตงโมหวานฉ่ำ"],
+          ["よるは きれいな ほしを みて ねました。", "โยะ-รุ วะ คิ-เร-นะ โฮะ-ชิ โอะ มิ-เตะ เนะ-มะ-ชิ-ตะ", "ตกดึกก็นอนดูดาวสวยๆ บนท้องฟ้า"]
+        ]},
+        { t: "9. อ่านหนังสือที่ห้องสมุด", l: [
+          ["あしたは がっこうで にほんごの テストが あります。", "อะ-ชิ-ตะ วะ กัก-โค เดะ นิ-ฮง-โกะ โนะ เทะ-สึ-โทะ งะ อะ-ริ-มัส", "พรุ่งนี้ที่โรงเรียนมีการสอบภาษาญี่ปุ่น"],
+          ["としょかんの しずかな へやで べんきょうします。", "โทะ-โฉะ-คัง โนะ ชิ-ซึ-คะ-นะ เฮะ-ยะ เดะ เบน-เคียว-ชิ-มัส", "ฉันจึงมาติวหนังสือในห้องเงียบๆ ที่ห้องสมุด"],
+          ["あたらしい ノートに たいせつな ことばを かきます。", "อะ-ตะ-ระ-ชี โน-โทะ นิ ไท-เซะ-ทสึ-นะ โคะ-โทะ-บะ โอะ คะ-คิ-มัส", "จดคำศัพท์สำคัญลงในสมุดโน้ตเล่มใหม่"],
+          ["ぜんぶ おぼえて、いい てんを とりたいです。", "เซน-บุ โอะ-โบะ-เอะ-เตะ, อี เทน โอะ โทะ-ริ-ไต เดส", "อยากจำให้ได้ทั้งหมดและทำคะแนนให้ได้ดีๆ"]
+        ]},
+        { t: "10. ของขวัญวันเกิด", l: [
+          ["きょうは たいせつな ともだちの たんじょうびです。", "เคียว วะ ไท-เซะ-ทสึ-นะ โทะ-โมะ-ดะ-จิ โนะ ทัน-โจ-บิ เดส", "วันนี้เป็นวันเกิดของเพื่อนคนสำคัญของฉัน"],
+          ["デパートで かわいい バッグと はなを かいました。", "เดะ-ปา-โทะ เดะ คะ-วะ-อี บัก-กึ โทะ ฮะ-นะ โอะ คะ-อิ-มะ-ชิ-ตะ", "ฉันไปซื้อกระเป๋าน่ารักๆ กับดอกไม้ที่ห้างสรรพสินค้า"],
+          ["ちいさな カードに メッセージも かきました。", "จี-ซะ-นะ คา-โดะ นิ เมส-เซ-จิ โมะ คะ-คิ-มะ-ชิ-ตะ", "เขียนข้อความอวยพรลงในการ์ดใบเล็กๆ ด้วย"],
+          ["よるの パーティーで プレゼントを わたします。", "โยะ-รุ โนะ พา-ที เดะ พึ-เระ-เซน-โทะ โอะ วะ-ตะ-ชิ-มัส", "ตั้งใจจะมอบของขวัญให้ในงานปาร์ตี้คืนนี้"]
+        ]}
       ];
       let readMode = "char", readOnlyLearned = true, readQueue = [], readRev = false, readDone = 0, storyIdx = 0, shownLines = {};
 
@@ -2555,6 +2831,18 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
           sec.className = "mode-section hidden w-full pop-in";
           document.getElementById("mode-list").after(sec);
         }
+        if (!document.getElementById("tab-type")) {
+          const base = document.getElementById("tab-list");
+          const t = base.cloneNode(true);
+          t.id = "tab-type";
+          t.setAttribute("onclick", "switchMode('type')");
+          t.innerHTML = '<i class="fa-solid fa-keyboard mr-1"></i> ฝึกพิมพ์';
+          base.after(t);
+          const sec = document.createElement("section");
+          sec.id = "mode-type";
+          sec.className = "mode-section hidden w-full pop-in";
+          document.getElementById("mode-list").after(sec);
+        }
         document.getElementById("tab-read").classList.toggle("hidden", appLang !== "jp");
       }
 
@@ -2568,19 +2856,24 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         const s = readLearnedSet();
         const ok = (w) => [...w].every((c) => "ーゃゅょっャュョッ".includes(c) || s.has(c.normalize("NFD")[0]));
         let pool = readOnlyLearned ? READ_SHORT.filter((x) => ok(x[0])) : READ_SHORT;
+        const offSet = new Set();
+        vocabData.forEach((v) => { if (srsData[v.id].off) [...v.word].forEach((c) => offSet.add(c.normalize("NFD")[0])); });
+        const small = "ーゃゅょっャュョッ";
+        pool = pool.filter((x) => ![...x[0]].filter((c) => !small.includes(c)).every((c) => offSet.has(c.normalize("NFD")[0])));
         if (pool.length < 4) pool = READ_SHORT;
         readQueue = [...pool].sort(() => Math.random() - 0.5);
         readRev = false;
         readDone = 0;
       }
 
-      let charQueue = [], charRev = false, charCat = "all", charOnlyLearned = true, charFallback = false, charStartT = 0, charDone = 0, charTimes = [];
+      let charLastIdx = -1, charQueue = [], charRev = false, charCat = "all", charOnlyLearned = true, charFallback = false, charStartT = 0, charDone = 0, charTimes = [];
       function buildCharQueue() {
-        const pick = (learnedOnly) => vocabData.map((_, i) => i).filter((i) => (charCat === "all" || vocabData[i].cefr === charCat) && (!learnedOnly || srsData[vocabData[i].id].level > 0));
+        const pick = (learnedOnly) => vocabData.map((_, i) => i).filter((i) => (charCat === "all" || vocabData[i].cefr === charCat) && (!learnedOnly || srsData[vocabData[i].id].level > 0) && !srsData[vocabData[i].id].off);
         let idx = pick(charOnlyLearned);
         charFallback = idx.length < 3;
-        if (charFallback) idx = pick(false);
+        if (charFallback) idx = pick(false).slice(0, 5); // book order (kana before kanji), not random
         charQueue = idx.sort(() => Math.random() - 0.5);
+        if (charQueue.length > 1 && charQueue[0] === charLastIdx) charQueue.push(charQueue.shift());
         charRev = false;
         charStartT = Date.now();
       }
@@ -2589,12 +2882,9 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
       function revealChar() { charTimes.push(Date.now() - charStartT); charRev = true; renderRead(); }
       function rateChar(ok) {
         const i = charQueue.shift();
+        charLastIdx = i;
         if (ok) charDone++;
-        else {
-          charQueue.splice(Math.min(3, charQueue.length), 0, i);
-          const s = srsData[vocabData[i].id];
-          if (s.level > 0) { s.nextReview = Date.now(); saveSRSData(); }
-        }
+        else charQueue.splice(Math.min(charQueue.length, 3 + Math.floor(Math.random() * 4)), 0, i);
         if (!charQueue.length) buildCharQueue();
         charRev = false;
         charStartT = Date.now();
@@ -2670,6 +2960,457 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         sec.innerHTML = `<div class="max-w-xl mx-auto"><div class="flex gap-2 mb-4">${btn("char", "สุ่มตัวอักษร")}${btn("short", "คำสั้น")}${btn("long", "เรื่องยาว")}</div>${body}</div>`;
       }
 
+
+      // ===== Mastery points + typing / speaking practice =====
+      const MASTER_PTS = 10;
+      const SRS_STEPS = [1, 2, 4, 7, 14, 30]; // days until the next point fades, by number of successful rounds
+      const srsIntervalMs = (s) => SRS_STEPS[Math.min(s.reps || 0, SRS_STEPS.length - 1)] * 86400000;
+      function setLevelFromPts(s) { s.level = s.pts >= MASTER_PTS ? 3 : s.pts >= 4 ? 2 : 1; }
+      let SELF_RATE_CAP = 10; // non-coercive: users can reach 10 pts via any mode they prefer
+
+      function showPtsToast(delta, currentPts, label = "") {
+        const box = document.getElementById("pts-toast-container");
+        if (!box) return;
+        const el = document.createElement("div");
+        const isPos = delta > 0;
+        const sign = isPos ? `+${delta}` : `${delta}`;
+        const color = isPos
+          ? (currentPts >= MASTER_PTS ? "bg-emerald-600 text-white" : "bg-slate-900/90 text-emerald-300")
+          : "bg-red-600/95 text-white";
+        el.className = `pts-toast px-4 py-1.5 rounded-full shadow-lg text-xs font-extrabold flex items-center gap-2 whitespace-nowrap ${color}`;
+        el.innerHTML = `<span>${sign} แต้ม</span><span class="opacity-80">(${currentPts}/${MASTER_PTS})</span>${label ? `<span class="text-[10px] bg-white/20 px-2 py-0.5 rounded-full">${label}</span>` : ""}`;
+        box.innerHTML = "";
+        box.appendChild(el);
+      }
+
+      function addPts(id, d, cap, silent = false) {
+        const s = srsData[id];
+        if (!s) return;
+        const now = Date.now();
+        const old = s.pts || 0;
+        s.pts = Math.min(MASTER_PTS, Math.max(0, old + d));
+        if (cap && d > 0) s.pts = Math.min(s.pts, Math.max(old, cap));
+        if (d > 0 && now - (s.lastRep || 0) > 6 * 3600000) { s.reps = (s.reps || 0) + 1; s.lastRep = now; } // new round (new sitting)
+        if (d < 0) s.reps = Math.max(0, (s.reps || 0) - 2);
+        setLevelFromPts(s);
+        s.lastReviewed = now;
+        s.lastDecay = 0;
+        if (!silent && d !== 0) {
+          const extra = s.pts >= MASTER_PTS && old < MASTER_PTS ? "ครบ 10 แต้ม! 🎉" : "";
+          showPtsToast(d, s.pts, extra);
+        }
+      }
+      let inDecay = false;
+      function applyDecay() {
+        if (inDecay) return;
+        inDecay = true;
+        const now = Date.now();
+        let changed = false;
+        Object.keys(srsData).forEach((id) => {
+          const s = srsData[id];
+          if (!s) return;
+          if (!s.v2) { s.v2 = true; s.lastReviewed = now; changed = true; return; } // start the clock fresh for older progress
+          if (s.off || !(s.pts > 0) || !s.lastReviewed) return;
+          const iv = srsIntervalMs(s);
+          let next = s.lastDecay && s.lastDecay >= s.lastReviewed ? s.lastDecay + iv : s.lastReviewed + iv;
+          while (now >= next && s.pts > 0) { s.pts--; s.lastDecay = next; next += iv; s.reps = Math.max(0, (s.reps || 0) - 1); changed = true; if (s.level > 0) setLevelFromPts(s); }
+        });
+        if (changed) localStorage.setItem(getStorageKeys().srs, JSON.stringify(srsData));
+        inDecay = false;
+      }
+      function setOff(idx, on) {
+        const s = srsData[vocabData[idx].id];
+        s.off = on;
+        if (on) { s.pts = MASTER_PTS; s.level = 3; } else { s.pts = 6; s.level = 2; s.lastReviewed = Date.now(); s.lastDecay = 0; }
+      }
+
+      // ===== Settings + tutorial =====
+      const SETTINGS_KEY = "vm_settings_v1";
+      const SETTINGS_DEFAULT = { bg: "", cap: 10, typeMin: 1, lockTest: false, autoAudio: true, tutorialSeen: false };
+      let appSettings = Object.assign({}, SETTINGS_DEFAULT);
+      try { Object.assign(appSettings, JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {}); } catch (e) {}
+      function saveSettings() { try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(appSettings)); } catch (e) {} }
+      function applySettings() {
+        TYPE_MIN_PTS = Math.min(6, Math.max(0, +appSettings.typeMin ?? 1));
+        if (appSettings.bg) document.body.style.setProperty("--bg-body", appSettings.bg);
+        else document.body.style.removeProperty("--bg-body");
+        const l2 = document.getElementById("lbl-rate-2"), l3 = document.getElementById("lbl-rate-3");
+        if (l2) l2.textContent = `+1 แต้ม (คุ้นๆ)`;
+        if (l3) l3.textContent = `+2 แต้ม (แม่นยำ)`;
+        typeQueue = [];
+      }
+      function closeVmOverlay() { const o = document.getElementById("vm-overlay"); if (o) o.remove(); }
+      function openVmOverlay(html) {
+        closeVmOverlay();
+        const o = document.createElement("div");
+        o.id = "vm-overlay";
+        o.className = "fixed inset-0 z-[110] bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4";
+        o.onclick = (e) => { if (e.target === o) closeVmOverlay(); };
+        o.innerHTML = `<div class="bg-white rounded-3xl w-full max-w-md max-h-[88vh] overflow-y-auto shadow-2xl p-6">${html}</div>`;
+        document.body.appendChild(o);
+        return o;
+      }
+      const BG_PRESETS = [["", "ตามธีม"], ["#ffffff", "ขาว"], ["#fffbeb", "ครีม"], ["#ecfdf5", "มิ้นต์"], ["#eff6ff", "ฟ้า"], ["#f5f3ff", "ม่วง"], ["#e5e7eb", "เทา"]];
+      function exportBackupJSON() {
+        const payload = {
+          version: 2,
+          exportedAt: new Date().toISOString(),
+          ox3k_srs_data: JSON.parse(localStorage.getItem("ox3k_srs_data") || "{}"),
+          ox3k_user_progress: JSON.parse(localStorage.getItem("ox3k_user_progress") || "{}"),
+          ox3k_custom_batches: JSON.parse(localStorage.getItem("ox3k_custom_batches") || "[]"),
+          jp_master_srs_data: JSON.parse(localStorage.getItem("jp_master_srs_data") || "{}"),
+          jp_master_user_progress: JSON.parse(localStorage.getItem("jp_master_user_progress") || "{}"),
+          jp_master_custom_batches: JSON.parse(localStorage.getItem("jp_master_custom_batches") || "[]"),
+          custom_mnemonics: JSON.parse(localStorage.getItem("vm_custom_mnemonics") || "{}")
+        };
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }));
+        a.download = `vocab_master_backup_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+      }
+      function importBackupJSON(ev) {
+        const file = ev.target.files[0];
+        ev.target.value = "";
+        if (!file) return;
+        const r = new FileReader();
+        r.onload = () => {
+          try {
+            const d = JSON.parse(r.result);
+            if (!d.ox3k_srs_data && !d.jp_master_srs_data) throw new Error("invalid");
+            ["ox3k_srs_data","ox3k_user_progress","ox3k_custom_batches","jp_master_srs_data","jp_master_user_progress","jp_master_custom_batches"].forEach(k => {
+              if (d[k]) localStorage.setItem(k, JSON.stringify(d[k]));
+            });
+            if (d.custom_mnemonics) localStorage.setItem("vm_custom_mnemonics", JSON.stringify(d.custom_mnemonics));
+            closeVmOverlay();
+            init();
+            showModal("กู้คืนข้อมูลสำเร็จ 🎉", "โหลดความก้าวหน้าและทริคช่วยจำทั้งหมดกลับมาเรียบร้อยแล้ว");
+          } catch (e) {
+            showModal("ไฟล์ไม่ถูกต้อง", "กรุณาเลือกไฟล์สำรองข้อมูล (.json) ที่ส่งออกจากระบบนี้");
+          }
+        };
+        r.readAsText(file);
+      }
+
+      function openSettings() {
+        const a = appSettings;
+        const sw = BG_PRESETS.map(([c, n]) => `<button onclick="setSetting('bg','${c}')" class="flex flex-col items-center gap-1 text-[10px] font-bold text-slate-500"><span class="w-9 h-9 rounded-full border-2 ${a.bg === c ? "border-primary-600" : "border-slate-200"}" style="background:${c || "linear-gradient(135deg,#f8fafc 50%,#fff0f5 50%)"}"></span>${n}</button>`).join("");
+        openVmOverlay(`<div class="flex justify-between items-center mb-4"><h3 class="text-xl font-extrabold"><i class="fa-solid fa-gear text-primary-600 mr-2"></i>ตั้งค่าระบบและข้อมูล</h3><button onclick="closeVmOverlay()" class="w-9 h-9 rounded-full bg-slate-100 text-slate-500"><i class="fa-solid fa-xmark"></i></button></div>
+          <p class="text-sm font-bold mb-2">สีพื้นหลังสบายตา</p>
+          <div class="flex flex-wrap gap-3 mb-2">${sw}</div>
+          <label class="flex items-center gap-2 text-xs text-slate-500 mb-4">เลือกสีเอง <input type="color" value="${a.bg || "#f8fafc"}" oninput="setSetting('bg',this.value,true)" class="w-10 h-8 rounded border border-slate-200"></label>
+          <p class="text-sm font-bold">แต้มแนะนำขั้นต่ำสำหรับโหมดฝึกพิมพ์: <span id="set-tm-v" class="text-primary-600">${TYPE_MIN_PTS}</span> แต้ม</p>
+          <p class="text-[11px] text-slate-400 mb-1">หากยังไม่มีคำถึงเกณฑ์ ระบบจะดึงคำในบทปัจจุบันมาให้ฝึกพิมพ์ได้ทันทีโดยไม่ล็อกกั้น</p>
+          <input type="range" min="0" max="6" value="${TYPE_MIN_PTS}" oninput="setSetting('typeMin',+this.value,true)" class="w-full mb-4">
+          <label class="flex items-start gap-3 mb-4 cursor-pointer"><input type="checkbox" ${a.autoAudio !== false ? "checked" : ""} onchange="setSetting('autoAudio',this.checked,true)" class="mt-1 w-5 h-5"><span><span class="text-sm font-bold block">เล่นเสียงอ่านอัตโนมัติเมื่อพลิกดูเฉลยการ์ด</span><span class="text-[11px] text-slate-400">ช่วยให้สมองเชื่อมโยงรูปคำกับเสียงได้ทันทีโดยไม่ต้องเอื้อมกดปุ่มลำโพง</span></span></label>
+          <label class="flex items-start gap-3 mb-5 cursor-pointer"><input type="checkbox" ${a.lockTest ? "checked" : ""} onchange="setSetting('lockTest',this.checked,true)" class="mt-1 w-5 h-5"><span><span class="text-sm font-bold block">ถามทดสอบ 1 ข้อก่อนล็อกคำว่าจำได้แล้ว (🔒)</span><span class="text-[11px] text-slate-400">ค่าเริ่มต้นปิดไว้เพื่อความรวดเร็ว เปิดได้ถ้าต้องการเช็กความแม่นก่อนล็อก</span></span></label>
+          <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 mb-5">
+            <p class="text-xs font-bold text-slate-700 mb-2"><i class="fa-solid fa-cloud-arrow-down mr-1.5 text-primary-600"></i>สำรองและกู้คืนความก้าวหน้า (Backup)</p>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="exportBackupJSON()" class="py-2.5 px-3 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-100"><i class="fa-solid fa-download mr-1"></i>ส่งออกไฟล์เก็บไว้</button>
+              <button onclick="document.getElementById('backup-import-input').click()" class="py-2.5 px-3 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-100"><i class="fa-solid fa-upload mr-1"></i>นำเข้าไฟล์สำรอง</button>
+              <input type="file" id="backup-import-input" accept=".json,application/json" class="hidden" onchange="importBackupJSON(event)">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2"><button onclick="openTutorial()" class="py-3 rounded-xl bg-primary-50 text-primary-700 font-bold text-sm">ดูวิธีใช้งาน</button><button onclick="resetSettings()" class="py-3 rounded-xl bg-slate-100 text-slate-600 font-bold text-sm">คืนค่าเริ่มต้น</button></div>`);
+      }
+      function setSetting(k, v, keepOpen) {
+        appSettings[k] = v; saveSettings(); applySettings();
+        
+        const t = document.getElementById("set-tm-v"); if (t) t.textContent = TYPE_MIN_PTS;
+        if (!keepOpen || k === "bg") { if (!keepOpen) openSettings(); }
+      }
+      function resetSettings() { const seen = appSettings.tutorialSeen; appSettings = Object.assign({}, SETTINGS_DEFAULT, { tutorialSeen: seen }); saveSettings(); applySettings(); openSettings(); }
+
+      let tutPage = 0;
+      function tutorialPages() {
+        const pts = (rows) => `<div class="rounded-2xl border border-slate-200 overflow-hidden text-sm">${rows.map((r, i) => `<div class="flex justify-between gap-3 px-3 py-2 ${i % 2 ? "bg-white" : "bg-slate-50"}"><span>${r[0]}</span><span class="font-bold whitespace-nowrap">${r[1]}</span></div>`).join("")}</div>`;
+        return [
+          ["เรียนยังไงให้จำได้จริง", `<p class="mb-3">แอปนี้ใช้หลักที่งานวิจัยพบว่าได้ผล คือ <b>ทดสอบตัวเอง</b> และ <b>ทวนห่างๆ</b> ไม่ใช่แค่อ่านซ้ำ</p>
+            <ol class="list-decimal pl-5 space-y-1.5"><li><b>บัตรคำ</b> ทำความรู้จักคำ พยายามนึกคำตอบก่อนพลิกการ์ด</li><li><b>ควิซ</b> เลือกตอบ ช่วยเชื่อมคำกับความหมาย</li><li><b>ฝึกพิมพ์</b> ดึงคำออกมาเอง ยากกว่าแต่จำแน่นกว่า</li><li><b>กลับมาทวน</b> แต้มจะลดเองถ้าทิ้งนาน</li></ol>
+            <p class="mt-3 text-slate-500 text-xs">เป้าหมายคือให้แต่ละคำได้ 10 แต้ม</p>`],
+          ["แต้มความจำ 0–10", `<p class="mb-3">ทุกคำมีแต้มความจำ 0–10 แต้ม ซึ่งสะสมได้จาก <b>บัตรคำ</b> และ <b>การฝึกพิมพ์</b> เท่านั้น เพื่อให้จำได้แม่นจริง:</p>${pts([["บัตรคำ: จำไม่ได้ (วนซ้ำ)", "−2 แต้ม"], ["บัตรคำ: คุ้นๆ (นึกนาน)", "+1 แต้ม"], ["บัตรคำ: นึกออกทันที", "+2 แต้ม"], ["ฝึกพิมพ์: ตอบถูก / ตอบผิด", "+3 / −2 แต้ม"], ["ควิซ & ฝึกอ่าน", "มินิเกม (คะแนนแยก ไม่คิดแต้มความจำ)"]])}
+            <p class="mt-3 text-xs text-slate-600"><b>ทำไมควิซถึงไม่เพิ่มแต้มความจำ?</b> เพราะการเดาช้อยส์ง่ายกว่าการนึกเอง ควิซและฝึกอ่านจึงเป็นมินิเกมไว้เล่นท้าทายความไวสนุกๆ โดยแยกคะแนน (Score & Streak) ต่างหาก</p>`],
+          ["แต้มลดลงเองได้", `<p class="mb-3">ถ้าไม่ได้ทวน แต้มจะค่อยๆ ลด 1 แต้มเมื่อครบช่วงเวลา</p>${pts([["เริ่มต้น", "1 วัน"], ["ทวนสำเร็จหลายรอบ", "2 → 4 → 7 วัน"], ["ยิ่งสำเร็จต่างวัน", "14 → 30 วัน"]])}
+            <p class="mt-3 text-xs text-slate-600">ตอบถูกต่างวันหลายครั้ง ช่วงที่แต้มคงอยู่จะยาวขึ้น ตอบผิดช่วงจะสั้นลง การตอบถูกหลายข้อในรอบเดียวกันนับเป็นรอบเดียว</p>`],
+          ["สถานะของคำ", `${pts([["⚪️ เพิ่งเริ่ม", "ยังไม่เคยเรียน"], ["🔴 ต้องทวน", "1–3 แต้ม"], ["🟡 กำลังจำ", "4–9 แต้ม"], ["🟢 ครบ 10 แต้ม", "10 แต้ม"], ["🔒 ล็อกว่าจำได้แล้ว", "ผ่านข้อทดสอบ"]])}
+            <p class="mt-3 text-xs text-slate-600">🔒 คือคำที่คุณยืนยันว่าจำได้แล้ว ต้องตอบข้อทดสอบก่อนล็อก คำนี้จะไม่ถูกสุ่มและแต้มไม่ลด กดเปิดกลับมาฝึกได้ที่คลังศัพท์</p>`],
+          ["การปลดล็อกโหมดต่างๆ", `<ul class="list-disc pl-5 space-y-1.5"><li><b>คำที่เรียนรู้แล้ว</b> คือคำที่คุณเคยเปิดดูและประเมินบนบัตรคำแล้วอย่างน้อย 1 ครั้ง (ระบบจะไม่นำคำนอกเหนือจากที่เคยเรียนมาถาม)</li><li><b>มินิเกมควิซ:</b> ปลดล็อกเมื่อมีคำที่เรียนรู้แล้วตั้งแต่ <b>10 คำขึ้นไป</b></li><li><b>โหมดฝึกพิมพ์:</b> ปลดล็อกเมื่อมีคำที่เรียนรู้แล้ว <b>มากกว่า 20 คำ</b> (21 คำขึ้นไป)</li><li><b>โหมดฝึกอ่าน (ญี่ปุ่น):</b> จัดเต็มทั้งสุ่มตัวอักษร คำสั้นกว่า 180 คำ และเรื่องสั้น 10 เรื่อง</li></ul>`],
+        ];
+      }
+      function renderTutorial() {
+        const pages = tutorialPages();
+        const [title, body] = pages[tutPage];
+        const last = tutPage === pages.length - 1;
+        openVmOverlay(`<div class="flex justify-between items-center mb-1"><p class="text-[11px] font-bold text-primary-600">สอนใช้งาน ${tutPage + 1}/${pages.length}</p><button onclick="closeTutorial()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500"><i class="fa-solid fa-xmark"></i></button></div>
+          <h3 class="text-xl font-extrabold mb-3">${title}</h3><div class="text-sm text-slate-700 leading-relaxed min-h-[220px]">${body}</div>
+          <div class="flex gap-2 mt-5"><button onclick="tutGo(-1)" class="flex-1 py-3 rounded-xl bg-slate-100 text-slate-600 font-bold text-sm ${tutPage === 0 ? "invisible" : ""}">ย้อนกลับ</button><button onclick="${last ? "closeTutorial()" : "tutGo(1)"}" class="flex-1 py-3 rounded-xl bg-primary-600 text-white font-bold text-sm">${last ? "เริ่มเลย" : "ถัดไป"}</button></div>`);
+      }
+      function tutGo(d) { tutPage = Math.max(0, tutPage + d); renderTutorial(); }
+      function openTutorial() { tutPage = 0; renderTutorial(); }
+      function closeTutorial() { appSettings.tutorialSeen = true; saveSettings(); closeVmOverlay(); }
+
+      function updateNavFade() {
+        const n = document.getElementById("main-nav"); if (!n) return;
+        n.classList.toggle("fade-l", n.scrollLeft > 4);
+        n.classList.toggle("fade-r", n.scrollLeft + n.clientWidth < n.scrollWidth - 4);
+      }
+      (function () {
+        const n = document.getElementById("main-nav");
+        if (n) n.addEventListener("scroll", updateNavFade, { passive: true });
+        window.addEventListener("resize", updateNavFade);
+      })();
+
+      function showOffTest(idx, onPass) {
+        if (!appSettings.lockTest) { onPass(); return; }
+        const v = vocabData[idx];
+        const old = document.getElementById("off-test"); if (old) old.remove();
+        const ov = document.createElement("div");
+        ov.id = "off-test";
+        ov.className = "fixed inset-0 z-[100] bg-slate-800 flex items-center justify-center p-4";
+        ov.onclick = (e) => { if (e.target === ov) ov.remove(); };
+        const q = appLang === "en"
+          ? `<p class="text-xs text-slate-400 mb-2">พิมพ์คำอังกฤษของความหมายนี้</p><p class="text-2xl font-black">${v.mean}</p>`
+          : `<p class="text-xs text-slate-400 mb-2">พิมพ์คำอ่าน (โรมาจิหรืออักษรไทย)</p><p class="text-6xl font-black jp-font">${v.word}</p>`;
+        ov.innerHTML = `<div class="bg-white rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl">
+          <p class="text-sm font-bold text-slate-700 mb-3">ก่อนล็อกว่าจำได้แล้ว ลองตอบข้อนี้ก่อน</p>${q}
+          <input id="off-test-input" autocomplete="off" autocapitalize="off" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-center text-lg mt-4" placeholder="พิมพ์คำตอบ">
+          <p id="off-test-msg" class="text-sm font-bold text-red-600 mt-2 min-h-[1.25rem]"></p>
+          <button id="off-test-ok" class="w-full mt-2 py-3 rounded-xl bg-primary-600 text-white font-bold">ตรวจ</button>
+          <button id="off-test-cancel" class="w-full mt-2 py-2 rounded-xl text-slate-500 text-sm font-bold">ยกเลิก</button></div>`;
+        document.body.appendChild(ov);
+        const input = document.getElementById("off-test-input");
+        const check = () => {
+          const t = typeNorm(input.value);
+          if (!t) return;
+          if (typeAnswers(v).includes(t)) { ov.remove(); onPass(); }
+          else { document.getElementById("off-test-msg").textContent = "ยังไม่ถูก ลองใหม่อีกครั้ง (ยังไม่ล็อก)"; input.value = ""; }
+        };
+        document.getElementById("off-test-ok").onclick = check;
+        document.getElementById("off-test-cancel").onclick = () => ov.remove();
+        input.onkeydown = (e) => { if (e.key === "Enter") check(); };
+        setTimeout(() => input.focus(), 50);
+      }
+      function markOff(idx) { showOffTest(idx, () => { setOff(idx, true); relearnIds.delete(vocabData[idx].id); rateWord(3); }); }
+      function toggleOffIdx(idx) {
+        const s = srsData[vocabData[idx].id];
+        const done = (on) => { setOff(idx, on); saveSRSData(); renderListCards(); filterList(); };
+        if (s.off) done(false); else showOffTest(idx, () => done(true));
+      }
+      const NEW_UNLOCK_LIMIT = 8; // new words open only when "in progress" words are at most this many
+      function learningIdx() { return vocabData.map((_, i) => i).filter((i) => { const q = srsData[vocabData[i].id]; return (q.level === 1 || q.level === 2) && !q.off; }); }
+      function openLearningPicker() {
+        const n = learningIdx().length;
+        const btn = "w-full py-3 rounded-xl font-bold mb-2 flex items-center justify-center gap-2 ";
+        openVmOverlay(`<h3 class="text-lg font-black mb-1">🟡 คำที่กำลังเรียนรู้ ${n} คำ</h3>
+          <p class="text-xs text-slate-500 mb-4">คัดเฉพาะคำที่กำลังเรียนและต้องทวนซ้ำ (ยังไม่ครบ 10 แต้ม) เรียงจากคำที่แต้มน้อยที่สุดก่อน</p>
+          ${n ? `<button onclick="startLearningSession('cards')" class="${btn}bg-primary-600 hover:bg-primary-700 text-white shadow-sm"><i class="fa-solid fa-layer-group"></i> ทบทวนด้วยบัตรคำ (Flashcards)</button>
+          <button onclick="startLearningSession('type')" class="${btn}bg-primary-50 hover:bg-primary-100 text-primary-700"><i class="fa-solid fa-keyboard"></i> ฝึกพิมพ์สะกดคำ</button>` : `<p class="text-sm text-slate-500 mb-3">ยังไม่มีคำที่กำลังเรียนรู้ในตอนนี้</p>`}
+          <button onclick="closeVmOverlay();goToFilteredList('learning')" class="${btn}bg-slate-100 hover:bg-slate-200 text-slate-700"><i class="fa-solid fa-book"></i> ดูในคลังคำศัพท์</button>
+          <button onclick="closeVmOverlay()" class="w-full py-2 text-slate-400 text-sm font-bold">ปิด</button>`);
+      }
+      function startLearningSession(how) {
+        closeVmOverlay();
+        if (how === "cards") {
+          activeSessionType = "learning";
+          relearnIds.clear();
+          const pts = (i) => srsData[vocabData[i].id].pts || 0;
+          sessionQueue = learningIdx().sort((x, y) => pts(x) - pts(y) || Math.random() - 0.5).slice(0, 20).sort(() => Math.random() - 0.5);
+          currentCardIndex = 0;
+          switchMode("flashcards");
+          loadFlashcard();
+        } else {
+          typePool = "mid"; typeRound = 1; typeQueue = [];
+          switchMode("type");
+        }
+      }
+      function weakIndexes() {
+        return vocabData.map((_, i) => i).filter((i) => srsData[vocabData[i].id].level > 0 && (srsData[vocabData[i].id].pts || 0) < MASTER_PTS);
+      }
+      let typeLastIdx = -1, typeQueue = [], typePool = "weak", typeMethod = "type", typeState = "ask", typeMsg = "", typeNote = "", typeRound = 1, typeOk = 0, typeLast = null;
+      const typeNorm = (s) => String(s).toLowerCase().replace(/[\s'’\-.,\/]/g, "");
+      let TYPE_MIN_PTS = 3; // typing opens for a word once it has at least this many points
+      const meanParts = (m) => String(m).split(/\s*[,;،/]\s*/).map((x) => x.trim()).filter(Boolean);
+      function typeAnswers(v) {
+        if (appLang === "en") {
+          const own = baseWord(v.word).split(/\s*,\s*/).map(typeNorm).filter(Boolean);
+          const mine = new Set(meanParts(v.mean));
+          vocabData.forEach((o) => { if (o !== v && meanParts(o.mean).some((x) => mine.has(x))) baseWord(o.word).split(/\s*,\s*/).map(typeNorm).filter(Boolean).forEach((a) => own.push(a)); });
+          return own;
+        }
+        const m = v.pron.match(/^(.*?)\s*\[(.*?)\]\s*$/);
+        const rawParts = m ? [m[1], m[2]] : [v.pron];
+        const parts = rawParts.join("/").split(/[\/\s,]+/).map(typeNorm).filter(Boolean);
+        parts.push(typeNorm(v.word));
+        return [...new Set(parts)];
+      }
+      function typeShowAnswer(v) { return appLang === "en" ? baseWord(v.word) : fmtPron(v.pron); }
+      function countLearnedWords() {
+        return vocabData.filter((v) => {
+          const s = srsData[v.id];
+          return s && s.level > 0 && !s.off;
+        }).length;
+      }
+      function isTypingUnlocked() {
+        return countLearnedWords() > 20;
+      }
+      function isQuizUnlocked() {
+        return countLearnedWords() >= 10;
+      }
+
+      function buildTypeQueue() {
+        if (!isTypingUnlocked()) {
+          typeQueue = [];
+          return;
+        }
+        const learned = vocabData.map((_, i) => i).filter((i) => {
+          const s = srsData[vocabData[i].id];
+          return s && s.level > 0 && !s.off;
+        });
+        const weak = (a) => a.filter((i) => (srsData[vocabData[i].id].pts || 0) < MASTER_PTS);
+        let q = [];
+        typeNote = "";
+        if (typePool === "mid") {
+          q = learned.filter((i) => { const l = srsData[vocabData[i].id].level; return l === 1 || l === 2; });
+        } else if (typePool === "weak") {
+          q = weak(learned);
+        } else {
+          q = learned;
+        }
+        if (q.length === 0) {
+          q = learned;
+          if (typePool !== "all") {
+            typeNote = "💡 คำในตัวกรองนี้ครบ 10 แต้มหมดแล้ว ระบบจึงดึงคำที่คุณเรียนแล้วทั้งหมดมาให้ทบทวนแทน";
+          }
+        }
+        typeQueue = q.sort(() => Math.random() - 0.5);
+        if (typeQueue.length > 1 && typeQueue[0] === typeLastIdx) typeQueue.push(typeQueue.shift());
+        typeState = "ask";
+        typeHintCount = 0;
+      }
+      function setTypePool(p) { typePool = p; typeRound = 1; buildTypeQueue(); renderType(); }
+      function setTypeMethod(m) { typeMethod = m; typeMsg = ""; renderType(); }
+      function checkType(text, spoken) {
+        if (!typeQueue.length) return;
+        const v = vocabData[typeQueue[0]];
+        typeLastIdx = typeQueue[0];
+        const t = typeNorm(text);
+        if (!t) return;
+        let ok = typeAnswers(v).includes(t);
+        if (spoken) ok = ok || (appLang === "jp" ? String(text).includes(v.word) : typeAnswers(v).some((a) => t.includes(a)));
+        if (typeState === "copy") {
+          if (ok) { const i = typeQueue.shift(); typeQueue.splice(Math.min(typeQueue.length, 3 + Math.floor(Math.random() * 3)), 0, i); typeState = "ask"; typeMsg = ""; }
+          else typeMsg = "ยังไม่ตรง ลองพิมพ์ตามเฉลยอีกครั้ง";
+          return renderType();
+        }
+        typeLast = ok;
+        if (ok) {
+          const bonus = typeHintCount > 0 ? 1 : 3;
+          addPts(v.id, bonus); typeOk++; typeQueue.shift(); typeHintCount = 0;
+          typeMsg = (srsData[v.id].pts || 0) >= MASTER_PTS ? `ถูกต้อง! (+${bonus} แต้ม) 🎉 คำนี้ครบ 10 แต้มแล้ว` : `ถูกต้อง! (+${bonus} แต้ม)`;
+          if (!typeQueue.length) { typeRound++; buildTypeQueue(); }
+        } else {
+          addPts(v.id, -2);
+          typeState = "copy";
+          typeMsg = "";
+          typeHintCount = 0;
+        }
+        saveSRSData();
+        renderType();
+      }
+      function submitType() { const el = document.getElementById("type-input"); if (el) checkType(el.value, false); }
+      function startMic() {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) return;
+        const r = new SR();
+        r.lang = appLang === "en" ? "en-US" : "ja-JP";
+        r.onresult = (e) => checkType(e.results[0][0].transcript, true);
+        r.onerror = () => { typeMsg = "ฟังไม่ชัด ลองอีกครั้ง หรือสลับเป็นโหมดพิมพ์"; renderType(); };
+        typeMsg = "กำลังฟัง... พูดได้เลย";
+        renderType();
+        r.start();
+      }
+      let typeHintCount = 0;
+      function revealTypeHint() {
+        typeHintCount++;
+        renderType();
+      }
+      function skipTypeToCopy() {
+        if (!typeQueue.length) return;
+        const v = vocabData[typeQueue[0]];
+        addPts(v.id, -1);
+        typeState = "copy";
+        typeMsg = "";
+        saveSRSData();
+        renderType();
+      }
+      function renderType() {
+        const sec = document.getElementById("mode-type");
+        if (!sec) return;
+        const learnedCount = countLearnedWords();
+        if (learnedCount <= 20) {
+          const need = 21 - learnedCount;
+          const pct = Math.min(100, Math.round((learnedCount / 21) * 100));
+          sec.innerHTML = `<div class="max-w-md mx-auto bg-white rounded-3xl shadow-lg border border-slate-100 p-8 text-center">
+            <div class="w-16 h-16 bg-primary-50 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+              <i class="fa-solid fa-lock"></i>
+            </div>
+            <h3 class="text-xl font-extrabold text-slate-800 mb-2">โหมดฝึกพิมพ์จะปลดล็อกเมื่อเรียนมากกว่า 20 คำ</h3>
+            <p class="text-xs sm:text-sm text-slate-500 mb-5 leading-relaxed">
+              โหมดฝึกพิมพ์จะดึงเฉพาะ <b>คำที่คุณเคยเปิดเรียนรู้แล้ว</b> มาทดสอบเท่านั้น (ไม่นำคำนอกเหนือที่เรียนมาถาม) ตอนนี้คุณเรียนไปแล้ว <b class="text-primary-600">${learnedCount} / 21 คำ</b> (อีก ${need} คำเพื่อปลดล็อก)
+            </p>
+            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden mb-6">
+              <div class="h-full bg-primary-600 rounded-full transition-all" style="width:${pct}%"></div>
+            </div>
+            <button onclick="startDailySession()" class="w-full py-3.5 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white font-bold shadow-md transition-all active:scale-95">
+              <i class="fa-solid fa-layer-group mr-2"></i>ไปเปิดเรียนบัตรคำเพิ่ม (${need} คำ)
+            </button>
+          </div>`;
+          return;
+        }
+        if (!typeQueue.length) buildTypeQueue();
+        const v = vocabData[typeQueue[0]];
+        const pts = srsData[v.id].pts || 0;
+        const mastered = vocabData.filter((x) => (srsData[x.id].pts || 0) >= MASTER_PTS && srsData[x.id].level > 0).length;
+        const hasMic = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+        const b = (on, label, fn) => `<button onclick="${fn}" class="flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all ${on ? "bg-primary-600 text-white shadow-sm" : "bg-white border border-slate-200 text-slate-600 hover:border-primary-300"}">${label}</button>`;
+        const targetWord = appLang === "en" ? baseWord(v.word) : (v.pron.split("[")[0] || v.pron).trim();
+        const hintStr = typeHintCount > 0
+          ? targetWord.slice(0, typeHintCount) + "•".repeat(Math.max(0, targetWord.length - typeHintCount))
+          : "";
+        const prompt = appLang === "en"
+          ? `<p class="text-xs text-slate-400 mb-2">พิมพ์หรือพูดคำศัพท์ภาษาอังกฤษของความหมายนี้</p><p class="text-3xl font-black text-slate-800">${v.mean}</p><p class="text-xs text-slate-400 mt-1">ระดับ CEFR ${v.cefr}</p>`
+          : `<p class="text-xs text-slate-400 mb-2">พิมพ์คำอ่านโรมาจิ หรือ คำอ่านไทย (เช่น ka หรือ คะ)</p><p class="text-7xl font-black jp-font text-slate-800">${v.word}</p>${v.cefr === "Kanji" ? `<p class="text-xs text-slate-400 mt-1">ความหมาย: ${v.mean}</p>` : ""}`;
+        let action;
+        if (typeState === "copy") {
+          action = `<p class="text-red-600 font-bold text-sm mb-1">ไม่ต้องกังวล! ลองพิมพ์ตามเฉลยด้านล่างเพื่อสร้างความจำในสมอง</p><p class="text-2xl font-black text-primary-600 mb-3">${typeShowAnswer(v)}</p>
+            <input id="type-input" onkeydown="if(event.key==='Enter')submitType()" autocomplete="off" autocapitalize="off" class="w-full border-2 border-primary-300 rounded-xl px-4 py-3 text-center text-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="พิมพ์ตามเฉลยด้านบน"><button onclick="submitType()" class="w-full mt-3 py-3.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold shadow-sm">ยืนยันและไปต่อ</button>`;
+        } else if (typeMethod === "mic" && hasMic) {
+          action = `<button onclick="startMic()" class="w-full py-4 rounded-xl bg-primary-600 text-white font-bold"><i class="fa-solid fa-microphone mr-2"></i>กดแล้วพูดคำตอบ</button>`;
+        } else {
+          action = `${hintStr ? `<p class="text-sm font-mono font-bold text-amber-600 bg-amber-50 border border-amber-200 rounded-xl py-1.5 px-3 inline-block mb-3">คำใบ้: ${hintStr}</p>` : ""}
+            <input id="type-input" onkeydown="if(event.key==='Enter')submitType()" autocomplete="off" autocapitalize="off" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-center text-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="พิมพ์คำตอบที่นี่...">
+            <button onclick="submitType()" class="w-full mt-3 py-3.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold shadow-sm">ตรวจคำตอบ (${typeHintCount > 0 ? "+1" : "+3"} แต้ม)</button>
+            <div class="flex gap-2 mt-2.5">
+              <button onclick="revealTypeHint()" class="flex-1 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-bold border border-amber-200"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i>ดูคำใบ้ทีละตัว</button>
+              <button onclick="skipTypeToCopy()" class="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold"><i class="fa-solid fa-eye mr-1"></i>นึกไม่ออก ดูเฉลยเลย</button>
+            </div>`;
+        }
+        sec.innerHTML = `<div class="max-w-xl mx-auto">
+          <div class="flex flex-wrap gap-1.5 mb-2">${b(typePool === "mid", "เฉพาะกำลังเรียนรู้", "setTypePool('mid')")}${b(typePool === "weak", "ยังไม่ครบ 10 แต้ม", "setTypePool('weak')")}${b(typePool === "all", "ทุกคำที่เรียนแล้ว (" + learnedCount + " คำ)", "setTypePool('all')")}</div>
+          <div class="flex gap-2 mb-3">${b(typeMethod === "type", "⌨️ โหมดพิมพ์", "setTypeMethod('type')")}${hasMic ? b(typeMethod === "mic", "🎤 โหมดพูด (ไมค์)", "setTypeMethod('mic')") : ""}</div>
+          <p class="text-[11px] text-slate-500 mb-3">ครบ 10 แต้มแล้ว ${mastered}/${learnedCount} คำที่เรียนแล้ว • รอบที่ ${typeRound} • เหลือในคิว ${typeQueue.length} คำ • ตอบถูกสะสม ${typeOk} ${typeNote ? "<br><span class='text-primary-600 font-semibold'>" + typeNote + "</span>" : ""}</p>
+          <div class="bg-white rounded-3xl shadow-lg border border-slate-100 p-6 text-center">
+            <div class="flex justify-between items-center text-[11px] text-slate-400 mb-3">
+              <span>แต้มความจำคำนี้: <b class="text-primary-600">${pts}/${MASTER_PTS}</b></span>
+              <div class="flex gap-0.5">${Array.from({length: 10}, (_, k) => `<span class="w-2 h-2 rounded-full ${k < pts ? (pts >= 10 ? "bg-emerald-500" : "bg-primary-500") : "bg-slate-200"}"></span>`).join("")}</div>
+            </div>
+            ${prompt}
+            <div class="mt-5">${action}</div>
+            ${typeMsg ? `<p class="mt-3 text-sm font-bold ${typeLast === false ? "text-red-600" : "text-emerald-600"}">${typeMsg}</p>` : ""}
+          </div></div>`;
+        setTimeout(() => { const el = document.getElementById("type-input"); if (el) el.focus(); }, 50);
+      }
+
       function switchMode(mode) {
         currentMode = mode;
         clearInterval(timerInterval);
@@ -2689,6 +3430,10 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         activeTab.classList.add("bg-white", "text-primary-600", "shadow-sm");
 
         if (mode === "read") renderRead();
+        if (mode === "type") renderType();
+        const navTab = document.getElementById("tab-" + mode);
+        if (navTab && navTab.scrollIntoView) navTab.scrollIntoView({ inline: "center", block: "nearest" });
+        setTimeout(updateNavFade, 350);
         if (mode === "quiz") {
           startNewQuiz();
         } else if (mode === "list") {
@@ -2721,20 +3466,43 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
 
         let badgeHtml = "⚪️ เพิ่งเริ่ม";
         let badgeClass = "bg-slate-100 text-slate-700";
-        if (srs.level === 1) {
+        const inSessionRelearn = relearnIds.has(data.id);
+        const isRelearn = srs.level === 1 || inSessionRelearn;
+        const easyBtn = document.querySelector('[onclick="rateWord(3)"]');
+        const ratingGrid = document.getElementById("fc-rating-buttons");
+        if (easyBtn) {
+          easyBtn.classList.toggle("hidden", inSessionRelearn);
+          if (ratingGrid) {
+            ratingGrid.classList.toggle("grid-cols-3", !inSessionRelearn);
+            ratingGrid.classList.toggle("grid-cols-2", inSessionRelearn);
+          }
+        }
+        if (inSessionRelearn) {
+          badgeHtml = "🔄 ทวนซ้ำในชุดนี้";
+          badgeClass = "bg-red-100 text-red-700";
+        } else if (isRelearn) {
           badgeHtml = "🔴 ต้องทวนซ้ำ";
           badgeClass = "bg-red-100 text-red-700";
         } else if (srs.level === 2) {
           badgeHtml = "🟡 กำลังจำ";
           badgeClass = "bg-yellow-100 text-yellow-700";
         } else if (srs.level >= 3) {
-          badgeHtml = "🟢 จำได้แม่น";
+          badgeHtml = "🟢 ครบ 10 แต้ม";
           badgeClass = "bg-green-100 text-green-700";
         }
 
         const badge = document.getElementById("fc-status-badge");
-        badge.innerHTML = badgeHtml;
+        badge.innerHTML = badgeHtml + ` · ${srs.pts || 0}/10`;
         badge.className = `text-[10px] px-2 py-1 rounded-md font-bold ${badgeClass}`;
+        let offBtn = document.getElementById("fc-off-btn");
+        if (!offBtn) {
+          offBtn = document.createElement("button");
+          offBtn.id = "fc-off-btn";
+          offBtn.className = "text-[10px] px-2 py-1 rounded-md font-bold bg-slate-100 text-slate-600 ml-2";
+          badge.after(offBtn);
+        }
+        offBtn.textContent = "🔒 ล็อกว่าจำได้แล้ว";
+        offBtn.onclick = (e) => { e.stopPropagation(); markOff(vocabIdx); };
 
         const wordEl = document.getElementById("fc-word");
         wordEl.textContent = data.word;
@@ -2750,12 +3518,12 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
             document.getElementById("fc-cefr-front").classList.remove("hidden");
         }
 
-        document.getElementById("fc-pronunciation-front").textContent = data.pron ? `[ ${data.pron} ]` : "";
-        document.getElementById("fc-pronunciation-back").textContent = data.pron ? `[ ${data.pron} ]` : "";
+        document.getElementById("fc-pronunciation-front").textContent = appLang === "en" ? "" : data.pron ? `[ ${fmtPron(data.pron)} ]` : "";
+        document.getElementById("fc-pronunciation-back").textContent = data.pron ? `[ ${fmtPron(data.pron)} ]` : "";
         document.getElementById("fc-cefr-front").textContent = `${appLang==='en'?'CEFR ':''}${data.cefr}`;
 
         document.getElementById("fc-meaning").textContent = data.mean;
-        document.getElementById("fc-mnemonic").textContent = data.mem || "ยังไม่มีทริคช่วยจำสำหรับรายการนี้ — ลองคิดทริคของตัวเองดูนะ ✨";
+        document.getElementById("fc-mnemonic").textContent = getWordMnemonic(data);
         
         // Ex split logic for JP formatting on back of card
         let exMain = `"${data.exEn}"`;
@@ -2769,21 +3537,57 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         document.getElementById("fc-example-en").textContent = exMain;
         document.getElementById("fc-example-th").textContent = `"${data.exTh}"`;
 
-        let daysIfGood =
-          srs.level === 0 ? 1 : Math.min(14, (srs.consecutiveCorrect + 1) * 2);
-        let daysIfEasy =
-          srs.level === 0 ? 3 : Math.min(30, (srs.consecutiveCorrect + 2) * 3);
-
-        document.getElementById("lbl-rate-2").textContent =
-          `ทวนใน ${daysIfGood} วัน`;
-        document.getElementById("lbl-rate-3").textContent =
-          `ทวนใน ${daysIfEasy} วัน`;
+        const l1 = document.getElementById("lbl-rate-1");
+        if (l1) l1.textContent = "-2 แต้ม (วนซ้ำ)";
+        document.getElementById("lbl-rate-2").textContent = `+1 แต้ม`;
+        document.getElementById("lbl-rate-3").textContent = `+2 แต้ม`;
 
         if (isFlipped) toggleFlip();
         document
           .getElementById("fc-rating-buttons")
           .classList.add("opacity-0", "pointer-events-none", "translate-y-4");
         document.getElementById("fc-instruction").classList.remove("hidden");
+      }
+
+      function getCustomMnemonics() {
+        try { return JSON.parse(localStorage.getItem("vm_custom_mnemonics") || "{}"); } catch (e) { return {}; }
+      }
+      function getWordMnemonic(data) {
+        const custom = getCustomMnemonics()[appLang + ":" + data.id];
+        if (custom) return custom;
+        if (data.mem && data.mem.toLowerCase() !== data.word.toLowerCase()) return data.mem;
+        return appLang === "en"
+          ? `จำผ่านประโยค: "${data.exEn}" (${data.exTh}) — กด 'แก้ไขทริคของฉัน' เพื่อจดมุกจำของตัวเอง!`
+          : data.mem || "กด 'แก้ไขทริคของฉัน' เพื่อจดวิธีจำตัวอักษรนี้ในแบบของคุณ ✨";
+      }
+      function openMnemonicEditor(e) {
+        if (e) e.stopPropagation();
+        const vocabIdx = sessionQueue[currentCardIndex];
+        const data = vocabData[vocabIdx];
+        if (!data) return;
+        const cur = getCustomMnemonics()[appLang + ":" + data.id] || data.mem || "";
+        openVmOverlay(`<div class="flex justify-between items-center mb-3"><h3 class="text-lg font-extrabold text-slate-800"><i class="fa-solid fa-lightbulb text-amber-500 mr-2"></i>สร้างทริคช่วยจำของคุณเอง</h3><button onclick="closeVmOverlay()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500"><i class="fa-solid fa-xmark"></i></button></div>
+          <p class="text-xs text-slate-500 mb-3">สมองจะจำคำศัพท์ได้แม่นขึ้นหลายเท่าเมื่อผูกกับมุกพ้องเสียงหรือเรื่องราวที่เราคิดเองสำหรับคำว่า <b class="text-primary-600">${data.word} (${data.mean})</b></p>
+          <textarea id="custom-mem-input" rows="3" class="w-full border-2 border-amber-200 rounded-2xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" placeholder="เช่น พ้องเสียงไทย หรือแยกคำช่วยจำ...">${cur}</textarea>
+          <div class="flex gap-2 mt-4">
+            <button onclick="closeVmOverlay()" class="flex-1 py-3 rounded-xl bg-slate-100 text-slate-600 font-bold text-sm">ยกเลิก</button>
+            <button onclick="saveCustomMnemonic()" class="flex-1 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-sm">บันทึกทริค</button>
+          </div>`);
+        setTimeout(() => { const el = document.getElementById("custom-mem-input"); if (el) el.focus(); }, 50);
+      }
+      function saveCustomMnemonic() {
+        const vocabIdx = sessionQueue[currentCardIndex];
+        const data = vocabData[vocabIdx];
+        const val = (document.getElementById("custom-mem-input") || {}).value || "";
+        if (data) {
+          const map = getCustomMnemonics();
+          if (val.trim()) map[appLang + ":" + data.id] = val.trim();
+          else delete map[appLang + ":" + data.id];
+          try { localStorage.setItem("vm_custom_mnemonics", JSON.stringify(map)); } catch (e) {}
+          document.getElementById("fc-mnemonic").textContent = getWordMnemonic(data);
+          renderListCards();
+        }
+        closeVmOverlay();
       }
 
       function toggleFlip() {
@@ -2803,31 +3607,33 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
             .getElementById("fc-rating-buttons")
             .classList.add("opacity-100", "translate-y-0");
           document.getElementById("fc-instruction").classList.add("hidden");
+          if (appSettings.autoAudio !== false) {
+            setTimeout(() => speakWord(), 180);
+          }
         }
       }
 
+      const relearnIds = new Set();
       function rateWord(rating) {
         const vocabIdx = sessionQueue[currentCardIndex];
         const wordId = vocabData[vocabIdx].id;
         let srs = srsData[wordId];
         const now = Date.now();
+        addPts(wordId, rating === 1 ? -2 : rating === 2 ? 1 : 2, SELF_RATE_CAP);
 
         if (rating === 1) {
-          srs.level = 1;
-          srs.consecutiveCorrect = 0;
-          srs.nextReview = now;
-          sessionQueue.push(vocabIdx);
-        } else if (rating === 2) {
-          srs.level = srs.level === 0 ? 2 : Math.min(3, srs.level + 1);
-          srs.consecutiveCorrect += 1;
-          srs.nextReview = now + srs.consecutiveCorrect * ONE_DAY;
-        } else if (rating === 3) {
-          srs.level = 3;
-          srs.consecutiveCorrect += 2;
-          srs.nextReview = now + srs.consecutiveCorrect * 2 * ONE_DAY;
-        }
-
-        srs.lastReviewed = now;
+          relearnIds.add(wordId);
+          const pos = Math.min(sessionQueue.length, currentCardIndex + 1 + 3 + Math.floor(Math.random() * 5));
+          sessionQueue.splice(pos, 0, vocabIdx);
+          // several missed words pending: shuffle their order so no repeating pattern forms
+          const slots = [];
+          for (let k = currentCardIndex + 1; k < sessionQueue.length; k++) if (relearnIds.has(vocabData[sessionQueue[k]].id)) slots.push(k);
+          if (slots.length > 1) {
+            const vals = slots.map((k) => sessionQueue[k]);
+            for (let a = vals.length - 1; a > 0; a--) { const b = Math.floor(Math.random() * (a + 1)); [vals[a], vals[b]] = [vals[b], vals[a]]; }
+            slots.forEach((k, n) => (sessionQueue[k] = vals[n]));
+          }
+        } else relearnIds.delete(wordId);
         srsData[wordId] = srs;
         saveSRSData();
 
@@ -2858,47 +3664,85 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         }, 50);
       }
 
+      function fillQuizFilter() {
+        const sel = document.getElementById("quiz-filter-cefr");
+        if (!sel) return;
+        const keep = sel.value;
+        const levels = [...new Set(vocabData.map((v) => v.cefr))];
+        sel.innerHTML = '<option value="all">ทุกระดับ</option>' + levels.map((l) => `<option value="${l}">${l}</option>`).join("");
+        sel.value = levels.includes(keep) ? keep : "all";
+        document.getElementById("quiz-filter-bar").classList.toggle("hidden", quizScope === "chapter");
+      }
+      function applyQuizFilter() { quizScope = "all"; initQuizUI(); }
       function getQuizPools() {
-        const lvl = (i) => (srsData[vocabData[i].id] || {}).level || 0;
-        const all = vocabData.map((_, i) => i);
-        // Requirement for JP might be lower to easily see quiz in demo, let's allow level >= 1 for base pool fallback
-        const mastered = all.filter((i) => lvl(i) >= 2); 
-        const learned = all.filter((i) => lvl(i) > 0);
-        let base = null,
-          fallback = false;
-        if (mastered.length >= 4) base = mastered;
-        else if (learned.length >= 4) {
-          base = learned;
-          fallback = true;
+        const st = (document.getElementById("quiz-filter-status") || {}).value || "learned";
+        const cf = (document.getElementById("quiz-filter-cefr") || {}).value || "all";
+        const S = (i) => srsData[vocabData[i].id] || {};
+        // Strictly ONLY words that have been opened/learned (level > 0)
+        const learnedAll = vocabData.map((_, i) => i).filter((i) => S(i).level > 0);
+        const inC = (i) => cf === "all" || vocabData[i].cefr === cf;
+        const rules = {
+          mastered: (i) => S(i).level >= 3 && !S(i).off,
+          learning: (i) => (S(i).level === 1 || S(i).level === 2) && !S(i).off,
+          learned: (i) => S(i).level > 0 && !S(i).off,
+          off: (i) => !!S(i).off,
+        };
+        const ruleFn = rules[st] || rules.learned;
+        let base = learnedAll.filter((i) => ruleFn(i) && inC(i)), fallback = false;
+        if (base.length < 4) {
+          base = learnedAll.filter((i) => rules.learned(i) && inC(i));
+          fallback = "learned";
+          if (base.length < 4) {
+            base = learnedAll.filter((i) => rules.learned(i));
+            fallback = "all_learned";
+          }
         }
-        return { base, fallback, all };
+        return { base, fallback, all: learnedAll, st };
       }
 
       function initQuizUI() {
-        if (quizScope !== "chapter" && !getQuizPools().base) {
+        fillQuizFilter();
+        const learnedCount = countLearnedWords();
+        if (learnedCount < 10) {
           quizActive = false;
+          const need = 10 - learnedCount;
           showModal(
-            "ยังทำควิซไม่ได้",
-            "โหมดสุ่มนี้ใช้คำที่คุณผ่านตาแล้ว ต้องมีอย่างน้อย 4 คำ ลองเรียนรู้ก่อนแล้วกลับมาใหม่",
-            "ตกลง",
-            () => switchMode("dashboard"),
+            "ควิซปลดล็อกเมื่อเรียนครบ 10 คำ 🔒",
+            `มินิเกมควิซจะสุ่มถามเฉพาะคำที่คุณเคยเปิดเรียนแล้วเท่านั้น ตอนนี้คุณเรียนไปแล้ว ${learnedCount}/10 คำ (ขาดอีก ${need} คำ) ไปเปิดดูบัตรคำก่อนแล้วกลับมาเล่นได้เลย!`,
+            "ไปเรียนบัตรคำ",
+            () => startDailySession(),
+            "กลับหน้าแรก",
+            () => switchMode("dashboard")
           );
           return;
         }
+        if (quizScope === "chapter") {
+          const startIdx = getChapter(quizChapterScope).start;
+          const endIdx = getChapter(quizChapterScope).end;
+          let learnedInCh = 0;
+          for (let i = startIdx; i < endIdx; i++) {
+            const s = srsData[vocabData[i].id];
+            if (s && s.level > 0 && !s.off) learnedInCh++;
+          }
+          if (learnedInCh < 4) {
+            quizScope = "all";
+          }
+        }
         quizScore = 0;
         quizStreak = 0;
+        quizMaxStreak = 0;
         quizLives = 3;
         quizActive = true;
 
         const badge = document.getElementById("quiz-scope-badge");
+        const bestQuiz = Number(localStorage.getItem("vm_quiz_best_" + appLang) || 0);
+        const bestLabel = bestQuiz > 0 ? ` • สถิติสูงสุด ${bestQuiz}` : "";
         if (quizScope === "chapter") {
-          badge.textContent = `โหมด: ควิซบทที่ ${quizChapterScope}`;
+          badge.textContent = `🎮 มินิเกมควิซบทที่ ${quizChapterScope} (เฉพาะคำที่เรียนแล้ว)${bestLabel}`;
           badge.className =
             "text-[10px] font-bold bg-orange-100 text-orange-700 px-2 py-1 rounded-md";
         } else {
-          badge.textContent = getQuizPools().fallback
-            ? "โหมด: ทายคำที่เคยเรียน (สุ่ม)"
-            : "โหมด: ทายคำที่จำแม่น (สุ่ม)";
+          badge.textContent = `🎮 มินิเกมทายศัพท์ที่เรียนแล้ว (${learnedCount} คำ)${bestLabel}`;
           badge.className =
             "text-[10px] font-bold bg-primary-100 text-primary-700 px-2 py-1 rounded-md";
         }
@@ -2927,6 +3771,7 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
       }
 
       // Fill-in-the-blank helpers: automatic for every English word whose example contains it (also inflected forms)
+      function fmtPron(p) { const m = String(p || "").match(/^(.*?)\s*\[(.*?)\]\s*$/); return m ? `${m[1]} / ${m[2]}` : String(p || ""); }
       function baseWord(w) { return String(w).replace(/\s*\([^)]*\)/g, '').trim(); }
       function blankPattern(word) {
         const esc = x => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -2942,6 +3787,18 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         return new RegExp('(?<![A-Za-z’\'])(?:' + forms.join('|') + ')(?![A-Za-z])', 'gi');
       }
 
+      let quizDeck = [], quizDeckKey = "", quizLastIdx = -1;
+      function pickQuizWord(cands) {
+        const key = quizScope + ":" + quizChapterScope + ":" + cands.length + ":" + cands[0];
+        if (key !== quizDeckKey || !quizDeck.length) {
+          quizDeckKey = key;
+          quizDeck = [...cands].sort(() => Math.random() - 0.5);
+          if (quizDeck.length > 1 && quizDeck[quizDeck.length - 1] === quizLastIdx) quizDeck.unshift(quizDeck.pop());
+        }
+        quizLastIdx = quizDeck.pop();
+        return quizLastIdx;
+      }
+
       function nextQuizQuestion() {
         if (!quizActive || currentMode !== "quiz") return;
         document
@@ -2952,7 +3809,11 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         if (quizScope === "chapter") {
           const startIdx = getChapter(quizChapterScope).start;
           const endIdx = getChapter(quizChapterScope).end;
-          for (let i = startIdx; i < endIdx; i++) candidates.push(i);
+          for (let i = startIdx; i < endIdx; i++) {
+            const s = srsData[vocabData[i].id];
+            if (s && s.level > 0 && !s.off) candidates.push(i);
+          }
+          if (candidates.length < 4) candidates = getQuizPools().base || [];
         } else {
           candidates = getQuizPools().base || [];
           if (candidates.length === 0) {
@@ -2961,8 +3822,7 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
           }
         }
 
-        currentQuizWordIdx =
-          candidates[Math.floor(Math.random() * candidates.length)];
+        currentQuizWordIdx = pickQuizWord(candidates);
         const correctData = vocabData[currentQuizWordIdx];
 
         // Randomize between word-to-meaning OR sentence completion quiz (Sentence mostly for EN)
@@ -2991,7 +3851,7 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
              document.getElementById("quiz-subtext").textContent = correctData.cefr;
           } else {
              wordEl.className = "text-3xl sm:text-5xl font-extrabold text-slate-800 tracking-tight mb-2 break-words";
-             document.getElementById("quiz-subtext").textContent = `${correctData.pron ? "[ " + correctData.pron + " ] • " : ""}CEFR ${correctData.cefr}`;
+             document.getElementById("quiz-subtext").textContent = `${appLang !== "en" && correctData.pron ? "[ " + correctData.pron + " ] • " : ""}CEFR ${correctData.cefr}`;
           }
         }
 
@@ -3044,11 +3904,11 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         );
         optionsContainer.innerHTML = "";
 
-        options.forEach((opt) => {
+        options.forEach((opt, oi) => {
           const btn = document.createElement("button");
           btn.className =
             "quiz-btn w-full text-left bg-white border-2 border-slate-200 hover:border-primary-400 hover:bg-primary-50 text-slate-700 font-bold py-4 px-5 rounded-2xl shadow-sm transition-all focus:outline-none flex justify-between items-center active:scale-[0.98] text-sm";
-          btn.innerHTML = `<span>${opt}</span><i class="fa-solid fa-circle text-slate-200 text-xs option-icon"></i>`;
+          btn.innerHTML = `<span><b class="text-slate-300 mr-2">${oi + 1}</b>${opt}</span><i class="fa-solid fa-circle text-slate-200 text-xs option-icon"></i>`;
           btn.onclick = () => handleQuizAnswer(opt, btn, correctAnswerText);
           optionsContainer.appendChild(btn);
         });
@@ -3094,9 +3954,10 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         buttons.forEach((b) => (b.onclick = null));
 
         const isCorrect = selectedAns === correctAns;
-
+        
         if (isCorrect) {
           quizStreak++;
+          if (quizStreak > quizMaxStreak) quizMaxStreak = quizStreak;
           quizScore += 10 * quizStreak + Math.floor(timeLeft / 10);
           if (clickedBtn) {
             clickedBtn.className =
@@ -3128,45 +3989,122 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
 
         updateQuizHUD();
 
-        setTimeout(() => {
-          if (quizLives <= 0) {
-            endQuiz();
-          } else {
-            nextQuizQuestion();
-          }
-        }, 1400);
+        // Fast advance: next question after a very short pause; tap anywhere / press any key to skip the wait
+        quizPendingAdv = () => {
+          quizPendingAdv = null;
+          if (quizLives <= 0) endQuiz();
+          else nextQuizQuestion();
+        };
+        quizAnsweredAt = Date.now();
+        clearTimeout(quizAdvTimer);
+        quizAdvTimer = setTimeout(() => { if (quizPendingAdv) quizPendingAdv(); }, isCorrect ? 250 : 1000);
       }
+
+      let quizPendingAdv = null, quizAdvTimer = null, quizAnsweredAt = 0;
+      function quizSkip() {
+        if (quizPendingAdv && Date.now() - quizAnsweredAt > 150) { clearTimeout(quizAdvTimer); quizPendingAdv(); }
+      }
+      document.addEventListener("keydown", (e) => {
+        if (document.getElementById("vm-overlay") || document.getElementById("off-test") || !document.getElementById("custom-modal").classList.contains("hidden")) return;
+        const tag = (e.target && e.target.tagName) || "";
+        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+
+        if (currentMode === "flashcards" && currentCardIndex < sessionQueue.length) {
+          if (e.code === "Space") {
+            e.preventDefault();
+            toggleFlip();
+            return;
+          }
+          if (e.key.toLowerCase() === "s") {
+            e.preventDefault();
+            speakWord();
+            return;
+          }
+          if (isFlipped && ["1", "2", "3"].includes(e.key)) {
+            const curData = vocabData[sessionQueue[currentCardIndex]];
+            if (e.key === "3" && curData && relearnIds.has(curData.id)) return;
+            e.preventDefault();
+            rateWord(Number(e.key));
+            return;
+          }
+        }
+
+        if (!quizActive || quizPendingAdv || !/^[1-9]$/.test(e.key)) return;
+        const btn = document.querySelectorAll(".quiz-btn")[Number(e.key) - 1];
+        if (btn && btn.onclick) btn.click();
+      });
+      document.addEventListener("click", quizSkip);
+      document.addEventListener("keydown", quizSkip);
 
       function endQuiz() {
         quizActive = false;
+        try {
+          const prevBest = Number(localStorage.getItem("vm_quiz_best_" + appLang) || 0);
+          if (quizScore > prevBest) localStorage.setItem("vm_quiz_best_" + appLang, String(quizScore));
+        } catch (e) {}
         document.getElementById("quiz-play-area").classList.add("hidden");
         document.getElementById("quiz-game-over").classList.remove("hidden");
         document.getElementById("go-score").textContent = quizScore;
-        document.getElementById("go-streak").textContent = quizStreak;
+        document.getElementById("go-streak").textContent = Math.max(quizMaxStreak, quizStreak);
       }
 
-      // Dictionary List
+      // Dictionary List (Paginated for instant rendering under Doherty Threshold)
+      let listLimit = 48;
+      function loadMoreListCards() {
+        listLimit += 48;
+        filterList(true);
+      }
       function renderListCards() {
+        listLimit = 48;
+        filterList(true);
+      }
+
+      function filterList(keepLimit = false) {
+        if (!keepLimit) listLimit = 48;
         const container = document.getElementById("list-grid-container");
+        if (!container) return;
         container.innerHTML = "";
 
-        vocabData.forEach((item) => {
-          const srs = srsData[item.id];
-          let srsBadgeHTML = `<span class="text-[10px] font-bold px-2 py-1 rounded-md bg-slate-100 text-slate-600 border border-slate-200">⚪️ คำใหม่</span>`;
-          let dataStatus = "new";
+        const query = (document.getElementById("search-input") || {}).value.toLowerCase() || "";
+        const statusFilter = (document.getElementById("filter-status") || {}).value || "all";
+        const cefrFilter = (document.getElementById("filter-cefr") || {}).value || "all";
 
-          if (srs.level >= 3) {
-            srsBadgeHTML = `<span class="text-[10px] font-bold px-2 py-1 rounded-md bg-green-100 text-green-700 border border-green-200">🟢 จำได้แม่น</span>`;
-            dataStatus = "mastered";
-          } else if (srs.level === 2) {
-            srsBadgeHTML = `<span class="text-[10px] font-bold px-2 py-1 rounded-md bg-yellow-100 text-yellow-700 border border-yellow-200">🟡 กำลังจำ</span>`;
-            dataStatus = "learning";
-          } else if (srs.level === 1) {
-            srsBadgeHTML = `<span class="text-[10px] font-bold px-2 py-1 rounded-md bg-red-100 text-red-700 border border-red-200">🔴 ต้องทวน</span>`;
-            dataStatus = "review";
+        const matched = [];
+        for (let idx = 0; idx < vocabData.length; idx++) {
+          const item = vocabData[idx];
+          const srs = srsData[item.id] || { level: 0, pts: 0 };
+          let dataStatus = "new";
+          if (srs.off) dataStatus = "off";
+          else if (srs.level >= 3) dataStatus = "mastered";
+          else if (srs.level === 2) dataStatus = "learning";
+          else if (srs.level === 1) dataStatus = "review";
+
+          const matchesStatus =
+            statusFilter === "all" ||
+            statusFilter === dataStatus ||
+            (statusFilter === "learning" && (dataStatus === "learning" || dataStatus === "review"));
+          const matchesCefr = cefrFilter === "all" || item.cefr === cefrFilter;
+          if (!matchesStatus || !matchesCefr) continue;
+
+          if (query) {
+            const hay = `${item.word} ${item.mean} ${item.exEn} ${item.mem} ${item.pron}`.toLowerCase();
+            if (!hay.includes(query)) continue;
           }
-          
-          let displayWordClass = appLang === "jp" ? "text-3xl font-black jp-font pt-1" : "text-xl font-extrabold";
+          matched.push({ item, idx, srs, dataStatus });
+        }
+
+        const displayWordClass = appLang === "jp" ? "text-3xl font-black jp-font pt-1" : "text-xl font-extrabold";
+        const slice = matched.slice(0, listLimit);
+
+        slice.forEach(({ item, idx, srs }) => {
+          let srsBadgeHTML = `<span class="text-[10px] font-bold px-2 py-1 rounded-md bg-slate-100 text-slate-600 border border-slate-200">⚪️ คำใหม่ · ${srs.pts || 0}/10</span>`;
+          if (srs.level >= 3) {
+            srsBadgeHTML = `<span class="text-[10px] font-bold px-2 py-1 rounded-md bg-green-100 text-green-700 border border-green-200">🟢 ครบ 10 แต้ม · ${srs.pts || 0}/10</span>`;
+          } else if (srs.level === 2) {
+            srsBadgeHTML = `<span class="text-[10px] font-bold px-2 py-1 rounded-md bg-yellow-100 text-yellow-700 border border-yellow-200">🟡 กำลังจำ · ${srs.pts || 0}/10</span>`;
+          } else if (srs.level === 1) {
+            srsBadgeHTML = `<span class="text-[10px] font-bold px-2 py-1 rounded-md bg-red-100 text-red-700 border border-red-200">🔴 ต้องทวน · ${srs.pts || 0}/10</span>`;
+          }
 
           const card = document.createElement("div");
           card.className =
@@ -3179,14 +4117,14 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
                                 <h3 class="${displayWordClass} text-slate-800 break-words">${item.word}</h3>
                                 <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary-100 text-primary-700">${appLang==='en'?'CEFR ':''}${item.cefr}</span>
                             </div>
-                            <div>${srsBadgeHTML}</div>
+                            <div class="flex items-center flex-wrap justify-end gap-1">${srsBadgeHTML}${srs.off || srs.level > 0 ? `<button onclick="toggleOffIdx(${idx})" class="text-[10px] font-bold px-2 py-1 rounded-md bg-slate-50 hover:bg-slate-100 text-slate-500 border border-slate-200">${srs.off ? "↩︎ เปิดฝึก" : "🔒 ล็อก"}</button>` : ""}</div>
                         </div>
-                        <p class="text-xs font-semibold text-primary-500 mb-2">${item.pron ? "[ " + item.pron + " ]" : ""}</p>
+                        <p class="text-xs font-semibold text-primary-500 mb-2">${item.pron ? "[ " + fmtPron(item.pron) + " ]" : ""}</p>
                         <p class="text-sm font-bold text-slate-700 mb-3">${item.mean}</p>
                         
                         <div class="bg-amber-50 p-2.5 rounded-2xl border border-amber-100 mb-3">
                             <p class="text-[10px] font-bold text-amber-800 mb-0.5"><i class="fa-solid fa-lightbulb mr-1"></i>เทคนิคจำ:</p>
-                            <p class="text-xs text-amber-900 leading-snug">${item.mem || "ยังไม่มีทริคช่วยจำ"}</p>
+                            <p class="text-xs text-amber-900 leading-snug">${getWordMnemonic(item)}</p>
                         </div>
                     </div>
 
@@ -3196,48 +4134,24 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
                         <p class="text-[10px] text-slate-400 mt-0.5">"${item.exTh}"</p>
                     </div>
                 `;
-
-          card.setAttribute(
-            "data-search",
-            `${item.word} ${item.mean} ${item.exEn} ${item.mem} ${item.pron}`.toLowerCase(),
-          );
-          card.setAttribute("data-status", dataStatus);
-          card.setAttribute("data-cefr", item.cefr);
-
           container.appendChild(card);
         });
-        filterList();
-      }
 
-      function filterList() {
-        const query = document
-          .getElementById("search-input")
-          .value.toLowerCase();
-        const statusFilter = document.getElementById("filter-status").value;
-        const cefrFilter = document.getElementById("filter-cefr").value;
-        const cards = document.querySelectorAll(".vocab-card");
-        let visibleCount = 0;
-
-        cards.forEach((card) => {
-          const text = card.getAttribute("data-search");
-          const status = card.getAttribute("data-status");
-          const cefr = card.getAttribute("data-cefr");
-
-          const matchesQuery = text.includes(query);
-          const matchesStatus =
-            statusFilter === "all" || statusFilter === status;
-          const matchesCefr = cefrFilter === "all" || cefrFilter === cefr;
-
-          if (matchesQuery && matchesStatus && matchesCefr) {
-            card.style.display = "flex";
-            visibleCount++;
-          } else {
-            card.style.display = "none";
-          }
-        });
+        let moreBtn = document.getElementById("list-load-more-wrap");
+        if (!moreBtn) {
+          moreBtn = document.createElement("div");
+          moreBtn.id = "list-load-more-wrap";
+          moreBtn.className = "mt-6 text-center";
+          container.after(moreBtn);
+        }
+        if (matched.length > listLimit) {
+          moreBtn.innerHTML = `<button onclick="loadMoreListCards()" class="px-6 py-3 rounded-2xl bg-white border border-slate-200 hover:border-primary-400 text-slate-700 font-bold text-xs shadow-sm transition-all">แสดงเพิ่มอีก (${listLimit} / ${matched.length} รายการ)</button>`;
+        } else {
+          moreBtn.innerHTML = matched.length > 0 ? `<p class="text-xs text-slate-400">แสดงครบทั้งหมด ${matched.length} รายการ</p>` : "";
+        }
 
         const emptyState = document.getElementById("list-empty-state");
-        if (visibleCount === 0) {
+        if (matched.length === 0) {
           emptyState.classList.remove("hidden");
         } else {
           emptyState.classList.add("hidden");
@@ -3251,7 +4165,12 @@ cycle|ไซ-เคิล|วงจร, ปั่นจักรยาน|The wa
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
 
-      window.onload = init;
+      window.onload = () => {
+        applySettings();
+        init();
+        setTimeout(updateNavFade, 300);
+        if (!appSettings.tutorialSeen) setTimeout(openTutorial, 400);
+      };
     </script>
   </body>
 </html>
